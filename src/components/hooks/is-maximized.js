@@ -8,7 +8,6 @@ export default function useIsMaximized() {
     function handleResize() {
       appWindow.isMaximized().then(
           response => {
-            debugger
             setIsMaximized(response)
           }
       )
