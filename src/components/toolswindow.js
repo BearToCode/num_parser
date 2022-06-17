@@ -1,14 +1,16 @@
 import React from "react";
+import { KalkCalculator, ConsoleLine } from "@paddim8/kalk-component";
+
 
 const ToolsWindow = () => {
   return (
-      <div>
-        <div className="text-sm bg-primary-100 border border-l-0 border-r-0 border-neutral-600 text-gray-300 px-2">
-          Terminal
-        </div>
-        <div className="px-2">
-          Lorem Ipsum:
-        </div>
+      <div className="kalk">
+        <kalk-calculator>
+          <console-line>kalker</console-line>
+          <console-line>
+            <span className="hint">Type 'help' for instructions.</span>
+          </console-line>
+        </kalk-calculator>
       </div>
   )
 }

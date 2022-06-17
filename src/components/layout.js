@@ -12,16 +12,16 @@ export default function Layout({ selected, children }) {
       grid-rows-[min-content_1fr] overflow-hidden">
         <Chrome />
         <Navbar selected={selected} />
-        <div className="relative">
+        <div className="">
           <VerticalSplit
             gutterClassName="bg-primary-100"
             gutterInnerElements={
-            <span className="text-gray-600">
+            <span className="text-slate-300 px-2 text-sm">
               Terminal
             </span>
             }
           >
-            <main className="">
+            <main className="bg-red-400">
               { children }
             </main>
             <ToolWindow />

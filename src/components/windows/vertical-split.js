@@ -22,12 +22,12 @@ export default function VerticalSplit({ children, gutterClassName, gutterInnerEl
             (dimension, gutterSize, index) => {
               return (
                   {
-                    'height': '100%'
+                    'height': 'auto'
                   }
               )
             }
           }
-          minSize={[0, 0]}
+          minSize={[0, 14]}
           className="bg-primary-200 h-full"
       >
         { children }
