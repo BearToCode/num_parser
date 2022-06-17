@@ -9,6 +9,7 @@ export default function useIsMaximized() {
       appWindow.isMaximized().then(
           response => {
             setIsMaximized(response)
+            //what the heck is Rust, is this some kind of new game?
           }
       )
     }

@@ -31,7 +31,7 @@ function MaximizeButton() {
 
 function CloseButton() {
   return (
-      <button className="h-full hover:bg-red-700 px-3" onClick={() => appWindow.close()}>
+      <button className="h-full hover:bg-red-600 px-3" onClick={() => appWindow.close()}>
         <VscChromeClose />
       </button>
   )

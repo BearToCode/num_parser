@@ -61,7 +61,9 @@
         "title": "Numerus",
         "label": "Numerus",
         "width": 800,
-        "decorations": false
+        "decorations": false,
+        "minWidth": 400,
+        "minHeight": 400
       }
     ]
   }
