@@ -12,17 +12,17 @@ import Addons from "./routes/Addons";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-  <React.StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<App />}>
-          <Route path="/2d" element={<TwoDimensions />} />
-          <Route path="/3d" element={<ThreeDimensions />} />
-          <Route path="/code" element={<Code />} />
-          <Route path="/document" element={<Document />} />
-          <Route path="/addons" element={<Addons />} />
-        </Route>
-      </Routes>
-    </BrowserRouter>
-  </React.StrictMode>
+    <React.StrictMode>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<App />}>
+            <Route path="/2d" element={<TwoDimensions />} />
+            <Route path="/3d" element={<ThreeDimensions />} />
+            <Route path="/code" element={<Code />} />
+            <Route path="/document" element={<Document />} />
+            <Route path="/addons" element={<Addons />} />
+          </Route>
+        </Routes>
+      </BrowserRouter>
+    </React.StrictMode>
 );

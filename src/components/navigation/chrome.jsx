@@ -5,7 +5,7 @@ import { useLocation } from "react-router-dom";
 
 function MinimizeButton() {
   return (
-      <button className="h-full hover:bg-neutral-700 px-3" onClick={() => appWindow.minimize()}>
+      <button className="h-full hover:bg-neutral-700 hover:text-white px-3" onClick={() => appWindow.minimize()}>
         <VscChromeMinimize />
       </button>
   )
@@ -16,13 +16,13 @@ function MaximizeButton() {
   if (isMaximized === undefined) return null;
   if (isMaximized) {
     return (
-        <button className="h-full hover:bg-neutral-700 px-3" onClick={() => appWindow.unmaximize()}>
+        <button className="h-full hover:bg-neutral-700 hover:text-white px-3" onClick={() => appWindow.unmaximize()}>
           <VscChromeRestore />
         </button>
     )
   } else {
     return (
-      <button className="h-full hover:bg-neutral-700 px-3" onClick={() => appWindow.maximize()}>
+      <button className="h-full hover:bg-neutral-700 hover:text-white px-3" onClick={() => appWindow.maximize()}>
         <VscChromeMaximize />
       </button>
     )
@@ -31,7 +31,7 @@ function MaximizeButton() {
 
 function CloseButton() {
   return (
-      <button className="h-full hover:bg-red-600 px-3" onClick={() => appWindow.close()}>
+      <button className="h-full hover:bg-red-600 hover:text-white px-3" onClick={() => appWindow.close()}>
         <VscChromeClose />
       </button>
   )

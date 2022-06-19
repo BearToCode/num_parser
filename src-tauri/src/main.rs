@@ -6,13 +6,13 @@
 use tauri::Manager;
 
 fn main() {
-    tauri::Builder::default()
-        .setup(|app| {
-            let window = app.get_window(&"Numerus").unwrap();
-            window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
-            Ok(())
-        })
+  tauri::Builder::default()
+      .setup(|app| {
+        let window = app.get_window(&"Numerus").unwrap();
+        window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
+        Ok(())
+      })
 
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+      .run(tauri::generate_context!())
+      .expect("error while running tauri application");
 }
