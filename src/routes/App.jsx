@@ -1,11 +1,10 @@
 import Layout from "../components/layout";
+import { Outlet } from 'react-router-dom';
 
-function App(props) {
+function App() {
   return (
     <Layout>
-      <div>
-
-      </div>
+      <Outlet />
     </Layout>
   );
 }

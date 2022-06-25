@@ -2,7 +2,7 @@ const Terminal = () => {
 
   return (
     <div>
-
+      CIAO 
     </div>
   )
 }

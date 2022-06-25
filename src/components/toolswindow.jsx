@@ -5,7 +5,7 @@ import { MdOutlineClose } from 'react-icons/md';
 
 const ToolsWindow = ({ children, closeFn }) => {
   return (
-      <div className="flex flex-col px-2">
+      <div className="flex flex-col bg-primary-200 relative px-2">
         <div className="flex text-lg text-neutral-500 h-6 items-center">
           <div className="flex-grow" />
           <button className="hover:bg-neutral-700 rounded" onClick={() => {
