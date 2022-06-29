@@ -1,7 +1,7 @@
 <script lang="ts">
   import "./app.css"; 
 
-  import { Route, Link, Router } from "svelte-navigator";
+  import { Route, Router } from "svelte-navigator";
   import Layout from "./lib/layout.svelte";
 
   import TwoDimensions from "./routes/two-dimensions.svelte";

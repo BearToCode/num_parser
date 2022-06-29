@@ -27,6 +27,7 @@
   "dependencies": {
     "@tauri-apps/api": "^1.0.1",
     "svelte-icons-pack": "^1.4.6",
-    "svelte-navigator": "^3.1.6"
+    "svelte-navigator": "^3.1.6",
+    "svelte-splitpanes": "^0.6.11"
   }
 }
