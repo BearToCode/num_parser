@@ -1,46 +1,46 @@
 <script lang="ts">
-  import Icon from "svelte-icons-pack";
+	import Icon from 'svelte-icons-pack';
 
-  import BiTerminal from "svelte-icons-pack/bi/BiTerminal";
+	import BiTerminal from 'svelte-icons-pack/bi/BiTerminal';
 
-  import Chrome from "./navigation/chrome.svelte";
-  import Navbar from "./navigation/navbar.svelte";
-  import Toolbar from "./navigation/toolbar.svelte";
-  import MainWindow from "./main-window.svelte";
+	import Chrome from './navigation/chrome.svelte';
+	import Navbar from './navigation/navbar.svelte';
+	import Toolbar from './navigation/toolbar.svelte';
+	import MainWindow from './main-window.svelte';
 
-  let windows: { name: string, icon: any, position: windowPosition }[] = [
-    { name: "Terminal", icon: BiTerminal, position: 'bottom' }
-  ]
+	let windows: { name: string; icon: any; position: windowPosition }[] = [
+		{ name: 'Terminal', icon: BiTerminal, position: 'bottom' },
+	];
 
-  let selectedWindow: string = "";
+	let selectedWindow: string = '';
 
-  type windowPosition = 'bottom' | 'left' | 'right';
+	type windowPosition = 'bottom' | 'left' | 'right';
 </script>
 
 <div
-  class="inline-grid w-screen h-screen overflow-hidden
-  grid-cols-[min-content_1fr] grid-rows-[min-content_1fr]">
+	class="inline-grid w-screen h-screen overflow-hidden
+  grid-cols-[min-content_1fr] grid-rows-[min-content_1fr]"
+>
+	<Chrome />
 
-  <Chrome />
+	<Navbar>
+		<slot name="links" />
+	</Navbar>
 
-  <Navbar>
-    <slot name="links"></slot>
-  </Navbar>
+	<MainWindow>
+		<slot name="routes" />
+	</MainWindow>
 
-  <MainWindow>
-    <slot name="routes"></slot>
-  </MainWindow>
-
-  <Toolbar>
-    {#each windows as window}
-      {#if window.position == 'bottom'}
-    <button class="flex items-center">
-      <div class="text-lg mr-1">
-        <Icon src={window.icon} color="currentcolor" />
-      </div>
-      {window.name}
-    </button>
-      {/if}
-    {/each}
-  </Toolbar>
+	<Toolbar>
+		{#each windows as window}
+			{#if window.position == 'bottom'}
+				<button class="flex items-center">
+					<div class="text-lg mr-1">
+						<Icon src={window.icon} color="currentcolor" />
+					</div>
+					{window.name}
+				</button>
+			{/if}
+		{/each}
+	</Toolbar>
 </div>

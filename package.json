@@ -7,6 +7,12 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "lint-svelte": "prettier --check --plugin-search-dir=. ./src",
+    "lint-tauri": "rustfmt --check ./src-tauri/src/main.rs",
+    "lint": "npm run lint-svelte && npm run lint-tauri",
+    "format-svelte": "prettier --write --plugin-search-dir=. ./src",
+    "format-tauri": "rustfmt ./src-tauri/src/main.rs",
+    "format": "npm run format-svelte && npm run format-tauri",
     "check": "svelte-check --tsconfig ./tsconfig.json",
     "tauri": "tauri"
   },
@@ -16,6 +22,8 @@
     "@tsconfig/svelte": "^2.0.1",
     "autoprefixer": "^10.4.7",
     "postcss": "^8.4.14",
+    "prettier": "^2.7.1",
+    "prettier-plugin-svelte": "^2.7.0",
     "svelte": "^3.44.0",
     "svelte-check": "^2.2.7",
     "svelte-preprocess": "^4.10.7",
@@ -28,6 +36,6 @@
     "@tauri-apps/api": "^1.0.1",
     "svelte-icons-pack": "^1.4.6",
     "svelte-navigator": "^3.1.6",
-    "svelte-splitpanes": "^0.6.11"
+    "svelte-splitpanes": "^0.7.0"
   }
 }
