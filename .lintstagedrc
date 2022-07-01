@@ -1,0 +1,4 @@
+{
+  "./src/**.*.{js,ts,svelte,css,scss}": "prettier --write",
+  "./src-tauri/**/*.rs": "rustfmt"
+}

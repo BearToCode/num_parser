@@ -14,13 +14,16 @@
     "format-tauri": "rustfmt ./src-tauri/src/main.rs",
     "format": "npm run format-svelte && npm run format-tauri",
     "check": "svelte-check --tsconfig ./tsconfig.json",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "commit": "npx lint-staged && npm run check && node ./node_modules/cz-customizable/standalone.js"
   },
   "devDependencies": {
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
     "@tauri-apps/cli": "^1.0.0",
     "@tsconfig/svelte": "^2.0.1",
     "autoprefixer": "^10.4.7",
+    "cz-customizable": "^6.7.0",
+    "lint-staged": "^13.0.3",
     "postcss": "^8.4.14",
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.7.0",
@@ -36,6 +39,11 @@
     "@tauri-apps/api": "^1.0.1",
     "svelte-icons-pack": "^1.4.6",
     "svelte-navigator": "^3.1.6",
-    "svelte-splitpanes": "^0.7.0"
+    "svelte-splitpanes": "^0.7.1"
+  },
+  "config": {
+    "cz-customizable": {
+      "config": "./.cz-config.cjs"
+    }
   }
 }
