@@ -1,6 +1,6 @@
 <script lang="ts">
-	const Icon = require('svelte-icons-pack');
-	const BiTerminal = require('svelte-icons-pack/bi/BiTerminal');
+	import Icon from 'svelte-icons-pack';
+	import BiTerminal from 'svelte-icons-pack/bi/BiTerminal';
 
 	import Chrome from './navigation/chrome.svelte';
 	import Navbar from './navigation/navbar.svelte';

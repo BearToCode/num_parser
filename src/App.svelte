@@ -9,12 +9,12 @@
 	import NavbarItem from './lib/navigation/navbar-item.svelte';
 
 	// icons
-	const Icon = require('svelte-icons-pack');
-	const AiOutlineFunction = require('svelte-icons-pack/ai/AiOutlineFunction');
-	const AiOutlineAppstore = require('svelte-icons-pack/ai/AiOutlineAppstore');
-	const BsBraces = require('svelte-icons-pack/bs/BsBraces');
-	const IoDocumentText = require('svelte-icons-pack/io/IoDocumentText');
-	const BiCube = require('svelte-icons-pack/bi/BiCube');
+	import Icon from 'svelte-icons-pack';
+	import AiOutlineFunction from 'svelte-icons-pack/ai/AiOutlineFunction';
+	import AiOutlineAppstore from 'svelte-icons-pack/ai/AiOutlineAppstore';
+	import BsBraces from 'svelte-icons-pack/bs/BsBraces';
+	import IoDocumentText from 'svelte-icons-pack/io/IoDocumentText';
+	import BiCube from 'svelte-icons-pack/bi/BiCube';
 
 	export let url = '';
 </script>
