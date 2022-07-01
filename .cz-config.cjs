@@ -1,32 +1,27 @@
 module.exports = {
   types: [
-    { value: 'feat', name: 'feat:     A new feature' },
-    { value: 'fix', name: 'fix:      A bug fix' },
-    { value: 'docs', name: 'docs:     Documentation only changes' },
+    { value: ':sparkles: feat', name: 'feat:     ✨  A new feature' },
+    { value: ':bug: fix', name: 'fix:      🐛  A bug fix' },
+    { value: ':memo: docs', name: 'docs:     📝  Documentation only changes' },
     {
-      value: 'style',
+      value: ':recycle: refactor',
+      name: 'refactor: ♻️   A code change that neither fixes a bug nor adds a feature',
+    },
+    {
+      value: ':zap: perf',
+      name: 'perf:     ⚡  A code change that improves performance',
+    },
+    { value: ':white_check_mark: test', name: 'test:     ✅  Adding missing tests' },
+    {
+      value: ':truck: build',
       name:
-        'style:    Changes that do not affect the meaning of the code\n            (white-space, formatting, missing semi-colons, etc)',
+        'build:    🚚  Changes to the build process, libraries and tools',
     },
-    {
-      value: 'refactor',
-      name: 'refactor: A code change that neither fixes a bug nor adds a feature',
-    },
-    {
-      value: 'perf',
-      name: 'perf:     A code change that improves performance',
-    },
-    { value: 'test', name: 'test:     Adding missing tests' },
-    {
-      value: 'chore',
-      name:
-        'chore:    Changes to the build process or auxiliary tools\n            and libraries such as documentation generation',
-    },
-    { value: 'revert', name: 'revert:   Revert to a commit' },
-    { value: 'WIP', name: 'WIP:      Work in progress' },
+    { value: ':rewind: revert', name: 'revert:   ⏪  Revert to a commit' },
+    { value: ':wrench: WIP', name: 'WIP:      🔧  Work in progress' },
   ],
 
-  scopes: [{ name: 'accounts' }, { name: 'admin' }, { name: 'exampleScope' }, { name: 'changeMe' }],
+  scopes: [{ name: 'front-end' }, { name: 'back-end' }, { name: 'both' }, { name: 'other' }],
 
   allowTicketNumber: false,
   isTicketNumberRequired: false,
