@@ -1,9 +1,10 @@
 <script lang="ts">
-	import Icon from 'svelte-icons-pack/Icon.svelte';
-	import VscChromeClose from 'svelte-icons-pack/vsc/VscChromeClose';
-	import VscChromeRestore from 'svelte-icons-pack/vsc/VscChromeRestore';
-	import VscChromeMinimize from 'svelte-icons-pack/vsc/VscChromeMinimize';
-	import VscChromeMaximize from 'svelte-icons-pack/vsc/VscChromeMaximize';
+	// import Icon from 'svelte-icons-pack/Icon.svelte';
+	const Icon = require('svelte-icons-pack/Icon.svelte');
+	const VscChromeClose = require('svelte-icons-pack/vsc/VscChromeClose');
+	const VscChromeRestore = require('svelte-icons-pack/vsc/VscChromeRestore');
+	const VscChromeMinimize = require('svelte-icons-pack/vsc/VscChromeMinimize');
+	const VscChromeMaximize = require('svelte-icons-pack/vsc/VscChromeMaximize');
 	import { appWindow } from '@tauri-apps/api/window';
 	import { useLocation } from 'svelte-navigator';
 

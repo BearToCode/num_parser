@@ -21,7 +21,7 @@ module.exports = {
     { value: ':wrench: WIP', name: 'WIP:      🔧  Work in progress' },
   ],
 
-  scopes: [{ name: 'front-end' }, { name: 'back-end' }, { name: 'both' }, { name: 'other' }],
+  scopes: [{ name: 'front-end' }, { name: 'back-end' }, { name: 'both' }],
 
   allowTicketNumber: false,
   isTicketNumberRequired: false,

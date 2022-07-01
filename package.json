@@ -13,7 +13,7 @@
     "format-svelte": "prettier --write --plugin-search-dir=. ./src",
     "format-tauri": "rustfmt ./src-tauri/src/main.rs",
     "format": "npm run format-svelte && npm run format-tauri",
-    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check": "svelte-check --tsconfig ./tsconfig.json && cargo check --manifest-path=./src-tauri/Cargo.toml",
     "tauri": "tauri",
     "commit": "npx lint-staged && npm run check && node ./node_modules/cz-customizable/standalone.js"
   },
@@ -21,6 +21,7 @@
     "@sveltejs/vite-plugin-svelte": "^1.0.0-next.30",
     "@tauri-apps/cli": "^1.0.0",
     "@tsconfig/svelte": "^2.0.1",
+    "@types/prettier": "^2.6.3",
     "autoprefixer": "^10.4.7",
     "commitlint": "^17.0.3",
     "commitlint-config-gitmoji": "^2.2.5",

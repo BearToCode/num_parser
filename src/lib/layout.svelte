@@ -1,7 +1,6 @@
 <script lang="ts">
-	import Icon from 'svelte-icons-pack';
-
-	import BiTerminal from 'svelte-icons-pack/bi/BiTerminal';
+	const Icon = require('svelte-icons-pack');
+	const BiTerminal = require('svelte-icons-pack/bi/BiTerminal');
 
 	import Chrome from './navigation/chrome.svelte';
 	import Navbar from './navigation/navbar.svelte';
@@ -12,7 +11,7 @@
 		{ name: 'Terminal', icon: BiTerminal, position: 'bottom' },
 	];
 
-	let selectedWindow: string = '';
+	// let selectedWindow: string = '';
 
 	type windowPosition = 'bottom' | 'left' | 'right';
 </script>
