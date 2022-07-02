@@ -21,7 +21,7 @@ module.exports = {
     { value: ':wrench: WIP', name: 'WIP:      🔧  Work in progress' },
   ],
 
-  scopes: [{ name: 'front-end' }, { name: 'back-end' }, { name: 'both' }],
+  // scopes: [{ name: 'front-end' }, { name: 'back-end' }, { name: 'both' }],
 
   allowTicketNumber: false,
   isTicketNumberRequired: false,
@@ -55,7 +55,7 @@ module.exports = {
   allowCustomScopes: true,
   allowBreakingChanges: ['feat', 'fix'],
   // skip any questions you want
-  skipQuestions: ['body'],
+  skipQuestions: ['scope', 'footer', 'breaking'],
 
   // limit subject length
   // subjectLimit: 100
