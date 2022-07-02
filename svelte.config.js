@@ -5,5 +5,8 @@ export default {
   // for more information about preprocessors
   preprocess: sveltePreprocess({
     postcss: true,
+    sass: {
+      includePaths: ['./src/styles']
+    }
   })
 }

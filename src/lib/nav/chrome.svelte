@@ -26,7 +26,7 @@
 <div
 	data-tauri-drag-region
 	class="h-8 bg-primary-200 toolbar text-neutral-400 flex flex-row col-span-2
-  items-center justify-between text-sm border-b border-neutral-600"
+  items-center justify-between text-sm border-b border-neutral-600 z-10"
 >
 	<div class="flex">
 		<ul class="space-x-4 flex flex-row select-none w-min ml-4">

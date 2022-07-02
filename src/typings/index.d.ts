@@ -11,3 +11,4 @@ declare module 'svelte-icons-pack/vsc/VscChromeClose';
 declare module 'svelte-icons-pack/vsc/VscChromeRestore';
 declare module 'svelte-icons-pack/vsc/VscChromeMinimize';
 declare module 'svelte-icons-pack/vsc/VscChromeMaximize';
+declare module 'svelte-icons-pack/io/IoClose';

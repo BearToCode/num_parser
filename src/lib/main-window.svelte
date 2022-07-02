@@ -1,16 +1,25 @@
 <script lang="ts">
 	import { Pane, Splitpanes } from 'svelte-splitpanes';
+	// Neon theme
+	import _ from '../styles/split-themes.scss';
 
-	let toolbarOpen = false;
+	import ToolsWindow from './tools-window.svelte';
+
+	let toolsWindowOpen = false;
+
+	export const toggleToolsWindow = () => {
+		toolsWindowOpen = !toolsWindowOpen;
+	};
 </script>
 
-<Splitpanes dblClickSplitter={false} horizontal={true}>
+<Splitpanes theme="neon-theme" dblClickSplitter={false} horizontal={true} class="bg-primary-200">
 	<Pane snapSize={10}>
 		<slot />
-		<button class="w-12 h-12 bg-red-400" on:click={() => (toolbarOpen = !toolbarOpen)} />
 	</Pane>
 
-	{#if toolbarOpen}
-		<Pane snapSize={10} size={30} />
+	{#if toolsWindowOpen}
+		<Pane snapSize={10} size={30}>
+			<ToolsWindow on:close={toggleToolsWindow} />
+		</Pane>
 	{/if}
 </Splitpanes>

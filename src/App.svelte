@@ -1,12 +1,12 @@
 <script lang="ts">
-	import './app.css';
+	import './app.scss';
 
 	import { Route, Router } from 'svelte-navigator';
 	import Layout from './lib/layout.svelte';
 
 	import TwoDimensions from './routes/two-dimensions.svelte';
 	import ThreeDimensions from './routes/three-dimensions.svelte';
-	import NavbarItem from './lib/navigation/navbar-item.svelte';
+	import NavbarItem from './lib/nav/navbar-item.svelte';
 
 	// icons
 	import Icon from 'svelte-icons-pack';

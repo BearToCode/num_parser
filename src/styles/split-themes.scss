@@ -1,0 +1,34 @@
+// Splitplanes themes
+.neon-theme {
+	&.splitpanes {
+		.splitpanes__pane {
+			@apply bg-primary-200;
+		}
+		.splitpanes__splitter {
+			@apply bg-primary-100 box-border relative flex-shrink-0;
+		}
+	}
+
+	.splitpanes__splitter:before {
+		content: '';
+		@apply absolute left-0 top-0 transition-all duration-300 bg-amber-500 opacity-0 delay-100;
+	}
+
+	&.splitpanes--dragging .splitpanes__splitter::before,
+	.splitpanes__splitter:hover::before {
+		@apply opacity-100;
+	}
+
+	&.splitpanes--vertical > .splitpanes__splitter {
+		@apply w-px;
+		&:before {
+			@apply -left-0.5 -right-0.5 h-full cursor-w-resize;
+		}
+	}
+	&.splitpanes--horizontal > .splitpanes__splitter {
+		@apply h-px;
+		&:before {
+			@apply -top-0.5 -bottom-0.5 w-full cursor-n-resize;
+		}
+	}
+}
