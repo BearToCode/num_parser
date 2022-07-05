@@ -32,7 +32,7 @@
 	};
 </script>
 
-<Splitpanes theme="neon-theme" dblClickSplitter={false}>
+<Splitpanes theme="neon-theme" dblClickSplitter={false} class="overflow-hidden">
 	<Pane size={30} snapSize={5} maxSize={50} class="bg-primary-600" />
 	<Pane class="bg-primary-700">
 		<Splitpanes theme="neon-theme" dblClickSplitter={false} horizontal={true}>
@@ -41,7 +41,7 @@
 			</Pane>
 
 			{#if toolsWindowOpen}
-				<Pane snapSize={10} bind:size={toolsWindowSize}>
+				<Pane snapSize={10} bind:size={toolsWindowSize} class="flex flex-col">
 					<ToolsWindow
 						isMaximized={toolsWindowSize == 100}
 						on:minimize={minimizeToolsWindow}

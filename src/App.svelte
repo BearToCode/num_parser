@@ -40,11 +40,11 @@
 		</div>
 
 		<div slot="routes">
-			<Route path="/2d" component={TwoDimensions} />
-			<Route path="/3d" component={ThreeDimensions} />
-			<Route path="/code" component={ThreeDimensions} />
-			<Route path="/document" component={ThreeDimensions} />
-			<Route path="/addons" component={ThreeDimensions} />
+			<Route path="/2d"><TwoDimensions /></Route>
+			<Route path="/3d"><ThreeDimensions /></Route>
+			<Route path="/code"><ThreeDimensions /></Route>
+			<Route path="/document"><ThreeDimensions /></Route>
+			<Route path="/addons"><ThreeDimensions /></Route>
 		</div>
 	</Layout>
 </Router>

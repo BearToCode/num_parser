@@ -1,7 +1,6 @@
-/** @type {import('tailwindcss').Config} */
-
 const defaultTheme = require('tailwindcss/defaultTheme')
 
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
@@ -41,6 +40,7 @@ module.exports = {
         }
       },
       fontFamily: {
+        // @ts-ignore
         'sans': ['JetBrainsMono', ...defaultTheme.fontFamily.sans]
       }
     },
