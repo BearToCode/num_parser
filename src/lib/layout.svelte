@@ -8,14 +8,19 @@
 	import MainWindow from './main-window.svelte';
 	import Rbar from './nav/rbar.svelte';
 
-	import Terminal from './tools/terminal.svelte';
+	import Terminal from './tools/term-window.svelte';
 
-	let windows: { name: string; icon: any; component: any }[] = [
-		{ name: 'Terminal', icon: BiTerminal, component: Terminal },
-	];
+	type window = {
+		name: string;
+		icon: any;
+		component: any;
+		navComponent: any;
+	};
+
+	let windows: window[] = [{ name: 'Terminal', icon: BiTerminal, component: Terminal, navComponent: null }];
 
 	let toggleToolsWindow: () => void;
-	let setToolsWindow: (component: any) => void;
+	let setToolsWindow: (w: window) => void;
 </script>
 
 <div
@@ -39,7 +44,7 @@
 			<button
 				class="flex items-center"
 				on:click={() => {
-					setToolsWindow(window.component);
+					setToolsWindow(window);
 					toggleToolsWindow();
 				}}
 			>

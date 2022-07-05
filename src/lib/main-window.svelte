@@ -6,7 +6,7 @@
 	import ToolsWindow from './tools-window.svelte';
 
 	let toolsWindowOpen = false;
-	let currentTool: any;
+	let currentToolWindow: { name: string; icon: any; component: any };
 	let toolsWindowSize = 30;
 	let unmaximizedSize = toolsWindowSize;
 
@@ -14,8 +14,8 @@
 		toolsWindowOpen = !toolsWindowOpen;
 	};
 
-	export const setToolsWindow = (component: any) => {
-		currentTool = component;
+	export const setToolsWindow = (window: { name: string; icon: any; component: any }) => {
+		currentToolWindow = window;
 	};
 
 	const maximizeToolsWindow = () => {
@@ -43,13 +43,14 @@
 			{#if toolsWindowOpen}
 				<Pane snapSize={10} bind:size={toolsWindowSize} class="flex flex-col">
 					<ToolsWindow
+						icon={currentToolWindow.icon}
 						isMaximized={toolsWindowSize == 100}
 						on:minimize={minimizeToolsWindow}
 						on:restore={restoreToolsWindow}
 						on:maximize={maximizeToolsWindow}
 						on:close={toggleToolsWindow}
 					>
-						<svelte:component this={currentTool} />
+						<svelte:component this={currentToolWindow.component} />
 					</ToolsWindow>
 				</Pane>
 			{/if}

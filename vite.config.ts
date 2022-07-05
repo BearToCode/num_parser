@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
+// @ts-ignore
 import path from 'path';
 
 // https://vitejs.dev/config/
