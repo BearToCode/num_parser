@@ -8,6 +8,10 @@ module.exports = {
       name: 'refactor: ♻️   A code change that neither fixes a bug nor adds a feature',
     },
     {
+      value: ':thread: style',
+      name: 'style:    🧵 An update that changes how the app looks,'
+    },
+    {
       value: ':zap: perf',
       name: 'perf:     ⚡  A code change that improves performance',
     },

@@ -1,3 +1,3 @@
-<nav class="w-14 bg-primary-200 border-r border-neutral-600">
+<nav class="w-14 bg-primary-700">
 	<slot />
 </nav>

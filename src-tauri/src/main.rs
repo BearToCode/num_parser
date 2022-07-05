@@ -7,7 +7,7 @@ use tauri::Manager;
 
 #[tauri::command]
 fn generate_graph() {
-    // println!("I was invoked by JS!");
+    println!("I was invoked by JS!");
 }
 
 fn main() {

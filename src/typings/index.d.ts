@@ -12,3 +12,6 @@ declare module 'svelte-icons-pack/vsc/VscChromeRestore';
 declare module 'svelte-icons-pack/vsc/VscChromeMinimize';
 declare module 'svelte-icons-pack/vsc/VscChromeMaximize';
 declare module 'svelte-icons-pack/io/IoClose';
+declare module 'svelte-icons-pack/fi/FiChevronUp';
+declare module 'svelte-icons-pack/fi/FiChevronDown';
+declare module 'svelte-icons-pack/bi/BiMinus';

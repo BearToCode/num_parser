@@ -6,15 +6,21 @@
 	import Navbar from './nav/navbar.svelte';
 	import Toolbar from './nav/toolbar.svelte';
 	import MainWindow from './main-window.svelte';
+	import Rbar from './nav/rbar.svelte';
 
-	let windows: { name: string; icon: any }[] = [{ name: 'Terminal', icon: BiTerminal }];
+	import Terminal from './tools/terminal.svelte';
+
+	let windows: { name: string; icon: any; component: any }[] = [
+		{ name: 'Terminal', icon: BiTerminal, component: Terminal },
+	];
 
 	let toggleToolsWindow: () => void;
+	let setToolsWindow: (component: any) => void;
 </script>
 
 <div
 	class="inline-grid w-screen h-screen overflow-hidden
-  grid-cols-[min-content_1fr] grid-rows-[min-content_1fr]"
+  grid-cols-[min-content_1fr_min-content] grid-rows-[min-content_1fr_min-content] bg-primary-600"
 >
 	<Chrome />
 
@@ -22,13 +28,21 @@
 		<slot name="links" />
 	</Navbar>
 
-	<MainWindow bind:toggleToolsWindow>
+	<MainWindow bind:toggleToolsWindow bind:setToolsWindow>
 		<slot name="routes" />
 	</MainWindow>
 
+	<Rbar />
+
 	<Toolbar>
 		{#each windows as window}
-			<button class="flex items-center" on:click={toggleToolsWindow}>
+			<button
+				class="flex items-center"
+				on:click={() => {
+					setToolsWindow(window.component);
+					toggleToolsWindow();
+				}}
+			>
 				<div class="text-lg mr-1">
 					<Icon src={window.icon} color="currentcolor" />
 				</div>
@@ -36,4 +50,6 @@
 			</button>
 		{/each}
 	</Toolbar>
+
+	<div class="bg-primary-700 border-t-2 border-l-2 border-primary-800" />
 </div>

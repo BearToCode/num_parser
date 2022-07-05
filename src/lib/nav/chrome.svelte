@@ -25,23 +25,14 @@
 
 <div
 	data-tauri-drag-region
-	class="h-8 bg-primary-200 toolbar text-neutral-400 flex flex-row col-span-2
-  items-center justify-between text-sm border-b border-neutral-600 z-10"
+	class="h-8 bg-primary-700 toolbar text-primary-100 flex flex-row col-span-3
+  items-center text-sm border-b-2 border-primary-800 z-10 justify-center relative"
 >
-	<div class="flex">
-		<ul class="space-x-4 flex flex-row select-none w-min ml-4">
-			<li>File</li>
-			<li>Edit</li>
-			<li>View</li>
-			<li>Help</li>
-		</ul>
-
-		<div class="bg-primary-300 rounded-lg px-3 text-md text-gray-500 ml-8">
-			{$currentLocation.pathname}
-		</div>
+	<div class="bg-secondary-700 rounded-lg px-3 text-xs text-white">
+		{$currentLocation.pathname}
 	</div>
 
-	<div class="text-base flex h-full">
+	<div class="text-base flex h-full absolute right-0">
 		<button class="h-full hover:bg-neutral-700 hover:text-white px-3" on:click={() => appWindow.minimize()}>
 			<Icon src={VscChromeMinimize} />
 		</button>
