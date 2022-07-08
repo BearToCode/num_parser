@@ -1,49 +1,56 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import { FitAddon } from 'xterm-addon-fit';
-	import { watchResize } from 'svelte-watch-resize';
-	import resolveConfig from 'tailwindcss/resolveConfig';
-	import tailwindConfig from 'tailwind.config.cjs';
-	import _ from 'xterm/css/xterm.css';
+	import 'xterm/css/xterm.css';
+	import * as xterm from 'xterm';
+	import * as fit from 'xterm-addon-fit';
+	import ResizeObserver from 'svelte-resize-observer';
 
-	// tailwind
-	const fullConfig = resolveConfig(tailwindConfig);
-
-	let termElem: HTMLElement;
-	let xterm: any;
-	let fitAddon: any;
-
-	onMount(async () => {
-		xterm = await import('xterm');
-		fitAddon = new FitAddon();
-		let term = new xterm.Terminal({
-			theme: {
-				background: fullConfig.theme.colors.primary['700'],
-			},
+	let terminalElement: HTMLElement;
+	let terminalController: xterm.Terminal;
+	let termFit: fit.FitAddon;
+	$: {
+		if (terminalController) {
+			// ...
+		}
+	}
+	function initalizeXterm() {
+		terminalController = new xterm.Terminal();
+		termFit = new fit.FitAddon();
+		terminalController.loadAddon(termFit);
+		terminalController.open(terminalElement);
+		termFit.fit();
+		terminalController.write(
+			'I am a terminal! I am a terminal! I am a terminal! I am a terminal! I am a terminal! I am a terminal! I am a terminal!'
+		);
+		terminalController.onData((e) => {
+			console.log(e);
 		});
-
-		term.loadAddon(fitAddon);
-		term.open(termElem);
-		fitAddon.fit();
-		term.write('Hello from \x1B[1;3;31mxterm.js\x1B[0m $ ');
+	}
+	onMount(async () => {
+		initalizeXterm();
 	});
-
-	function resizeTerminal() {
-		if (fitAddon) {
-			fitAddon.fit();
+	function handleTermResize() {
+		if (termFit) {
+			termFit.fit();
+			console.log('Resizing!');
 		}
 	}
 </script>
 
-<div
-	class="w-full overflow-y-scroll text-primary-200 flex-grow"
-	id="terminal"
-	bind:this={termElem}
-	use:watchResize={resizeTerminal}
-/>
+<!-- Actual terminal -->
+<div id="terminal" bind:this={terminalElement} />
+
+<!-- Resize observer -->
+<div class="absolute top-0 bottom-0 left-0 right-0">
+	<ResizeObserver on:resize={handleTermResize} />
+</div>
 
 <style lang="scss">
-	#terminal,
+	:global(#terminal) {
+		@apply w-full h-full;
+	}
+
+	:global(#terminal),
 	:global(.xterm .xterm-viewport) {
 		/* width */
 		&::-webkit-scrollbar {

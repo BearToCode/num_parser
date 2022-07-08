@@ -3,6 +3,8 @@
     windows_subsystem = "windows"
 )]
 
+mod parser;
+
 use tauri::Manager;
 
 #[tauri::command]

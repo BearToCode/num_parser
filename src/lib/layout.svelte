@@ -14,10 +14,9 @@
 		name: string;
 		icon: any;
 		component: any;
-		navComponent: any;
 	};
 
-	let windows: window[] = [{ name: 'Terminal', icon: BiTerminal, component: Terminal, navComponent: null }];
+	let windows: window[] = [{ name: 'Terminal', icon: BiTerminal, component: Terminal }];
 
 	let toggleToolsWindow: () => void;
 	let setToolsWindow: (w: window) => void;

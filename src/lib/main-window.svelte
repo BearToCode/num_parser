@@ -49,9 +49,8 @@
 						on:restore={restoreToolsWindow}
 						on:maximize={maximizeToolsWindow}
 						on:close={toggleToolsWindow}
-					>
-						<svelte:component this={currentToolWindow.component} />
-					</ToolsWindow>
+						tool={currentToolWindow.component}
+					/>
 				</Pane>
 			{/if}
 		</Splitpanes>
