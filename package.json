@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --port=8080",
     "build": "vite build",
     "preview": "vite preview",
     "lint-svelte": "prettier --check --plugin-search-dir=. ./src",
@@ -46,6 +46,7 @@
     "svelte-navigator": "^3.1.6",
     "svelte-resize-observer": "^2.0.0",
     "svelte-splitpanes": "^0.7.1",
+    "svelte-watch-resize": "^1.0.3",
     "xterm": "^4.19.0",
     "xterm-addon-fit": "^0.5.0"
   },
