@@ -7,5 +7,5 @@
 
 <h1 class="">About this site</h1>
 <p>TODO...</p>
-
+<p class="text-white">MICIO è BRAVO</p>
 <a href="/">Home</a>

@@ -16,16 +16,13 @@
 
 	// Get initial value
 	let isMaximizedPromise = windowIsMaximized();
-
-	// Update on window resize
-	window.addEventListener('resize', () => {
-		isMaximizedPromise = windowIsMaximized();
-	});
 </script>
+
+<svelte:window on:resize={() => (isMaximizedPromise = windowIsMaximized())} />
 
 <div
 	data-tauri-drag-region
-	class="h-8 bg-primary-700 toolbar text-primary-100 flex flex-row col-span-3
+	class="h-8 bg-primary-700 text-primary-100 flex flex-row col-span-3
   items-center text-sm border-b-2 border-primary-800 z-10 justify-center relative"
 >
 	<div class="bg-secondary-700 rounded-lg px-3 text-xs text-white">

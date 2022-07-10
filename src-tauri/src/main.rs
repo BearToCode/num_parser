@@ -4,6 +4,7 @@
 )]
 
 mod parser;
+mod term;
 
 use tauri::Manager;
 
@@ -19,7 +20,7 @@ fn main() {
             window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![generate_graph])
+        .invoke_handler(tauri::generate_handler![generate_graph,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

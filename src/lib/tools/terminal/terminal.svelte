@@ -3,7 +3,10 @@
 	import 'xterm/css/xterm.css';
 	import * as xterm from 'xterm';
 	import * as fit from 'xterm-addon-fit';
-	import { watchResize } from 'svelte-watch-resize';
+	import ResizeObserver from 'svelte-resize-observer';
+	import { invoke } from '@tauri-apps/api/tauri';
+	import termIO from './io';
+
 	// Tailwind
 	import resolveConfig from 'tailwindcss/resolveConfig';
 	import tailwindConfig from 'tailwind.config.cjs';
@@ -12,23 +15,21 @@
 	let terminalElement: HTMLElement;
 	let terminalController: xterm.Terminal;
 	let termFit: fit.FitAddon;
+	let io: termIO;
 
 	function initializeXterm() {
 		terminalController = new xterm.Terminal({
+			fontFamily: 'JetBrainsMono',
 			theme: {
 				background: fullConfig.theme.colors.primary['700'],
 			},
+			convertEol: true,
 		});
 		termFit = new fit.FitAddon();
 		terminalController.loadAddon(termFit);
 		terminalController.open(terminalElement);
-		for (let i = 0; i < 20; i++) {
-			terminalController.write('\x1b[32mThis is a working terminal!\x1b[m\n');
-			termFit.fit();
-		}
-		terminalController.onData((e) => {
-			terminalController.write(e);
-		});
+		termFit.fit();
+		io = new termIO(terminalController);
 	}
 	onMount(async () => {
 		initializeXterm();
@@ -40,12 +41,11 @@
 	}
 </script>
 
-<div
-	id="terminal"
-	bind:this={terminalElement}
-	class="absolute top-0 bottom-0 right-0 left-0"
-	use:watchResize={handleTermResize}
-/>
+<div id="terminal" bind:this={terminalElement} class="absolute top-0 bottom-0 right-0 left-0" />
+
+<div class="absolute top-0 right-0 bottom-0 left-0">
+	<ResizeObserver on:resize={handleTermResize} />
+</div>
 
 <svelte:window on:resize={handleTermResize} />
 
