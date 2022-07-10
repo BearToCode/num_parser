@@ -1,7 +1,5 @@
 <script lang="ts">
 	import Terminal from './terminal.svelte';
-
-	let windowsCount = 1;
 </script>
 
 <div class="w-full h-full relative flex">

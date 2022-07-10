@@ -9,7 +9,7 @@ module.exports = {
     },
     {
       value: ':thread: style',
-      name: 'style:    🧵  An update that changes how the app looks,'
+      name: 'style:    🧵  An update that changes how the app looks',
     },
     {
       value: ':zap: perf',

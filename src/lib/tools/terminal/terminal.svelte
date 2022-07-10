@@ -4,8 +4,8 @@
 	import * as xterm from 'xterm';
 	import * as fit from 'xterm-addon-fit';
 	import ResizeObserver from 'svelte-resize-observer';
-	import { invoke } from '@tauri-apps/api/tauri';
 	import termIO from './io';
+	import '../../../styles/term.scss';
 
 	// Tailwind
 	import resolveConfig from 'tailwindcss/resolveConfig';
@@ -15,7 +15,6 @@
 	let terminalElement: HTMLElement;
 	let terminalController: xterm.Terminal;
 	let termFit: fit.FitAddon;
-	let io: termIO;
 
 	function initializeXterm() {
 		terminalController = new xterm.Terminal({
@@ -29,7 +28,7 @@
 		terminalController.loadAddon(termFit);
 		terminalController.open(terminalElement);
 		termFit.fit();
-		io = new termIO(terminalController);
+		new termIO(terminalController);
 	}
 	onMount(async () => {
 		initializeXterm();
@@ -48,20 +47,3 @@
 </div>
 
 <svelte:window on:resize={handleTermResize} />
-
-<style lang="scss">
-	:global(.xterm-viewport) {
-		/* width */
-		&::-webkit-scrollbar {
-			@apply w-3;
-		}
-		/* FIXME: */
-		/* Handle on hover */
-		&::-webkit-scrollbar-thumb:hover {
-			@apply bg-primary-400;
-		}
-	}
-	:global(#terminal:hover .xterm-viewport::-webkit-scrollbar-thumb) {
-		@apply bg-primary-600;
-	}
-</style>

@@ -8,7 +8,6 @@ export default class termIO {
 	private _timerId: NodeJS.Timeout;
 
 	private _promptStr: string = '~ ';
-	private _promptLength: number;
 
 	private _currentLine: number;
 
@@ -22,9 +21,8 @@ export default class termIO {
 
 	initializeTerminal(): void {
 		this.prompt();
-		this._promptLength = this._terminalController.buffer.active.cursorX;
 		this._terminalController.onKey((e) => this.handleKey(e));
-		this._terminalController.onResize((e) => this.debounceReflow(250));
+		this._terminalController.onResize((/*e*/) => this.debounceReflow(250));
 	}
 
 	prompt(): void {
@@ -56,8 +54,6 @@ export default class termIO {
 			case 'PageDown':
 				break;
 			case 'End':
-				break;
-			case 'PageDown':
 				break;
 			case 'Tab':
 				break;

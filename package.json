@@ -13,7 +13,9 @@
     "format-svelte": "prettier --write --plugin-search-dir=. ./src",
     "format-tauri": "rustfmt ./src-tauri/src/main.rs",
     "format": "npm run format-svelte && npm run format-tauri",
-    "check": "svelte-check --tsconfig ./tsconfig.json && cargo check --manifest-path=./src-tauri/Cargo.toml",
+    "check-svelte": "svelte-check --tsconfig ./tsconfig.json",
+    "check-tauri": "cargo check --manifest-path=./src-tauri/Cargo.toml",
+    "check": "npm run check-svelte && npm run check-tauri",
     "tauri": "tauri",
     "commit": "npx lint-staged && npm run check && node ./node_modules/cz-customizable/standalone.js"
   },
@@ -29,6 +31,7 @@
     "husky": "^8.0.1",
     "lint-staged": "^13.0.3",
     "postcss": "^8.4.14",
+    "postcss-loader": "^7.0.0",
     "prettier": "^2.7.1",
     "prettier-plugin-svelte": "^2.7.0",
     "sass": "^1.53.0",
