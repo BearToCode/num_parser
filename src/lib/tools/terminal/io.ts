@@ -43,8 +43,10 @@ export default class termIO {
 			case 'Backspace':
 				this.del();
 			case 'ArrowRight':
+				// this.moveRight();
 				break;
 			case 'ArrowLeft':
+				// this.moveLeft();
 				break;
 			case 'ArrowUp':
 				break;
@@ -80,16 +82,16 @@ export default class termIO {
 				return;
 			}
 
-			if (this.cursorPosition().posX == 1) {
+			if (this.cursorPosition().posX == 0) {
 				this.setCursorPosition(
 					this._terminalController.cols, // Right
-					this.cursorPosition().posY - 1 // Up one
+					this.cursorPosition().posY
 				);
+				this._terminalController.write(ansi.erase.display(0));
+			} else {
+				this._terminalController.write('\b \b');
 			}
 
-			console.log('Ciao');
-
-			this._terminalController.write('\b \b');
 			this._typedChars -= 1;
 		}
 	}
@@ -124,7 +126,8 @@ export default class termIO {
 	}
 
 	setCursorPosition(x: number, y: number): void {
-		this._terminalController.write(ansi.cursor.position(x, y));
+		console.log(x, y);
+		this._terminalController.write(ansi.cursor.position(y, x));
 	}
 
 	deleteInput(): void {
