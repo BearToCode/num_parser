@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Pane, Splitpanes } from 'svelte-splitpanes';
 	// Neon theme
-	import _ from '../styles/split-themes.scss';
+	import '@styles/split-themes.scss';
 
 	import ToolsWindow from './tools-window.svelte';
 

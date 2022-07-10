@@ -5,7 +5,7 @@
 	import * as fit from 'xterm-addon-fit';
 	import ResizeObserver from 'svelte-resize-observer';
 	import termIO from './io';
-	import '../../../styles/term.scss';
+	import '@styles/term.scss';
 
 	// Tailwind
 	import resolveConfig from 'tailwindcss/resolveConfig';
