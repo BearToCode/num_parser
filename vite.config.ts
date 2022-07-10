@@ -17,7 +17,7 @@ export default defineConfig({
   },
   optimizeDeps: {
     include: [
-      path.resolve(__dirname, 'tailwind.config.cjs')
+      path.resolve(__dirname, 'tailwind.config.cjs'),
     ]
   }
 })

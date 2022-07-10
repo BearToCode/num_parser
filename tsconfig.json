@@ -23,10 +23,10 @@
     ],
 
     "paths": {
-      "@components": ["./src/lib"],
-      "@styles": ["./src/styles"],
-      "@routes": ["./src/routes"],
-      "@utils": ["./src/utils"]
+      "@components/*": ["./src/lib/*"],
+      "@styles/*": ["./src/styles/*"],
+      "@routes/*": ["./src/routes/*"],
+      "@utils/*": ["./src/utils/*"]
     }
   },
   "include": ["src/**/*.d.ts", "src/**/*.ts", "src/**/*.js", "src/**/*.svelte"],

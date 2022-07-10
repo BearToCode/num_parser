@@ -6,11 +6,7 @@
 	import ResizeObserver from 'svelte-resize-observer';
 	import termIO from './io';
 	import '@styles/term.scss';
-
-	// Tailwind
-	import resolveConfig from 'tailwindcss/resolveConfig';
-	import tailwindConfig from 'tailwind.config.cjs';
-	const fullConfig = resolveConfig(tailwindConfig);
+	import theme from '@utils/theme';
 
 	let terminalElement: HTMLElement;
 	let terminalController: xterm.Terminal;
@@ -20,7 +16,7 @@
 		terminalController = new xterm.Terminal({
 			fontFamily: 'JetBrainsMono',
 			theme: {
-				background: fullConfig.theme.colors.primary['700'],
+				background: theme.colors.primary['700'],
 			},
 			convertEol: true,
 		});

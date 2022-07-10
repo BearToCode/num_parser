@@ -1,5 +1,7 @@
 import ansi from 'ansi-escape-sequences';
 import type { Terminal } from 'xterm';
+import { hexToRgb } from '@utils/colors';
+import theme from '@utils/theme';
 
 export default class termIO {
 	private _terminalController: Terminal;
@@ -26,7 +28,10 @@ export default class termIO {
 	}
 
 	prompt(): void {
-		this._terminalController.write(ansi.style.red + this._promptStr + ansi.style.reset);
+		const colorHex = theme.colors.secondary['500'];
+		const c = hexToRgb(colorHex);
+		// @ts-ignore (for some reason rgb() is not included in @types/ansi-escape-sequences)
+		this._terminalController.write(ansi.rgb(c.r, c.b, c.b) + this._promptStr + ansi.style.reset);
 	}
 
 	handleKey(e: { key: string; domEvent: KeyboardEvent }): void {
