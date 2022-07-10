@@ -7,7 +7,7 @@ export default class termIO {
 	private _currentInput: string;
 	private _timerId: NodeJS.Timeout;
 
-	private _promptStr: string = '\u001b[36mnumerus> \u001b';
+	private _promptStr: string = '~ ';
 	private _promptLength: number;
 
 	private _currentLine: number;
@@ -24,20 +24,45 @@ export default class termIO {
 		this.prompt();
 		this._promptLength = this._terminalController.buffer.active.cursorX;
 		this._terminalController.onKey((e) => this.handleKey(e));
-		this._terminalController.onResize((e) => this.debounceReflow(500));
+		this._terminalController.onResize((e) => this.debounceReflow(250));
 	}
 
 	prompt(): void {
-		this._terminalController.write(this._promptStr);
+		this._terminalController.write(ansi.style.red + this._promptStr + ansi.style.reset);
 	}
 
 	handleKey(e: { key: string; domEvent: KeyboardEvent }): void {
 		const keyStr = e.domEvent.key;
-		if (keyStr === 'Enter') {
-		} else if (keyStr === 'Backspace') {
-		} else if (['ArrowRight', 'ArrowLeft', 'ArrowUp', 'ArrowDown'].indexOf(keyStr) != -1) {
-		} else {
-			this.write(keyStr);
+		switch (keyStr) {
+			case 'Enter':
+				break;
+			case 'Delete':
+			case 'Backspace':
+				this.del();
+			case 'ArrowRight':
+				break;
+			case 'ArrowLeft':
+				break;
+			case 'ArrowUp':
+				break;
+			case 'ArrowDown':
+				break;
+			case 'Insert':
+				break;
+			case 'Home':
+				break;
+			case 'PageUp':
+				break;
+			case 'PageDown':
+				break;
+			case 'End':
+				break;
+			case 'PageDown':
+				break;
+			case 'Tab':
+				break;
+			default:
+				this.write(keyStr);
 		}
 	}
 
@@ -46,6 +71,26 @@ export default class termIO {
 		this._currentInput += s;
 
 		this._terminalController.write(s);
+	}
+
+	del(n: number = 1) {
+		for (let i = 0; i < n; i++) {
+			if (this._typedChars == 0) {
+				return;
+			}
+
+			if (this.cursorPosition().posX == 1) {
+				this.setCursorPosition(
+					this._terminalController.cols, // Right
+					this.cursorPosition().posY - 1 // Up one
+				);
+			}
+
+			console.log('Ciao');
+
+			this._terminalController.write('\b \b');
+			this._typedChars -= 1;
+		}
 	}
 
 	debounceReflow(delay: number): void {
