@@ -93,6 +93,7 @@ export default class termIO {
 			}
 
 			this._typedChars -= 1;
+			this._currentInput = this._currentInput.slice(0, -1);
 		}
 	}
 
