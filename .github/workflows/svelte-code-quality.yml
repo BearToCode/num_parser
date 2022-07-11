@@ -1,4 +1,4 @@
-name: Code Quality Checks
+name: Svelte Code Quality Checks
 
 on: [push, pull_request]
 
@@ -24,13 +24,7 @@ jobs:
       - name: Svelte check
         run: npm run check-svelte
       
-      - name: Tauri check
-        run: npm run check-tauri
-      
       # Check for code style
       
       - name: Svelte lint
         run: npm run lint-svelte
-      
-      - name: Tauri lint
-        run: npm run lint-tauri
