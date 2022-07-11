@@ -4,12 +4,7 @@ on: [push, pull_request]
 
 jobs:
   test-tauri:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: ubuntu-latest
-
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
