@@ -12,7 +12,8 @@ export default defineConfig({
       '@components': path.resolve(__dirname, './src/lib'),
       '@styles': path.resolve(__dirname, './src/styles'),
       '@routes': path.resolve(__dirname, './src/routes'),
-      '@utils': path.resolve(__dirname, './src/utils')
+      '@utils': path.resolve(__dirname, './src/utils'),
+      '@core': path.resolve(__dirname, './src/core')
     }
   },
   optimizeDeps: {

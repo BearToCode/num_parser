@@ -7,10 +7,14 @@
 	import termIO from './io';
 	import '@styles/term.scss';
 	import theme from '@utils/theme';
+	import Sender from './sender.svelte';
 
 	let terminalElement: HTMLElement;
 	let terminalController: xterm.Terminal;
 	let termFit: fit.FitAddon;
+	let IO: termIO;
+
+	let focusSender: () => void;
 
 	function initializeXterm() {
 		terminalController = new xterm.Terminal({
@@ -24,7 +28,7 @@
 		terminalController.loadAddon(termFit);
 		terminalController.open(terminalElement);
 		termFit.fit();
-		new termIO(terminalController);
+		IO = new termIO(terminalController);
 	}
 	onMount(async () => {
 		initializeXterm();
@@ -36,10 +40,17 @@
 	}
 </script>
 
-<div id="terminal" bind:this={terminalElement} class="absolute top-0 bottom-0 right-0 left-0" />
+<div id="terminal" bind:this={terminalElement} class="absolute left-0 right-0 top-0 bottom-0" on:click={focusSender} />
 
 <div class="absolute top-0 right-0 bottom-0 left-0">
 	<ResizeObserver on:resize={handleTermResize} />
 </div>
+
+<Sender
+	bind:focus={focusSender}
+	on:command={(e) => {
+		IO.execute(e.detail.command);
+	}}
+/>
 
 <svelte:window on:resize={handleTermResize} />
