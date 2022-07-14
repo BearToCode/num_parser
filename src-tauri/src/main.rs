@@ -2,16 +2,9 @@
     all(not(debug_assertions), target_os = "windows"),
     windows_subsystem = "windows"
 )]
-
-mod parser;
-mod term;
+mod core;
 
 use tauri::Manager;
-
-#[tauri::command]
-fn generate_graph() {
-    println!("I was invoked by JS!");
-}
 
 fn main() {
     tauri::Builder::default()
@@ -20,7 +13,10 @@ fn main() {
             window_shadows::set_shadow(&window, true).expect("Unsupported platform!");
             Ok(())
         })
-        .invoke_handler(tauri::generate_handler![generate_graph,])
+        .invoke_handler(tauri::generate_handler![
+            core::add_declaration,
+            core::evaluate_expression
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

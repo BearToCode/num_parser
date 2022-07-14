@@ -30,7 +30,9 @@ export default class termIO {
 			return;
 		}
 
-		this.prompt();
+		await this.prompt();
+		await this.write(command);
+		await this.write('\r\n');
 
 		if (command.indexOf('=') == -1) {
 			let out = SendEvaluation(command, this._context).expect(this.write.bind(this));
