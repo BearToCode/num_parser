@@ -3,6 +3,8 @@ pub mod trigonometry;
 
 use std::collections::HashMap;
 
+use serde::{Deserialize, Serialize};
+
 pub enum ExpressionType {
     Value,
     Operator {
@@ -15,7 +17,8 @@ pub enum ExpressionType {
     },
 }
 
-pub enum Expression<'a> {
+#[derive(Serialize, Deserialize)]
+pub enum Expression {
     Const {
         value: f64,
     },
@@ -23,20 +26,20 @@ pub enum Expression<'a> {
         identifier: char,
     },
     Sum {
-        first_addend: &'a Expression<'a>,
-        second_addend: &'a Expression<'a>,
+        first_addend: Box<Expression>,
+        second_addend: Box<Expression>,
     },
     Subtraction {
-        minuend: &'a Expression<'a>,
-        subtrahend: &'a Expression<'a>,
+        minuend: Box<Expression>,
+        subtrahend: Box<Expression>,
     },
     Multiplication {
-        first_factor: &'a Expression<'a>,
-        second_factor: &'a Expression<'a>,
+        first_factor: Box<Expression>,
+        second_factor: Box<Expression>,
     },
     Division {
-        dividend: &'a Expression<'a>,
-        divisor: &'a Expression<'a>,
+        dividend: Box<Expression>,
+        divisor: Box<Expression>,
     },
 }
 
@@ -44,7 +47,7 @@ pub fn variant_eq(a: &ExpressionType, b: &ExpressionType) -> bool {
     std::mem::discriminant(a) == std::mem::discriminant(b)
 }
 
-impl Expression<'_> {
+impl Expression {
     pub fn r#type(&self) -> ExpressionType {
         match self {
             Expression::Const { value } => ExpressionType::Value,

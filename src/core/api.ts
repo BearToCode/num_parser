@@ -13,9 +13,9 @@ export class Result<Type> {
 		return !(typeof this.content === 'string');
 	}
 
-	public expect(logMethod: (str: string) => any): Context | null {
+	public expect(logMethod: (str: string) => any): Type | null {
 		if (this.isValid()) {
-			return this.content;
+			return this.content as Type;
 		} else {
 			logMethod(ansi.style.red);
 			logMethod(this.content as string);
@@ -30,8 +30,8 @@ export function SendDeclaration(input: string, context: Context): Result<Context
 	return new Result<Context>('Declaration error');
 }
 
-export function SendEvaluation(input: string, context: Context): Result<number> {
-	let out = invoke('evaluate_expression', { input: input, context: context });
+export async function SendEvaluation(input: string, context: Context): Promise<Result<number>> {
+	let out = await invoke('evaluate_expression', { input: input, context: context });
 	console.log(out);
 	return new Result<number>('Evaluation error');
 }

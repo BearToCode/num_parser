@@ -2,13 +2,13 @@ use super::functions::{variant_eq, Expression, ExpressionType};
 
 pub fn parse_function<'a>(
     s: &'a str,
-    functions: &'a Vec<&Expression>,
-) -> Result<Expression<'a>, String> {
+    functions: &'a Vec<Expression>,
+) -> Result<Expression, String> {
     let mut string = String::from(s);
     // Get all the operators
     let operators: Vec<&Expression> = functions
         .iter()
-        .filter(|&&e| {
+        .filter(|&e| {
             variant_eq(
                 &e.r#type(),
                 &ExpressionType::Operator {
@@ -18,7 +18,6 @@ pub fn parse_function<'a>(
                 },
             )
         })
-        .copied()
         .collect::<Vec<&Expression>>();
 
     // Check brackets
@@ -29,6 +28,8 @@ pub fn parse_function<'a>(
 
     // Remove spaces
     string = string.replace(" ", "");
+
+    println!("{}", string);
 
     // Convert operators
     match operators_to_functions(&mut string, &operators) {
@@ -245,6 +246,8 @@ fn get_highest_priority_operator(
             highest_priority_operator_index = i;
         }
     }
+
+    println!("{:?}", highest_priority);
 
     if highest_priority == (0, 0) {
         None

@@ -35,8 +35,8 @@ export default class termIO {
 		await this.write('\r\n');
 
 		if (command.indexOf('=') == -1) {
-			let out = SendEvaluation(command, this._context).expect(this.write.bind(this));
-			if (out) this._context = out;
+			let out = await SendEvaluation(command, this._context);
+			out.expect(this.write.bind(this));
 		} else {
 		}
 
