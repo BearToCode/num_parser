@@ -12,5 +12,12 @@ pub fn add_declaration() {
 #[tauri::command]
 pub fn evaluate_expression(input: String, context: Context) -> Result<Expression, String> {
     println!("input: {}", input);
-    return parser::parse_function(&input, &context.functions);
+    let r = parser::parse_function(&input);
+    match r {
+        Ok(value) => Ok(value),
+        Err(err) => {
+            println!("{}", err);
+            Err(err)
+        }
+    }
 }

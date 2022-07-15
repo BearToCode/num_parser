@@ -1,24 +1,7 @@
-use super::functions::{variant_eq, Expression, ExpressionType};
+use super::functions::Expression;
 
-pub fn parse_function<'a>(
-    s: &'a str,
-    functions: &'a Vec<Expression>,
-) -> Result<Expression, String> {
+pub fn parse_function<'a>(s: &'a str) -> Result<Expression, String> {
     let mut string = String::from(s);
-    // Get all the operators
-    let operators: Vec<&Expression> = functions
-        .iter()
-        .filter(|&e| {
-            variant_eq(
-                &e.r#type(),
-                &ExpressionType::Operator {
-                    priority: 0,
-                    identifier: '.',
-                    name: "",
-                },
-            )
-        })
-        .collect::<Vec<&Expression>>();
 
     // Check brackets
     match are_brackets_valid(&string) {
@@ -32,7 +15,7 @@ pub fn parse_function<'a>(
     println!("{}", string);
 
     // Convert operators
-    match operators_to_functions(&mut string, &operators) {
+    match operators_to_functions(&mut string) {
         Ok(()) => (),
         Err(err) => return Err(String::from(err)),
     };
@@ -61,19 +44,18 @@ fn are_brackets_valid(string: &String) -> Result<(), String> {
     }
 }
 
-fn operators_to_functions(
-    string: &mut String,
-    operators: &Vec<&Expression>,
-) -> Result<(), &'static str> {
+fn operators_to_functions(string: &mut String) -> Result<(), &'static str> {
     loop {
         let (current_operator_index, current_operator_name) =
-            match get_highest_priority_operator(&string, operators) {
+            match get_highest_priority_operator(&string) {
                 Some(result) => result,
                 None => break,
             };
 
         // Replace operator char with a comma
         string.replace_range(current_operator_index..current_operator_index + 1, ",");
+
+        println!("comma: {}", string);
 
         let left_expression_end = match get_adjacent_expression_end_index(
             &string,
@@ -83,6 +65,8 @@ fn operators_to_functions(
             Ok(result) => result,
             Err(msg) => return Err(msg),
         };
+
+        println!("right...");
 
         let right_expression_end = match get_adjacent_expression_end_index(
             string,
@@ -101,6 +85,7 @@ fn operators_to_functions(
             &(current_operator_name.to_owned() + "("),
         );
     }
+    println!("{}", string);
     Ok(())
 }
 
@@ -134,8 +119,10 @@ fn get_adjacent_expression_end_index(
     let mut text_found = false;
     let mut expect_function = false;
 
-    while index != 0 && index != string.len() - 1 {
+    loop {
         let current_char = string.chars().nth(index).unwrap();
+
+        println!("{}", current_char);
 
         if dir == Direction::Left && text_found && !current_char.is_alphabetic() {
             // L:2
@@ -143,7 +130,7 @@ fn get_adjacent_expression_end_index(
         } else if !current_char.is_digit(10) && numbers_found {
             if dir == Direction::Right {
                 // R:2
-                return Ok(index - 1);
+                return Ok(index);
             } else {
                 // L:3
                 return Ok(index + 1);
@@ -183,6 +170,11 @@ fn get_adjacent_expression_end_index(
             }
         }
 
+        if !(index > 0 && index < string.len() - 1) {
+            println!("index: {}, len: {}", index, string.len());
+            break;
+        };
+
         index = match dir {
             Direction::Left => index - 1,
             Direction::Right => index + 1,
@@ -192,7 +184,7 @@ fn get_adjacent_expression_end_index(
         return if dir == Direction::Left {
             Ok(0)
         } else {
-            Ok(string.len() - 1)
+            Ok(string.len())
         };
     } else {
         Err("Error while parsing operators!")
@@ -200,14 +192,11 @@ fn get_adjacent_expression_end_index(
 }
 
 // Returns the index and the function of the highest priority operator
-fn get_highest_priority_operator(
-    string: &String,
-    operators: &Vec<&Expression>,
-) -> Option<(usize, &'static str)> {
+fn get_highest_priority_operator(string: &String) -> Option<(usize, &'static str)> {
     let mut current_depth: u16 = 0;
     let mut highest_priority_operator_index: usize = 0;
     let mut highest_priority_operator_name: &str = "";
-    let mut highest_priority: (u16, u16) = (0, 0);
+    let mut highest_priority: (u16, u8) = (0, 0);
     for (i, char) in string.chars().enumerate() {
         if char == '(' {
             current_depth += 1;
@@ -215,37 +204,23 @@ fn get_highest_priority_operator(
             current_depth -= 1;
         }
 
-        let mut is_operator = false;
-        let mut op_content: (u16, char, &str) = (0, '!', "Error");
-
-        for operator in operators {
-            op_content = match operator.r#type() {
-                ExpressionType::Operator {
-                    priority: p,
-                    identifier: c,
-                    name: n,
-                } => (p, c, n),
-                _ => panic!("Provided function is not an operator!"),
+        let (operator_name, operator_priority) =
+            match super::functions::operators::operator_data_from_char(&char) {
+                Some(value) => value,
+                None => continue,
             };
 
-            if char == op_content.1 {
-                is_operator = true;
-                break;
-            }
-        }
-
-        if !is_operator {
-            continue;
-        }
-
-        let this_priority = (current_depth, op_content.0);
+        let this_priority = (current_depth, operator_priority);
 
         if this_priority > highest_priority {
             highest_priority = this_priority;
-            highest_priority_operator_name = op_content.2;
+            highest_priority_operator_name = operator_name;
             highest_priority_operator_index = i;
+            println!("high: {}", highest_priority_operator_index);
         }
     }
+
+    println!("high: {}", highest_priority_operator_index);
 
     println!("{:?}", highest_priority);
 
