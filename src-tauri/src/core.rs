@@ -1,3 +1,5 @@
+use self::context::Context;
+
 pub mod context;
 pub mod functions;
 pub mod parser;
@@ -8,4 +10,6 @@ pub fn add_declaration() {
 }
 
 #[tauri::command]
-pub fn evaluate_expression() {}
+pub fn evaluate_expression(/*input: String, context: Context*/) {
+    // println!("input: {}", input);
+}

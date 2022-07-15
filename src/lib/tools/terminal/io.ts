@@ -1,10 +1,9 @@
 import ansi from 'ansi-escape-sequences';
 import type { Terminal } from 'xterm';
-import type Context from '@core/context';
+import Context from '@core/context';
 import { hexToRgb } from '@utils/colors';
 import theme from '@utils/theme';
-import { SendDeclaration, Result, SendEvaluation } from '@core/invocations';
-import { resolve } from '@tauri-apps/api/path';
+import { SendDeclaration, Result, SendEvaluation } from '@core/api';
 
 export default class termIO {
 	private _terminalController: Terminal;
@@ -14,6 +13,7 @@ export default class termIO {
 
 	constructor(term: Terminal) {
 		this._terminalController = term;
+		this._context = new Context();
 		this.write(ansi.cursor.hide);
 	}
 

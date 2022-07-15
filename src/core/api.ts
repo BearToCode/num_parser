@@ -31,7 +31,7 @@ export function SendDeclaration(input: string, context: Context): Result<Context
 }
 
 export function SendEvaluation(input: string, context: Context): Result<number> {
-	let out = invoke('evaluate_expression', { context: context });
+	let out = invoke('evaluate_expression', { input: input, context: context });
 	console.log(out);
 	return new Result<number>('Evaluation error');
 }
