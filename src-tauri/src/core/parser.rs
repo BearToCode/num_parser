@@ -7,14 +7,19 @@ use super::functions::Expression;
 pub fn parse_function<'a>(s: &'a str) -> Result<Expression, String> {
     let mut string = String::from(s);
 
-    // Check brackets
+    // Remove spaces
+    string = string.replace(" ", "");
+
+    // Checks
     match checks::are_brackets_valid(&string) {
         Ok(()) => (),
         Err(error) => return Err(String::from(error)),
     }
 
-    // Remove spaces
-    string = string.replace(" ", "");
+    match checks::are_operators_valid(&string) {
+        Ok(()) => (),
+        Err(error) => return Err(String::from(error)),
+    }
 
     println!("{}", string);
 

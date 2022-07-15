@@ -1,3 +1,5 @@
+use crate::core::functions::operators::operator_data_from_char;
+
 pub fn are_brackets_valid(string: &String) -> Result<(), String> {
     let mut current_depth: i16 = 0;
     for (i, char) in string.chars().enumerate() {
@@ -17,4 +19,27 @@ pub fn are_brackets_valid(string: &String) -> Result<(), String> {
     } else {
         Ok(())
     }
+}
+
+pub fn are_operators_valid(string: &String) -> Result<(), String> {
+    // Operators are non digit and non alphabetic characters
+    for (index, char) in string.chars().enumerate() {
+        if !is_possible_operator(&char) {
+            continue;
+        }
+        match operator_data_from_char(&char) {
+            Some(_) => (),
+            None => {
+                return Err(String::from(format!(
+                    "Invalid operator '{}' at position: {}",
+                    char, index
+                )))
+            }
+        }
+    }
+    Ok(())
+}
+
+fn is_possible_operator(char: &char) -> bool {
+    !char.is_alphanumeric()
 }
