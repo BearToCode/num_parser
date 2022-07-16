@@ -52,7 +52,7 @@ impl Function for Multiplication {
         "mul"
     }
     fn calc(&self, values: &HashMap<char, f64>) -> f64 {
-        self.first_factor.eval(values) - self.second_factor.eval(values)
+        self.first_factor.eval(values) * self.second_factor.eval(values)
     }
 }
 

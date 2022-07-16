@@ -43,12 +43,13 @@ pub fn operators_to_functions(string: &mut String) -> Result<(), &'static str> {
             &(current_operator_name.to_owned() + "("),
         );
     }
+    remove_useless_brackets(string);
     println!("{}", string);
     Ok(())
 }
 
 // Returns the index and the function of the highest priority operator
-pub fn get_highest_priority_operator(string: &String) -> Option<(usize, &'static str)> {
+fn get_highest_priority_operator(string: &String) -> Option<(usize, &'static str)> {
     let mut current_depth: u16 = 0;
     let mut highest_priority_operator_index: usize = 0;
     let mut highest_priority_operator_name: &str = "";
@@ -87,5 +88,46 @@ pub fn get_highest_priority_operator(string: &String) -> Option<(usize, &'static
             highest_priority_operator_index,
             highest_priority_operator_name,
         ))
+    }
+}
+
+// To be executed after operators have been converted, otherwise
+// operations will be executed in the wrong order
+fn remove_useless_brackets(string: &mut String) {
+    let mut previous_is_letter = false;
+    let mut index = 0;
+    while index < string.len() {
+        let char = string.chars().nth(index).unwrap();
+
+        if index == string.len() - 2 {
+            return;
+        }
+
+        if char == '(' {
+            if !previous_is_letter {
+                // Remove the corresponding bracket
+                let mut inner_index = index + 1;
+                let mut inner_depth: i16 = 1;
+                while inner_index < string.len() {
+                    let inner_char = string.chars().nth(inner_index).unwrap();
+                    if inner_char == '(' {
+                        inner_depth += 1;
+                    } else if inner_char == ')' {
+                        inner_depth -= 1;
+                        if inner_depth == 0 {
+                            // Remove the bracket
+                            string.replace_range(inner_index..inner_index + 1, "");
+                            break;
+                        }
+                    }
+                    inner_index += 1;
+                }
+                // Remove the starting bracket
+                string.replace_range(index..index + 1, "");
+                index -= 1;
+            }
+        }
+        previous_is_letter = char.is_alphabetic();
+        index += 1;
     }
 }
