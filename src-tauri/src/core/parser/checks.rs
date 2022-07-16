@@ -22,7 +22,7 @@ pub fn are_brackets_valid(string: &String) -> Result<(), String> {
 }
 
 pub fn are_operators_valid(string: &String) -> Result<(), String> {
-    // Operators are non digit and non alphabetic characters
+    // Operators are non digit, non alphabetic characters and non brackets
     for (index, char) in string.chars().enumerate() {
         if !is_possible_operator(&char) {
             continue;
@@ -41,5 +41,5 @@ pub fn are_operators_valid(string: &String) -> Result<(), String> {
 }
 
 fn is_possible_operator(char: &char) -> bool {
-    !char.is_alphanumeric()
+    !char.is_alphanumeric() && *char != '(' && *char != ')'
 }
