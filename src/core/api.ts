@@ -1,37 +1,48 @@
 import type Context from './context';
-import ansi from 'ansi-escape-sequences';
 import { invoke } from '@tauri-apps/api';
 
 export class Result<Type> {
-	public content: Type | string;
+	private _content: Type | string;
+	private _type: 'Ok' | 'Err';
 
-	constructor(out: Type | string) {
-		this.content = out;
+	constructor(out: Type | string, type: 'Ok' | 'Err') {
+		this._content = out;
+		this._type = type;
 	}
 
 	public isValid(): boolean {
-		return !(typeof this.content === 'string');
+		return this._type == 'Ok';
 	}
 
-	public expect(logMethod: (str: string) => any): Type | null {
+	public log(OkLogMethod: (str: string) => any, ErrLogMethod: (str: string) => any): void {
 		if (this.isValid()) {
-			return this.content as Type;
+			OkLogMethod(this._content.toString());
 		} else {
-			logMethod(ansi.style.red);
-			logMethod(this.content as string);
-			logMethod(ansi.style.reset);
+			ErrLogMethod(this._content as string);
 		}
+	}
+
+	public extract(): Type | string {
+		return this._content;
 	}
 }
 
-export function SendDeclaration(input: string, context: Context): Result<Context> {
-	let out = invoke('add_declaration', { context: context });
-	console.log(out);
-	return new Result<Context>('Declaration error');
+export function SendDeclaration(input: string, context: Context): Promise<Result<Context>> {
+	return invoke('add_declaration', { context: context })
+		.then((r) => {
+			return new Result<Context>(r as Context, 'Ok');
+		})
+		.catch((e) => {
+			return new Result<Context>(e as string, 'Err');
+		});
 }
 
 export async function SendEvaluation(input: string, context: Context): Promise<Result<number>> {
-	let out: number | string = await invoke('evaluate_expression', { input: input, context: context });
-	console.log(out);
-	return new Result<number>(out);
+	return invoke('evaluate_expression', { input: input, context: context })
+		.then((r) => {
+			return new Result<number>(r as number, 'Ok');
+		})
+		.catch((e) => {
+			return new Result<number>(e as string, 'Err');
+		});
 }

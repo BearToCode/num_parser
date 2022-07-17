@@ -35,20 +35,29 @@ export default class termIO {
 		await this.write('\r\n');
 
 		if (command.indexOf('=') == -1) {
-			let out = await SendEvaluation(command, this._context);
-			let result: number | null = out.expect(this.write.bind(this));
-			if (result) {
-				await this.write(`${result}`);
-			}
+			await SendEvaluation(command, this._context).then((r) => r.log(this.logOk.bind(this), this.logErr.bind(this)));
 		} else {
 		}
-
-		this._terminalController.write('\r\n');
 	}
 
 	async write(s: string): Promise<void> {
 		return new Promise((resolve) => {
 			this._terminalController.write(s, () => resolve());
 		});
+	}
+
+	async logOk(s: string): Promise<void> {
+		await this.write(ansi.style.white);
+		await this.write(s);
+		await this.write(ansi.style.reset);
+		await this.write('\r\n');
+	}
+
+	async logErr(s: string): Promise<void> {
+		await this.write(ansi.style.white);
+		await this.write(ansi.style['bg-red']);
+		await this.write(s);
+		await this.write(ansi.style.reset);
+		await this.write('\r\n');
 	}
 }
