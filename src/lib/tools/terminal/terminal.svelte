@@ -40,7 +40,7 @@
 	}
 </script>
 
-<div id="terminal" bind:this={terminalElement} class="absolute left-0 right-0 top-0 bottom-0" on:click={focusSender} />
+<div id="terminal" bind:this={terminalElement} class="absolute left-0 right-0 top-0 bottom-8" on:click={focusSender} />
 
 <div class="absolute top-0 right-0 bottom-0 left-0">
 	<ResizeObserver on:resize={handleTermResize} />

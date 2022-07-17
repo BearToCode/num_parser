@@ -25,9 +25,11 @@ export default class termIO {
 	}
 
 	public async execute(command: string) {
-		if (command == 'clear') {
-			this._terminalController.reset();
-			return;
+		if (command == 'clear') return this._terminalController.reset();
+
+		if (command == '') {
+			await this.prompt();
+			return this.write('\r\n');
 		}
 
 		await this.prompt();

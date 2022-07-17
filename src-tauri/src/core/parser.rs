@@ -10,6 +10,10 @@ use self::utils::is_valid_number;
 pub fn parse_expression<'a>(expression: &'a str) -> Result<Expression, String> {
     let mut string = String::from(expression);
 
+    if string.len() == 0 {
+        return Err(String::from("No expression provided!"));
+    }
+
     // Remove spaces
     string = string.replace(" ", "");
 
