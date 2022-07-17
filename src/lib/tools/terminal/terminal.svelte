@@ -16,6 +16,8 @@
 
 	let focusSender: () => void;
 
+	export let hidden: boolean;
+
 	function initializeXterm() {
 		terminalController = new xterm.Terminal({
 			fontFamily: 'JetBrainsMono',
@@ -41,21 +43,28 @@
 </script>
 
 <div
-	id="terminal"
-	bind:this={terminalElement}
-	class={`absolute left-0 right-0 top-0 bottom-8`}
-	on:click={focusSender}
-/>
+	class={`
+		${hidden && 'absolute top-0 right-0 h-0 w-0 overflow-hidden'}
+		${!hidden && 'absolute left-0 top-0 right-0 bottom-0'}
+	`}
+>
+	<div
+		id="terminal"
+		bind:this={terminalElement}
+		class={`absolute left-0 right-0 top-0 bottom-8`}
+		on:click={focusSender}
+	/>
 
-<div class={`absolute top-0 right-0 bottom-0 left-0`}>
-	<ResizeObserver on:resize={handleTermResize} />
+	<div class={`absolute top-0 right-0 bottom-0 left-0`}>
+		<ResizeObserver on:resize={handleTermResize} />
+	</div>
+
+	<Sender
+		bind:focus={focusSender}
+		on:command={(e) => {
+			IO.execute(e.detail.command);
+		}}
+	/>
 </div>
-
-<Sender
-	bind:focus={focusSender}
-	on:command={(e) => {
-		IO.execute(e.detail.command);
-	}}
-/>
 
 <svelte:window on:resize={handleTermResize} />

@@ -16,5 +16,6 @@ declare module 'svelte-icons-pack/fi/FiChevronUp';
 declare module 'svelte-icons-pack/fi/FiChevronDown';
 declare module 'svelte-icons-pack/bi/BiMinus';
 declare module 'svelte-icons-pack/bi/BiSolidTerminal';
+declare module 'svelte-icons-pack/bi/BiPlus';
 // Same thing from some other modules
 declare module 'tailwindcss/resolveConfig';
