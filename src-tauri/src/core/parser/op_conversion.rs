@@ -99,7 +99,7 @@ fn remove_useless_brackets(expression: &mut String) {
     while index < expression.len() {
         let char = expression.chars().nth(index).unwrap();
 
-        if index == expression.len() - 2 {
+        if index < expression.len() - 1 {
             return;
         }
 
