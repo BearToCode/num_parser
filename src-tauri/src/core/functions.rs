@@ -9,7 +9,7 @@ use self::operators::{Division, Multiplication, Subtraction, Sum};
 
 pub trait Function {
     fn name() -> &'static str;
-    fn calc(&self, values: &HashMap<char, f64>) -> f64;
+    fn calc(&self, values: &HashMap<char, f64>) -> Result<f64, String>;
     fn build(arguments: Vec<Expression>) -> Result<Box<Self>, String>;
 }
 
@@ -31,14 +31,17 @@ pub enum Expression {
 }
 
 impl Expression {
-    pub fn eval(&self, values: &HashMap<char, f64>) -> f64 {
+    pub fn eval(&self, values: &HashMap<char, f64>) -> Result<f64, String> {
         match self {
-            Expression::Const { value } => *value,
-            Expression::Variable { identifier } => *values.get(identifier).unwrap(),
-            Expression::Sum(sum) => sum.calc(values),
-            Expression::Subtraction(subtraction) => subtraction.calc(values),
-            Expression::Multiplication(multiplication) => multiplication.calc(values),
-            Expression::Division(division) => division.calc(values),
+            Expression::Const { value } => Ok(*value),
+            Expression::Variable { identifier } => match values.get(identifier) {
+                Some(value) => Ok(*value),
+                None => Err(format!("Invalid variable: '{}' !", identifier)),
+            },
+            Expression::Sum(sum) => Ok(sum.calc(values)?),
+            Expression::Subtraction(subtraction) => Ok(subtraction.calc(values)?),
+            Expression::Multiplication(multiplication) => Ok(multiplication.calc(values)?),
+            Expression::Division(division) => Ok(division.calc(values)?),
         }
     }
 }

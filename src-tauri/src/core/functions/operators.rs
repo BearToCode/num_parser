@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::{Expression, Function};
-use serde::{Deserialize, Serialize};
+use serde::{de::value, Deserialize, Serialize};
 
 // Structs
 #[derive(Serialize, Deserialize)]
@@ -33,8 +33,8 @@ impl Function for Sum {
     fn name() -> &'static str {
         "sum"
     }
-    fn calc(&self, values: &HashMap<char, f64>) -> f64 {
-        self.first_addend.eval(values) + self.second_addend.eval(values)
+    fn calc(&self, values: &HashMap<char, f64>) -> Result<f64, String> {
+        Ok(self.first_addend.eval(values)? + self.second_addend.eval(values)?)
     }
     fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
         if arguments.len() != 2 {
@@ -56,8 +56,8 @@ impl Function for Subtraction {
     fn name() -> &'static str {
         "sub"
     }
-    fn calc(&self, values: &HashMap<char, f64>) -> f64 {
-        self.minuend.eval(values) - self.subtrahend.eval(values)
+    fn calc(&self, values: &HashMap<char, f64>) -> Result<f64, String> {
+        Ok(self.minuend.eval(values)? - self.subtrahend.eval(values)?)
     }
     fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
         if arguments.len() != 2 {
@@ -79,8 +79,8 @@ impl Function for Multiplication {
     fn name() -> &'static str {
         "mul"
     }
-    fn calc(&self, values: &HashMap<char, f64>) -> f64 {
-        self.first_factor.eval(values) * self.second_factor.eval(values)
+    fn calc(&self, values: &HashMap<char, f64>) -> Result<f64, String> {
+        Ok(self.first_factor.eval(values)? * self.second_factor.eval(values)?)
     }
     fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
         if arguments.len() != 2 {
@@ -102,8 +102,8 @@ impl Function for Division {
     fn name() -> &'static str {
         "div"
     }
-    fn calc(&self, values: &HashMap<char, f64>) -> f64 {
-        self.dividend.eval(values) / self.divisor.eval(values)
+    fn calc(&self, values: &HashMap<char, f64>) -> Result<f64, String> {
+        Ok(self.dividend.eval(values)? / self.divisor.eval(values)?)
     }
     fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
         if arguments.len() != 2 {
