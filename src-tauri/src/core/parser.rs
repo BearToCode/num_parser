@@ -182,7 +182,8 @@ fn is_const_or_variable(expression: &String) -> Result<Option<Expression>, Strin
         }));
     } else {
         return Err(format!(
-            "Expression: '' is not a function, but neither a number or a variable!"
+            "Expression: '{}' is not a function, but neither a number or a variable!",
+            expression
         ));
     }
 }

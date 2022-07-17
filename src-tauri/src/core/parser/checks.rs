@@ -22,16 +22,27 @@ pub fn are_brackets_valid(expression: &String) -> Result<(), String> {
 }
 
 pub fn are_operators_valid(expression: &String) -> Result<(), String> {
-    // Operators are non digit, non alphabetic characters and non brackets
+    let mut previous_is_operator = false;
+
     for (index, char) in expression.chars().enumerate() {
         if !is_possible_operator(&char) {
+            previous_is_operator = false;
             continue;
         }
         match operator_data_from_char(&char) {
-            Some(_) => (),
+            Some(_) => {
+                // Avoid adjacent operators
+                if previous_is_operator {
+                    return Err(String::from(format!(
+                        "Invalid adjacent operator '{}' at position: {} !",
+                        char, index
+                    )));
+                }
+                previous_is_operator = true;
+            }
             None => {
                 return Err(String::from(format!(
-                    "Invalid operator '{}' at position: {}",
+                    "Invalid operator '{}' at position: {} !",
                     char, index
                 )))
             }
@@ -40,6 +51,7 @@ pub fn are_operators_valid(expression: &String) -> Result<(), String> {
     Ok(())
 }
 
+// Operators are non digit, non alphabetic characters and non brackets
 fn is_possible_operator(char: &char) -> bool {
-    !char.is_alphanumeric() && *char != '(' && *char != ')'
+    !char.is_alphanumeric() && *char != '(' && *char != ')' && *char != ',' && *char != '.'
 }
