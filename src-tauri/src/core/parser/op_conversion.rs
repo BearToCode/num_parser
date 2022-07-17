@@ -13,23 +13,17 @@ pub fn operators_to_functions(expression: &mut String) -> Result<(), &'static st
         // Replace operator char with a comma
         expression.replace_range(current_operator_index..current_operator_index + 1, ",");
 
-        let left_expression_end = match get_adjacent_expression_end_index(
+        let left_expression_end = get_adjacent_expression_end_index(
             &expression,
             current_operator_index,
             Direction::Left,
-        ) {
-            Ok(result) => result,
-            Err(msg) => return Err(msg),
-        };
+        )?;
 
-        let right_expression_end = match get_adjacent_expression_end_index(
+        let right_expression_end = get_adjacent_expression_end_index(
             expression,
             current_operator_index,
             Direction::Right,
-        ) {
-            Ok(result) => result,
-            Err(msg) => return Err(msg),
-        };
+        )?;
 
         // Place closing bracket at the end of the right expression
         expression.insert(right_expression_end, ')');

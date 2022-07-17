@@ -18,76 +18,50 @@ pub fn parse_expression<'a>(expression: &'a str) -> Result<Expression, String> {
     string = string.replace(" ", "");
 
     // Checks
-    match checks::are_brackets_valid(&string) {
-        Ok(()) => (),
-        Err(error) => return Err(String::from(error)),
-    }
+    checks::are_brackets_valid(&string)?;
 
-    match checks::are_operators_valid(&string) {
-        Ok(()) => (),
-        Err(error) => return Err(String::from(error)),
-    }
+    checks::are_operators_valid(&string)?;
 
     // Convert operators
-    match op_conversion::operators_to_functions(&mut string) {
-        Ok(()) => (),
-        Err(err) => return Err(String::from(err)),
-    };
+    op_conversion::operators_to_functions(&mut string)?;
 
     // Build the expression
-    match build_expression(&string) {
-        Ok(exp) => return Ok(exp),
-        Err(err) => return Err(err),
-    }
+    return build_expression(&string);
 }
 
 // Input shall be of type function(arg1, arg2, ...)
 fn build_expression(expression: &String) -> Result<Expression, String> {
-    match is_const_or_variable(expression) {
-        Ok(value) => match value {
-            Some(exp) => return Ok(exp),
-            None => (),
-        },
-        Err(err) => return Err(err),
+    match is_const_or_variable(expression)? {
+        Some(exp) => return Ok(exp),
+        None => (),
     };
 
-    let content: Vec<String> = match get_function_content(expression) {
-        Ok(value) => value,
-        Err(err) => return Err(err),
-    };
+    let content: Vec<String> = get_function_content(expression)?;
 
     // Get the corresponding function
     match get_function_name(expression) {
         Err(err) => Err(err),
         Ok(name) => match &name[..] {
-            "sum" => match get_function_parameters(&content) {
-                Ok(arguments) => match operators::Sum::build(arguments) {
-                    Ok(expression) => return Ok(Expression::Sum(*expression)),
-                    Err(err) => return Err(err),
-                },
-                Err(err) => return Err(err),
-            },
-            "sub" => match get_function_parameters(&content) {
-                Ok(arguments) => match operators::Subtraction::build(arguments) {
-                    Ok(expression) => return Ok(Expression::Subtraction(*expression)),
-                    Err(err) => return Err(err),
-                },
-                Err(err) => return Err(err),
-            },
-            "mul" => match get_function_parameters(&content) {
-                Ok(arguments) => match operators::Multiplication::build(arguments) {
-                    Ok(expression) => return Ok(Expression::Multiplication(*expression)),
-                    Err(err) => return Err(err),
-                },
-                Err(err) => return Err(err),
-            },
-            "div" => match get_function_parameters(&content) {
-                Ok(arguments) => match operators::Division::build(arguments) {
-                    Ok(expression) => return Ok(Expression::Division(*expression)),
-                    Err(err) => return Err(err),
-                },
-                Err(err) => return Err(err),
-            },
+            "sum" => {
+                return Ok(Expression::Sum(*operators::Sum::build(
+                    get_function_parameters(&content)?,
+                )?))
+            }
+            "sub" => {
+                return Ok(Expression::Subtraction(*operators::Subtraction::build(
+                    get_function_parameters(&content)?,
+                )?))
+            }
+            "mul" => {
+                return Ok(Expression::Multiplication(
+                    *operators::Multiplication::build(get_function_parameters(&content)?)?,
+                ))
+            }
+            "div" => {
+                return Ok(Expression::Division(*operators::Division::build(
+                    get_function_parameters(&content)?,
+                )?))
+            }
             other => return Err(format!("Invalid function name: {}!", other)),
         },
     }
@@ -154,10 +128,7 @@ fn get_function_parameters(content: &Vec<String>) -> Result<Vec<Expression>, Str
     let mut out_vec: Vec<Expression> = vec![];
 
     for expression in content {
-        match build_expression(expression) {
-            Ok(exp) => out_vec.push(exp),
-            Err(err) => return Err(err),
-        }
+        out_vec.push(build_expression(expression)?);
     }
 
     Ok(out_vec)
