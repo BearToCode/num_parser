@@ -1,9 +1,9 @@
 export default class Context {
 	public definitions: {};
-	public functions: {}[];
+	public user_functions: {}[];
 
 	constructor() {
 		this.definitions = {};
-		this.functions = [];
+		this.user_functions = [];
 	}
 }

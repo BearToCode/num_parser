@@ -99,3 +99,15 @@ pub fn get_adjacent_expression_end_index(
         Err("Error while parsing operators!")
     }
 }
+
+pub fn is_valid_number(string: &String, radix: u32) -> bool {
+    let mut comma_found = false;
+    for char in string.chars() {
+        if !(char.is_digit(radix) || char == '.' && !comma_found) {
+            return false;
+        } else if char == '.' {
+            comma_found = true;
+        }
+    }
+    true
+}

@@ -36,7 +36,10 @@ export default class termIO {
 
 		if (command.indexOf('=') == -1) {
 			let out = await SendEvaluation(command, this._context);
-			out.expect(this.write.bind(this));
+			let result: number | null = out.expect(this.write.bind(this));
+			if (result) {
+				await this.write(`${result}`);
+			}
 		} else {
 		}
 

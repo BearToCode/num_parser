@@ -1,8 +1,8 @@
 use crate::core::functions::operators::operator_data_from_char;
 
-pub fn are_brackets_valid(string: &String) -> Result<(), String> {
+pub fn are_brackets_valid(expression: &String) -> Result<(), String> {
     let mut current_depth: i16 = 0;
-    for (i, char) in string.chars().enumerate() {
+    for (i, char) in expression.chars().enumerate() {
         if char == '(' {
             current_depth += 1;
         } else if char == ')' {
@@ -21,9 +21,9 @@ pub fn are_brackets_valid(string: &String) -> Result<(), String> {
     }
 }
 
-pub fn are_operators_valid(string: &String) -> Result<(), String> {
+pub fn are_operators_valid(expression: &String) -> Result<(), String> {
     // Operators are non digit, non alphabetic characters and non brackets
-    for (index, char) in string.chars().enumerate() {
+    for (index, char) in expression.chars().enumerate() {
         if !is_possible_operator(&char) {
             continue;
         }

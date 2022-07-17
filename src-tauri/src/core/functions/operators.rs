@@ -36,6 +36,20 @@ impl Function for Sum {
     fn calc(&self, values: &HashMap<char, f64>) -> f64 {
         self.first_addend.eval(values) + self.second_addend.eval(values)
     }
+    fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
+        if arguments.len() != 2 {
+            Err(super::invalid_arguments_count_err(
+                Sum::name(),
+                2,
+                arguments.len(),
+            ))
+        } else {
+            Ok(Box::new(Sum {
+                second_addend: Box::new(arguments.pop().unwrap()),
+                first_addend: Box::new(arguments.pop().unwrap()),
+            }))
+        }
+    }
 }
 
 impl Function for Subtraction {
@@ -44,6 +58,20 @@ impl Function for Subtraction {
     }
     fn calc(&self, values: &HashMap<char, f64>) -> f64 {
         self.minuend.eval(values) - self.subtrahend.eval(values)
+    }
+    fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
+        if arguments.len() != 2 {
+            Err(super::invalid_arguments_count_err(
+                Sum::name(),
+                2,
+                arguments.len(),
+            ))
+        } else {
+            Ok(Box::new(Subtraction {
+                subtrahend: Box::new(arguments.pop().unwrap()),
+                minuend: Box::new(arguments.pop().unwrap()),
+            }))
+        }
     }
 }
 
@@ -54,6 +82,20 @@ impl Function for Multiplication {
     fn calc(&self, values: &HashMap<char, f64>) -> f64 {
         self.first_factor.eval(values) * self.second_factor.eval(values)
     }
+    fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
+        if arguments.len() != 2 {
+            Err(super::invalid_arguments_count_err(
+                Sum::name(),
+                2,
+                arguments.len(),
+            ))
+        } else {
+            Ok(Box::new(Multiplication {
+                second_factor: Box::new(arguments.pop().unwrap()),
+                first_factor: Box::new(arguments.pop().unwrap()),
+            }))
+        }
+    }
 }
 
 impl Function for Division {
@@ -62,6 +104,20 @@ impl Function for Division {
     }
     fn calc(&self, values: &HashMap<char, f64>) -> f64 {
         self.dividend.eval(values) / self.divisor.eval(values)
+    }
+    fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
+        if arguments.len() != 2 {
+            Err(super::invalid_arguments_count_err(
+                Sum::name(),
+                2,
+                arguments.len(),
+            ))
+        } else {
+            Ok(Box::new(Division {
+                divisor: Box::new(arguments.pop().unwrap()),
+                dividend: Box::new(arguments.pop().unwrap()),
+            }))
+        }
     }
 }
 

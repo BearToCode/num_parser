@@ -6,15 +6,14 @@ pub mod parser;
 
 #[tauri::command]
 pub fn add_declaration() {
-    // println!("{}", parser::parse_function(s, functions))
+    // println!("{}",& parser::parse_function(s, functions))
 }
 
 #[tauri::command]
-pub fn evaluate_expression(input: String, context: Context) -> Result<Expression, String> {
+pub fn evaluate_expression(input: String, context: Context) -> Result<f64, String> {
     println!("input: {}", input);
-    let r = parser::parse_function(&input);
-    match r {
-        Ok(value) => Ok(value),
+    match parser::parse_expression(&input) {
+        Ok(expression) => Ok(expression.eval(&context.definitions)),
         Err(err) => {
             println!("{}", err);
             Err(err)

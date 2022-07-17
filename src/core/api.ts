@@ -31,7 +31,7 @@ export function SendDeclaration(input: string, context: Context): Result<Context
 }
 
 export async function SendEvaluation(input: string, context: Context): Promise<Result<number>> {
-	let out = await invoke('evaluate_expression', { input: input, context: context });
+	let out: number | string = await invoke('evaluate_expression', { input: input, context: context });
 	console.log(out);
-	return new Result<number>('Evaluation error');
+	return new Result<number>(out);
 }
