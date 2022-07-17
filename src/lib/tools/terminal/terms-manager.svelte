@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { each } from 'svelte/internal';
 	import Icon from 'svelte-icons-pack';
 	import BiSolidTerminal from 'svelte-icons-pack/bi/BiSolidTerminal';
 

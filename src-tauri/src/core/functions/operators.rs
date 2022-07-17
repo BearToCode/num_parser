@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 
 use super::{Expression, Function};
-use serde::{de::value, Deserialize, Serialize};
+use serde::{Deserialize, Serialize};
 
 // Structs
 #[derive(Serialize, Deserialize)]

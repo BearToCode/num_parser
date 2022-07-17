@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { createEventDispatcher, validate_component } from 'svelte/internal';
+	import { createEventDispatcher } from 'svelte/internal';
 
 	const dispatch = createEventDispatcher();
 
@@ -114,7 +114,7 @@
 	/>
 </div>
 
-<style lang="scss">
+<style lang="postcss">
 	::selection {
 		@apply bg-primary-50 text-primary-700;
 	}

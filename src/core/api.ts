@@ -27,8 +27,8 @@ export class Result<Type> {
 	}
 }
 
-export function SendDeclaration(input: string, context: Context): Promise<Result<Context>> {
-	return invoke('add_declaration', { context: context })
+export async function SendDeclaration(input: string, context: Context): Promise<Result<Context>> {
+	return invoke('add_declaration', { input: input, context: context })
 		.then((r) => {
 			return new Result<Context>(r as Context, 'Ok');
 		})

@@ -1,4 +1,4 @@
-use self::{context::Context, functions::Expression};
+use self::context::Context;
 
 pub mod context;
 pub mod functions;

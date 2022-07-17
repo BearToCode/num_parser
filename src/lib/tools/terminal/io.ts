@@ -3,7 +3,7 @@ import type { Terminal } from 'xterm';
 import Context from '@core/context';
 import { hexToRgb } from '@utils/colors';
 import theme from '@utils/theme';
-import { SendDeclaration, Result, SendEvaluation } from '@core/api';
+import { /*SendDeclaration, Result,*/ SendEvaluation } from '@core/api';
 
 export default class termIO {
 	private _terminalController: Terminal;
