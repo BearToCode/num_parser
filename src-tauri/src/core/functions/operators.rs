@@ -103,7 +103,12 @@ impl Function for Division {
         "div"
     }
     fn calc(&self, values: &HashMap<char, f64>) -> Result<f64, String> {
-        Ok(self.dividend.eval(values)? / self.divisor.eval(values)?)
+        Ok(self.dividend.eval(values)?
+            / if self.divisor.eval(values)? == 0 as f64 {
+                return Err(String::from("Trying to divide by zero!"));
+            } else {
+                self.divisor.eval(values)?
+            })
     }
     fn build(mut arguments: Vec<Expression>) -> Result<Box<Self>, String> {
         if arguments.len() != 2 {
