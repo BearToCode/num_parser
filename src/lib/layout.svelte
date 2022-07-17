@@ -8,7 +8,7 @@
 	import MainWindow from './main-window.svelte';
 	import Rbar from './nav/rbar.svelte';
 
-	import Terminal from './tools/terminal/term-window.svelte';
+	import Terminal from './tools/terminal/terms-manager.svelte';
 
 	type window = {
 		name: string;

@@ -54,7 +54,7 @@
 			</button>
 		</div>
 	</div>
-	<div class="p-2 flex-grow overflow-hidden relative">
+	<div class="flex-grow overflow-hidden relative">
 		<svelte:component this={tool} />
 	</div>
 </div>
