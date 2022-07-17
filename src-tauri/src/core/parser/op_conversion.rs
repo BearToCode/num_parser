@@ -13,8 +13,6 @@ pub fn operators_to_functions(expression: &mut String) -> Result<(), &'static st
         // Replace operator char with a comma
         expression.replace_range(current_operator_index..current_operator_index + 1, ",");
 
-        println!("comma: {}", expression);
-
         let left_expression_end = match get_adjacent_expression_end_index(
             &expression,
             current_operator_index,
@@ -23,8 +21,6 @@ pub fn operators_to_functions(expression: &mut String) -> Result<(), &'static st
             Ok(result) => result,
             Err(msg) => return Err(msg),
         };
-
-        println!("right...");
 
         let right_expression_end = match get_adjacent_expression_end_index(
             expression,
@@ -44,7 +40,6 @@ pub fn operators_to_functions(expression: &mut String) -> Result<(), &'static st
         );
     }
     remove_useless_brackets(expression);
-    println!("{}", expression);
     Ok(())
 }
 
@@ -73,13 +68,8 @@ fn get_highest_priority_operator(expression: &String) -> Option<(usize, &'static
             highest_priority = this_priority;
             highest_priority_operator_name = operator_name;
             highest_priority_operator_index = i;
-            println!("high: {}", highest_priority_operator_index);
         }
     }
-
-    println!("high: {}", highest_priority_operator_index);
-
-    println!("{:?}", highest_priority);
 
     if highest_priority == (0, 0) {
         None

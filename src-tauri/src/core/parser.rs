@@ -24,8 +24,6 @@ pub fn parse_expression<'a>(expression: &'a str) -> Result<Expression, String> {
         Err(error) => return Err(String::from(error)),
     }
 
-    println!("{}", string);
-
     // Convert operators
     match op_conversion::operators_to_functions(&mut string) {
         Ok(()) => (),
@@ -94,8 +92,6 @@ fn build_expression(expression: &String) -> Result<Expression, String> {
 fn get_function_content(function: &String) -> Result<Vec<String>, String> {
     let mut mut_function = function.clone();
 
-    println!("{}", mut_function);
-
     // Remove closing bracket
     if mut_function.chars().nth_back(0).unwrap() != ')' {
         return Err(String::from(
@@ -135,8 +131,6 @@ fn get_function_content(function: &String) -> Result<Vec<String>, String> {
 
             // Add final sequence
             split_content.push(String::from(&mut_function[last_cut..mut_function.len()]));
-
-            println!("{:?}", split_content);
 
             return Ok(split_content);
         } else {

@@ -31,8 +31,6 @@ pub fn get_adjacent_expression_end_index(
     loop {
         let current_char = string.chars().nth(index).unwrap();
 
-        println!("{}", current_char);
-
         if dir == Direction::Left && text_found && !current_char.is_alphabetic() {
             // L:2
             return Ok(index + 1);
@@ -80,7 +78,6 @@ pub fn get_adjacent_expression_end_index(
         }
 
         if !(index > 0 && index < string.len() - 1) {
-            println!("index: {}, len: {}", index, string.len());
             break;
         };
 
