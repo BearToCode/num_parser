@@ -10,7 +10,7 @@ use self::operators::{Division, Multiplication, Subtraction, Sum};
 pub trait Function {
     fn name() -> &'static str;
     fn calc(&self, values: &HashMap<char, f64>) -> Result<f64, String>;
-    fn build(arguments: Vec<Expression>) -> Result<Box<Self>, String>;
+    fn build(arguments: Vec<Expression>) -> Result<Expression, String>;
 }
 
 pub fn invalid_arguments_count_err(function_name: &str, expected: u8, given: usize) -> String {

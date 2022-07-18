@@ -2,7 +2,7 @@ mod checks;
 mod op_conversion;
 mod utils;
 
-use super::functions::operators;
+use super::functions::operators::*;
 use super::functions::{Expression, Function};
 
 use self::utils::{get_function_name, is_const_or_variable};
@@ -42,26 +42,10 @@ fn build_expression(expression: &String) -> Result<Expression, String> {
     match get_function_name(expression) {
         Err(err) => Err(err),
         Ok(name) => match &name[..] {
-            "sum" => {
-                return Ok(Expression::Sum(*operators::Sum::build(
-                    get_function_parameters(&content)?,
-                )?))
-            }
-            "sub" => {
-                return Ok(Expression::Subtraction(*operators::Subtraction::build(
-                    get_function_parameters(&content)?,
-                )?))
-            }
-            "mul" => {
-                return Ok(Expression::Multiplication(
-                    *operators::Multiplication::build(get_function_parameters(&content)?)?,
-                ))
-            }
-            "div" => {
-                return Ok(Expression::Division(*operators::Division::build(
-                    get_function_parameters(&content)?,
-                )?))
-            }
+            "sum" => return Ok(Sum::build(get_function_parameters(&content)?)?),
+            "sub" => return Ok(Subtraction::build(get_function_parameters(&content)?)?),
+            "mul" => return Ok(Multiplication::build(get_function_parameters(&content)?)?),
+            "div" => return Ok(Division::build(get_function_parameters(&content)?)?),
             other => return Err(format!("Invalid function name: {}!", other)),
         },
     }
