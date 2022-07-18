@@ -36,7 +36,7 @@ pub fn get_adjacent_expression_end_index(
         if dir == Direction::Left && text_found && !current_char.is_alphabetic() {
             // L:2
             return Ok(index + 1);
-        } else if !current_char.is_digit(10) && numbers_found {
+        } else if !(current_char.is_digit(10) || current_char == '.') && numbers_found {
             if dir == Direction::Right {
                 // R:2
                 return Ok(index);
@@ -57,7 +57,7 @@ pub fn get_adjacent_expression_end_index(
                 // R:1
                 return Ok(index);
             }
-        } else if current_char.is_digit(10) && relative_depth == 0 {
+        } else if (current_char.is_digit(10) || current_char == '.') && relative_depth == 0 {
             numbers_found = true;
         } else {
             if dir == Direction::Left && relative_depth == 0 {
