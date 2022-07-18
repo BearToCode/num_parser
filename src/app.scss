@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+body {
+	@apply overflow-hidden;
+}
+
 @font-face {
 	font-family: 'JetBrainsMono';
 	src: url('./assets/fonts/JetBrainsMono-Regular.ttf');

@@ -1,3 +1,5 @@
+use super::Expression;
+
 #[derive(PartialEq, Eq)]
 pub enum Direction {
     Left,
@@ -107,4 +109,50 @@ pub fn is_valid_number(string: &String, radix: u32) -> bool {
         }
     }
     true
+}
+
+pub fn is_const_or_variable(expression: &String) -> Result<Option<Expression>, String> {
+    if expression.contains('(') {
+        return Ok(None);
+    }
+
+    // const
+    if is_valid_number(&expression, 10) {
+        return Ok(Some(Expression::Const {
+            value: expression.parse::<f64>().unwrap(),
+        }));
+    // var
+    } else if expression.len() == 1 {
+        return Ok(Some(Expression::Variable {
+            identifier: expression.chars().nth(0).unwrap(),
+        }));
+    } else {
+        return Err(format!(
+            "Expression: '{}' is not a function, but neither a number or a variable!",
+            expression
+        ));
+    }
+}
+
+pub fn get_function_name(expression: &String) -> Result<String, String> {
+    let mut index = 0;
+    let mut name: String = String::from("");
+    while index < expression.len() {
+        let char = expression.chars().nth(index).unwrap();
+        if char.is_alphabetic() {
+            name.push(char);
+        } else if char == '(' {
+            return Ok(name);
+        } else {
+            return Err(format!(
+                "Error while parsing expression: invalid character '{}' !",
+                char
+            ));
+        }
+        index += 1;
+    }
+
+    Err(String::from(
+        "Error while parsing expression: could not find a function!",
+    ))
 }
