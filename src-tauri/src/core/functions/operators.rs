@@ -28,6 +28,12 @@ pub struct Division {
     divisor: Box<Expression>,
 }
 
+#[derive(Serialize, Deserialize)]
+pub struct Modulo {
+    dividend: Box<Expression>,
+    divisor: Box<Expression>,
+}
+
 // Implementation
 impl Function for Sum {
     fn name() -> &'static str {
@@ -126,12 +132,41 @@ impl Function for Division {
     }
 }
 
+impl Function for Modulo {
+    fn name() -> &'static str {
+        "mod"
+    }
+    fn calc(&self, values: &HashMap<char, f64>) -> Result<f64, String> {
+        Ok(self.dividend.eval(values)?
+            % if self.divisor.eval(values)? == 0 as f64 {
+                return Err(String::from("Trying to divide by zero!"));
+            } else {
+                self.divisor.eval(values)?
+            })
+    }
+    fn build(mut arguments: Vec<Expression>) -> Result<Expression, String> {
+        if arguments.len() != 2 {
+            Err(super::invalid_arguments_count_err(
+                Sum::name(),
+                2,
+                arguments.len(),
+            ))
+        } else {
+            Ok(Expression::Modulo(Modulo {
+                divisor: Box::new(arguments.pop().unwrap()),
+                dividend: Box::new(arguments.pop().unwrap()),
+            }))
+        }
+    }
+}
+
 pub fn operator_data_from_char(c: &char) -> Option<(&'static str, u8)> {
     match c {
         '+' => Some((Sum::name(), 1)),
         '-' => Some((Subtraction::name(), 1)),
         '*' => Some((Multiplication::name(), 2)),
         '/' => Some((Division::name(), 3)),
+        '%' => Some((Modulo::name(), 3)),
         _ => None,
     }
 }

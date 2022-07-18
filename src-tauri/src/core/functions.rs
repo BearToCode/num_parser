@@ -5,7 +5,7 @@ use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
 
-use self::operators::{Division, Multiplication, Subtraction, Sum};
+use self::operators::*;
 
 pub trait Function {
     fn name() -> &'static str;
@@ -28,6 +28,7 @@ pub enum Expression {
     Subtraction(Subtraction),
     Multiplication(Multiplication),
     Division(Division),
+    Modulo(Modulo),
 }
 
 impl Expression {
@@ -42,6 +43,7 @@ impl Expression {
             Expression::Subtraction(subtraction) => Ok(subtraction.calc(values)?),
             Expression::Multiplication(multiplication) => Ok(multiplication.calc(values)?),
             Expression::Division(division) => Ok(division.calc(values)?),
+            Expression::Modulo(modulo) => Ok(modulo.calc(values)?),
         }
     }
 }

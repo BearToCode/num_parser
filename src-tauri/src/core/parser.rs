@@ -46,6 +46,7 @@ fn build_expression(expression: &String) -> Result<Expression, String> {
             "sub" => return Ok(Subtraction::build(get_function_parameters(&content)?)?),
             "mul" => return Ok(Multiplication::build(get_function_parameters(&content)?)?),
             "div" => return Ok(Division::build(get_function_parameters(&content)?)?),
+            "mod" => return Ok(Modulo::build(get_function_parameters(&content)?)?),
             other => return Err(format!("Invalid function name: {}!", other)),
         },
     }
