@@ -3,7 +3,7 @@ import type { Terminal } from 'xterm';
 import Context from '@core/context';
 import { hexToRgb } from '@utils/colors';
 import theme from '@utils/theme';
-import { /*SendDeclaration, Result,*/ SendEvaluation } from '@core/api';
+import { EvaluateWithMutableContext } from '@core/api';
 
 export default class termIO {
 	private _terminalController: Terminal;
@@ -36,10 +36,10 @@ export default class termIO {
 		await this.write(command);
 		await this.write('\r\n');
 
-		if (command.indexOf('=') == -1) {
-			await SendEvaluation(command, this._context).then((r) => r.log(this.logOk.bind(this), this.logErr.bind(this)));
-		} else {
-		}
+		await EvaluateWithMutableContext(command, this._context).then((r) => {
+			r[0].log(this.logOk.bind(this), this.logErr.bind(this));
+			this._context = r[1];
+		});
 	}
 
 	async write(s: string): Promise<void> {

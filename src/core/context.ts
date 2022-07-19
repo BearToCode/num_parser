@@ -1,9 +1,9 @@
 export default class Context {
-	public definitions: {};
-	public user_functions: {}[];
+	public variables: Map<string, any>;
+	public functions: Map<string, any>;
 
 	constructor() {
-		this.definitions = {};
-		this.user_functions = [];
+		this.variables = new Map<string, any>();
+		this.functions = new Map<string, any>();
 	}
 }
