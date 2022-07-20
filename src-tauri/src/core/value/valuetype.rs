@@ -1,10 +1,12 @@
 use super::Value;
 
+#[derive(Debug)]
 pub enum ValueType {
     IntType,
     FloatType,
     ComplexType,
     VectorType,
+    BoolType,
 }
 
 impl Value {
@@ -14,6 +16,7 @@ impl Value {
             Self::Float(_) => ValueType::FloatType,
             Self::Complex(_) => ValueType::ComplexType,
             Self::Vector(_) => ValueType::VectorType,
+            Self::Bool(_) => ValueType::BoolType,
         }
     }
 }
