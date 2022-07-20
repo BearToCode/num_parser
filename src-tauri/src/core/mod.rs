@@ -1,3 +1,12 @@
+mod expr;
+mod function;
+mod out;
+mod parser;
+mod token;
+mod tree;
+mod value;
+
+// OLD TO BE REMOVED
 use evalexpr;
 
 #[tauri::command]
