@@ -1,5 +1,5 @@
 mod display;
-mod tokentype;
+pub mod tokentype;
 
 use super::out::{
     ErrorType::{self, *},
@@ -7,14 +7,14 @@ use super::out::{
 };
 use tokentype::TokenType;
 
-#[derive(Clone)]
+#[derive(Debug, Clone)]
 pub struct Token {
     pub r#type: TokenType,
     pub length: usize,
     pub value: String,
 }
 
-type TokenStream = Vec<Token>;
+pub type TokenStream = Vec<Token>;
 
 impl Token {
     fn new(r#type: TokenType, length: usize, value: &str) -> Self {
@@ -50,6 +50,29 @@ fn remove_whitespaces(string: &mut String) {
     string.replace(" ", "");
 }
 
+/// Joins all identifiers.
+fn join_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
+    let mut joined_stream: TokenStream = vec![];
+
+    let mut is_previous_identifier: bool = false;
+    // Iterate over the stream and join any literal
+    for token in stream {
+        let is_identifier = token.r#type == TokenType::Identifier;
+
+        if is_identifier && is_previous_identifier {
+            // Join with the previous token and remove the current one.
+            let previous_token = joined_stream.last_mut().unwrap();
+            previous_token.join_with(token, TokenType::Identifier);
+        } else {
+            joined_stream.push(token.clone());
+        }
+
+        is_previous_identifier = is_identifier;
+    }
+
+    Ok(joined_stream)
+}
+
 /// Joins numbers handling commas.
 fn join_literals(stream: &TokenStream) -> EvalResult<TokenStream> {
     let mut joined_stream: TokenStream = vec![];
@@ -66,7 +89,7 @@ fn join_literals(stream: &TokenStream) -> EvalResult<TokenStream> {
             if is_comma {
                 if comma_found {
                     return Err(ErrorType::InvalidTokenAtPosition {
-                        token: format!("{}", token),
+                        token: token.r#type,
                     }); // TODO:
                 }
                 comma_found = true;
@@ -76,6 +99,8 @@ fn join_literals(stream: &TokenStream) -> EvalResult<TokenStream> {
                 // Join with the previous token and remove the current one.
                 let previous_token = joined_stream.last_mut().unwrap();
                 previous_token.join_with(token, TokenType::Literal);
+            } else {
+                joined_stream.push(token.clone());
             }
         } else {
             comma_found = false;

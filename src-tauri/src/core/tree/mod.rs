@@ -1,7 +1,9 @@
+use super::expr::Expression;
 use super::function::*;
+use super::token::{tokentype::TokenType, Token, TokenStream};
 
-/// A node in the expression tree.
-pub struct Node {
-    children: Vec<Node>,
-    function: Function,
-}
+/// An expression is a node in the expression tree.
+type Node = Expression;
+
+/// Builds an expression tree, effectively parsing the token stream.
+pub fn build_tree(stream: TokenStream) {}

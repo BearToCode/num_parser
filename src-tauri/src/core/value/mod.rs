@@ -1,8 +1,7 @@
 mod display;
 pub mod valuetype;
 
-use self::valuetype::ValueType::*;
-use super::out::EvalResult;
+use self::valuetype::ValueType::{self, *};
 use super::out::*;
 use num::complex::Complex64;
 
@@ -23,6 +22,26 @@ pub enum Value {
 }
 
 impl Value {
+    pub fn is_int(&self) -> bool {
+        matches!(self, Value::Int(_))
+    }
+
+    pub fn is_float(&self) -> bool {
+        matches!(self, Value::Float(_))
+    }
+
+    pub fn is_complex(&self) -> bool {
+        matches!(self, Value::Complex(_))
+    }
+
+    pub fn is_vector(&self) -> bool {
+        matches!(self, Value::Vector(_))
+    }
+
+    pub fn is_bool(&self) -> bool {
+        matches!(self, Value::Bool(_))
+    }
+
     pub fn as_int(&self) -> EvalResult<IntValue> {
         match self {
             Value::Int(n) => Ok(*n),
@@ -39,6 +58,17 @@ impl Value {
             Value::Float(n) => Ok(*n),
             Value::Int(n) => Ok(*n as f64),
             Value::Bool(n) => Ok(*n as i64 as f64),
+            Value::Complex(n) => {
+                if n.im == 0.0 {
+                    Ok(n.re)
+                } else {
+                    Err(ErrorType::FailedCast {
+                        value: self.clone(),
+                        from: ValueType::ComplexType,
+                        To: ValueType::FloatType,
+                    })
+                }
+            }
             other => Err(ErrorType::TypeError {
                 expected: FloatType,
                 given: other.to_type(),
@@ -76,6 +106,16 @@ impl Value {
                 expected: BoolType,
                 given: other.to_type(),
             }),
+        }
+    }
+
+    pub fn as_type(&self, valuetype: &ValueType) -> EvalResult<Value> {
+        match valuetype {
+            ValueType::BoolType => Ok(Value::Bool(self.as_bool()?)),
+            ValueType::IntType => Ok(Value::Int(self.as_int()?)),
+            ValueType::FloatType => Ok(Value::Float(self.as_float()?)),
+            ValueType::ComplexType => Ok(Value::Complex(self.as_complex()?)),
+            ValueType::VectorType => Ok(Value::Vector(self.as_vector()?)),
         }
     }
 }

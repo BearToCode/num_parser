@@ -1,5 +1,5 @@
 /// Contains all the possible input tokens type.
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum TokenType {
     // OPERATORS
     /// A plus '+' character.

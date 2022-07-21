@@ -1,7 +1,7 @@
 mod expr;
 mod function;
+mod operators;
 mod out;
-mod parser;
 mod token;
 mod tree;
 mod value;
