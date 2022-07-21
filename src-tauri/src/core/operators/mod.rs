@@ -57,7 +57,29 @@ impl Value {
     }
 
     pub fn sub(self, rhs: Self) -> EvalResult<Self> {
-        Value::add(self, Value::mul(rhs, Value::Int(-1))?)
+        match Value::add(self, Value::mul(rhs, Value::Int(-1))?) {
+            // Replace eventual error with the right operation name.
+            Ok(value) => Ok(value),
+            Err(err) => Err(match err {
+                ErrorType::ErrorDuring {
+                    operation_name: _,
+                    error,
+                } => ErrorType::ErrorDuring {
+                    operation_name: "subtraction of arrays",
+                    error,
+                },
+                ErrorType::MismatchedArrayLengths {
+                    first,
+                    second,
+                    operation_name: _,
+                } => ErrorType::MismatchedArrayLengths {
+                    first,
+                    second,
+                    operation_name: "subtraction",
+                },
+                other => other,
+            }),
+        }
     }
 
     pub fn mul(self, rhs: Self) -> EvalResult<Self> {
@@ -93,7 +115,7 @@ impl Value {
                             match Value::mul(self_as_vector[i].clone(), rhs_as_vector[i].clone()) {
                                 Err(err) => {
                                     return Err(ErrorType::ErrorDuring {
-                                        operation_name: "sum of arrays",
+                                        operation_name: "multiplication of arrays",
                                         error: Box::new(err),
                                     })
                                 }
@@ -151,7 +173,7 @@ impl Value {
                             match Value::div(self_as_vector[i].clone(), rhs_as_vector[i].clone()) {
                                 Err(err) => {
                                     return Err(ErrorType::ErrorDuring {
-                                        operation_name: "sum of arrays",
+                                        operation_name: "division of arrays",
                                         error: Box::new(err),
                                     })
                                 }
