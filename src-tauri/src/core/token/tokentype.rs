@@ -18,3 +18,13 @@ pub enum TokenType {
     /// A string representing either a function call or a variable.
     Identifier,
 }
+
+impl TokenType {
+    pub fn is_binary_operator(&self) -> bool {
+        use self::TokenType::*;
+        match self {
+            Plus | Minus | Star | Slash => true,
+            _ => false,
+        }
+    }
+}

@@ -98,6 +98,7 @@ impl Value {
                 Value::Complex(self_converted.as_complex()? * rhs_converted.as_complex()?)
             }
             ValueType::VectorType => Value::Vector({
+                // TODO: add support for multiplication of a single number and a vector
                 let self_as_vector = self_converted.as_vector()?;
                 let rhs_as_vector = rhs_converted.as_vector()?;
                 let mut out_vector: Vec<Value> = vec![];

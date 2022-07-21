@@ -33,7 +33,9 @@ impl Token {
 }
 
 /// Builds a stream of tokens.
-fn build_stream(source: String) -> EvalResult<TokenStream> {
+fn build_stream(mut source: String) -> EvalResult<TokenStream> {
+    remove_whitespaces(&mut source);
+
     let mut stream: TokenStream = vec![];
     let mut content_iter = source.chars();
 
@@ -50,6 +52,11 @@ fn remove_whitespaces(string: &mut String) {
     string.replace(" ", "");
 }
 
+/// Adds star tokens (multiplications) when no operator is present
+fn add_implicit_multiplication(stream: &mut TokenStream) {
+    // TODO
+}
+
 /// Joins all identifiers.
 fn join_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
     let mut joined_stream: TokenStream = vec![];
@@ -60,7 +67,7 @@ fn join_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
         let is_identifier = token.r#type == TokenType::Identifier;
 
         if is_identifier && is_previous_identifier {
-            // Join with the previous token and remove the current one.
+            // Join with the previous token and avoid pushing the current one.
             let previous_token = joined_stream.last_mut().unwrap();
             previous_token.join_with(token, TokenType::Identifier);
         } else {
@@ -90,13 +97,13 @@ fn join_literals(stream: &TokenStream) -> EvalResult<TokenStream> {
                 if comma_found {
                     return Err(ErrorType::InvalidTokenAtPosition {
                         token: token.r#type,
-                    }); // TODO:
+                    });
                 }
                 comma_found = true;
             }
 
             if is_previous_literal {
-                // Join with the previous token and remove the current one.
+                // Join with the previous token and avoid pushing the current one.
                 let previous_token = joined_stream.last_mut().unwrap();
                 previous_token.join_with(token, TokenType::Literal);
             } else {
