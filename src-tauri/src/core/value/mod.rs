@@ -118,4 +118,32 @@ impl Value {
             ValueType::VectorType => Ok(Value::Vector(self.as_vector()?)),
         }
     }
+
+    /// Creates a new value from a string. Only accepts booleans, ints or floats.
+    pub fn from_string(string: String) -> EvalResult<Self> {
+        match &string[..] {
+            "true" => Ok(Value::Bool(true)),
+            "false" => Ok(Value::Bool(false)),
+            other => {
+                let count = other.matches(".").count();
+                if count != 0 {
+                    if count == 1 {
+                        match other.parse::<f64>() {
+                            Ok(value) => Ok(Value::Float(value)),
+                            Err(_) => Err(ErrorType::FailedParse { value: string }),
+                        }
+                    } else {
+                        Err(ErrorType::InvalidTokenAtPosition {
+                            token: super::token::tokentype::TokenType::Dot,
+                        })
+                    }
+                } else {
+                    match other.parse::<i64>() {
+                        Ok(value) => Ok(Value::Int(value)),
+                        Err(_) => Err(ErrorType::FailedParse { value: string }),
+                    }
+                }
+            }
+        }
+    }
 }

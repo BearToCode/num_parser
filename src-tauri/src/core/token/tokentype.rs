@@ -20,16 +20,19 @@ pub enum TokenType {
     ClosingBracket,
 
     /// A dot '.' character.
-    Comma,
+    Dot,
     /// A string representing a value.
     Literal,
-    /// A string representing either a function call or a variable.
-    Identifier,
+
+    /// A string representing a function call.
+    FunctionIdentifier,
+    /// A string representing a variable.
+    VariableIdentifier,
 }
 
 impl TokenType {
     pub fn is_expression(&self) -> bool {
-        *self == TokenType::Identifier || // Function or variable
+        *self == TokenType::FunctionIdentifier || // Function or variable
         *self == TokenType::Literal ||  // A number
         self.is_binary_operator() // An operator
     }
@@ -41,18 +44,22 @@ impl TokenType {
         }
     }
 
+    pub fn is_unary_operator(&self) -> bool {
+        match self {
+            Minus => true,
+            _ => false,
+        }
+    }
+
     pub fn precedence(&self) -> EvalResult<u16> {
         Ok(match self {
             Plus | Minus => 10,
             Star | Slash => 20,
 
-            Identifier => 200,
+            FunctionIdentifier | VariableIdentifier => 200,
+
             Literal => 300,
             _ => return Err(ErrorType::NotAnOperator { token: *self }),
         })
-    }
-
-    pub fn max_precedence() -> u16 {
-        500
     }
 }

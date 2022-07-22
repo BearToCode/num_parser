@@ -37,7 +37,13 @@ impl fmt::Display for ErrorType {
             NotAnOperator { token } => {
                 write!(f, "SYNTAX ERROR: `{}` is not a valid operator!", token)
             }
-            InvalidClosingBracket => write!(f, "SYNTAX ERROR: Invalid closing bracket."),
+            InvalidClosingBracket => write!(f, "SYNTAX ERROR: invalid closing bracket."),
+            MissingClosingBracket => write!(f, "SYNTAX ERROR: missing closing bracket."),
+            MissingOperatorArgument { token } => {
+                write!(f, "SYNTAX ERROR: missing argument for operator `{}`", token)
+            }
+            FailedParse { value } => write!(f, "SYNTAX ERROR: could not parse value `{}`.", value),
+
             ErrorDuring {
                 operation_name,
                 error,

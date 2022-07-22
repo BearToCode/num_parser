@@ -7,12 +7,12 @@ use std::fmt;
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.r#type {
-            Plus | Minus | Star | Slash | Comma | OpeningBracket | ClosingBracket => {
+            Plus | Minus | Star | Slash | Dot | OpeningBracket | ClosingBracket => {
                 write!(f, "{}", self.r#type)
             }
 
             Literal => write!(f, "{}", self.value),
-            Identifier => write!(f, "{}", self.value),
+            FunctionIdentifier | VariableIdentifier => write!(f, "{}", self.value),
         }
     }
 }
@@ -28,9 +28,10 @@ impl fmt::Display for TokenType {
             OpeningBracket => write!(f, "("),
             ClosingBracket => write!(f, ")"),
 
-            Comma => write!(f, "."),
+            Dot => write!(f, "."),
             Literal => write!(f, "<literal>"),
-            Identifier => write!(f, "<identifier>"),
+            FunctionIdentifier => write!(f, "<func>"),
+            VariableIdentifier => write!(f, "<var>"),
         }
     }
 }

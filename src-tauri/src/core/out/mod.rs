@@ -15,13 +15,9 @@ pub enum ErrorType {
         given: ValueType,
     },
     /// An unknown token found while parsing the string.
-    UnknownToken {
-        token: String,
-    },
+    UnknownToken { token: String },
     /// A known token placed in an invalid position.
-    InvalidTokenAtPosition {
-        token: TokenType,
-    },
+    InvalidTokenAtPosition { token: TokenType },
     /// A failed cast due to data loss.
     FailedCast {
         value: Value,
@@ -35,14 +31,17 @@ pub enum ErrorType {
         operation_name: &'static str,
     },
     /// Trying to divide by zero.
-    DivideByZero {
-        numerator: Value,
-    },
+    DivideByZero { numerator: Value },
     /// A token which is not an operator being used as such.
-    NotAnOperator {
-        token: TokenType,
-    },
+    NotAnOperator { token: TokenType },
+    /// An invalid closing bracket.
     InvalidClosingBracket,
+    /// A missing closing bracket.
+    MissingClosingBracket,
+    /// A missing left argument for an operator.
+    MissingOperatorArgument { token: TokenType },
+    /// An error occurred while parsing a literal.
+    FailedParse { value: String },
 
     /// An error wrapper to add additional information.
     ErrorDuring {

@@ -43,9 +43,56 @@ fn build_stream(mut source: String) -> EvalResult<TokenStream> {
         stream.push(tokenize(&c)?);
     }
 
+    stream = join_identifiers(&stream)?;
     stream = join_literals(&stream)?;
+    stream = add_implicit_multiplications(&stream);
 
     Ok(stream)
+}
+
+fn add_implicit_multiplications(stream: &TokenStream) -> TokenStream {
+    // Add token '*' between:
+    // literal-bracket: 2(4) or (4)2
+    // bracket-bracket: (2)(4)
+    // variable-bracket: pi(2) or (2)pi
+    // variable-literal: 2pi or pi2
+
+    // Return if empty.
+    if stream.len() == 0 {
+        return stream.clone();
+    }
+
+    let mut out_stream: TokenStream = vec![stream[0].clone()];
+
+    let mut previous_token_type = stream[0].r#type;
+    let mut index = 1;
+
+    while index < stream.len() {
+        let current_type = stream[index].r#type;
+
+        if previous_token_type == TokenType::Literal && current_type == TokenType::OpeningBracket
+            || previous_token_type == TokenType::ClosingBracket
+                && current_type == TokenType::Literal
+            || previous_token_type == TokenType::ClosingBracket
+                && current_type == TokenType::OpeningBracket
+            || previous_token_type == TokenType::VariableIdentifier
+                && current_type == TokenType::OpeningBracket
+            || previous_token_type == TokenType::ClosingBracket
+                && current_type == TokenType::VariableIdentifier
+            || previous_token_type == TokenType::Literal
+                && current_type == TokenType::VariableIdentifier
+            || previous_token_type == TokenType::VariableIdentifier
+                && current_type == TokenType::Literal
+        {
+            out_stream.push(Token::new(TokenType::Star, 1, ""));
+        }
+
+        out_stream.push(stream[index].clone());
+        previous_token_type = current_type;
+        index += 1;
+    }
+
+    out_stream
 }
 
 fn remove_whitespaces(string: &String) -> String {
@@ -59,12 +106,12 @@ fn join_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
     let mut is_previous_identifier: bool = false;
     // Iterate over the stream and join any literal
     for token in stream {
-        let is_identifier = token.r#type == TokenType::Identifier;
+        let is_identifier = token.r#type == TokenType::FunctionIdentifier;
 
         if is_identifier && is_previous_identifier {
             // Join with the previous token and avoid pushing the current one.
             let previous_token = joined_stream.last_mut().unwrap();
-            previous_token.join_with(token, TokenType::Identifier);
+            previous_token.join_with(token, TokenType::FunctionIdentifier);
         } else {
             joined_stream.push(token.clone());
         }
@@ -84,8 +131,21 @@ fn join_literals(stream: &TokenStream) -> EvalResult<TokenStream> {
     let mut comma_found = false;
     // Iterate over the stream and join any literal
     for token in stream {
+        // Handle bool values
+        if token.r#type == TokenType::VariableIdentifier {
+            if token.value == String::from("true") {
+                joined_stream.push(Token::new(TokenType::Literal, 4, "true"));
+                is_previous_literal = true;
+                continue;
+            } else if token.value == String::from("false") {
+                joined_stream.push(Token::new(TokenType::Literal, 5, "false"));
+                is_previous_literal = true;
+                continue;
+            }
+        }
+
         let is_literal = token.r#type == TokenType::Literal;
-        let is_comma = token.r#type == TokenType::Comma;
+        let is_comma = token.r#type == TokenType::Dot;
 
         if is_literal || is_comma {
             if is_comma {
@@ -123,7 +183,7 @@ fn tokenize(character: &char) -> EvalResult<Token> {
         '-' => Token::new(TokenType::Minus, 1, ""),
         '*' => Token::new(TokenType::Star, 1, ""),
         '/' => Token::new(TokenType::Slash, 1, ""),
-        '.' => Token::new(TokenType::Comma, 1, ""),
+        '.' => Token::new(TokenType::Dot, 1, ""),
         '(' => Token::new(TokenType::OpeningBracket, 1, ""),
         ')' => Token::new(TokenType::ClosingBracket, 1, ""),
         other => {
@@ -131,7 +191,16 @@ fn tokenize(character: &char) -> EvalResult<Token> {
             if other.is_numeric() {
                 Token::new(TokenType::Literal, 1, &as_string)
             } else if other.is_alphabetic() {
-                Token::new(TokenType::Identifier, 1, &as_string)
+                // TODO: VECTORS (CHECK COMMAS)
+
+                // TODO: TO FUNCTION OR IDENTIFIER
+                // TODO: IMAGINARY NUMBERS
+
+                // TODO: CREATE LIST OF RESERVED KEYWORDS TO NOT USE AS STATEMENTS
+
+                // SHOULD NOT BE DONE HERE
+                unimplemented!()
+                // Token::new(TokenType::FunctionIdentifier, 1, &as_string)
             } else {
                 return Err(ErrorType::UnknownToken {
                     token: String::from(&as_string),
