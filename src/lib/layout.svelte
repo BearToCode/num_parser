@@ -1,25 +1,16 @@
 <script lang="ts">
+	// Icons
 	import Icon from 'svelte-icons-pack';
-	import BiTerminal from 'svelte-icons-pack/bi/BiTerminal';
 
+	// Layout components
 	import Chrome from './nav/chrome.svelte';
 	import Navbar from './nav/navbar.svelte';
 	import Toolbar from './nav/toolbar.svelte';
 	import MainWindow from './main-window.svelte';
 	import Rbar from './nav/rbar.svelte';
 
-	import Terminal from './tools/terminal/terms-manager.svelte';
-
-	type window = {
-		name: string;
-		icon: any;
-		component: any;
-	};
-
-	let windows: window[] = [{ name: 'Terminal', icon: BiTerminal, component: Terminal }];
-
-	let toggleToolsWindow: () => void;
-	let setToolsWindow: (w: window) => void;
+	// Windows
+	import { toolsWindows, toggleToolsWindow, toolsWindowState, currentToolsWindow } from './windows-manager';
 </script>
 
 <div
@@ -32,18 +23,18 @@
 		<slot name="links" />
 	</Navbar>
 
-	<MainWindow bind:toggleToolsWindow bind:setToolsWindow>
+	<MainWindow>
 		<slot name="routes" />
 	</MainWindow>
 
 	<Rbar />
 
 	<Toolbar>
-		{#each windows as window}
+		{#each toolsWindows as window}
 			<button
 				class="flex items-center"
 				on:click={() => {
-					setToolsWindow(window);
+					currentToolsWindow.set(window);
 					toggleToolsWindow();
 				}}
 			>

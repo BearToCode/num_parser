@@ -4,31 +4,46 @@
 	import '@styles/split-themes.scss';
 
 	import ToolsWindow from './tools-window.svelte';
+	import {
+		toggleToolsWindow,
+		toolsWindowSize,
+		currentToolsWindow,
+		toolsWindowState,
+		WindowState,
+		Window,
+	} from './windows-manager';
 
-	let toolsWindowOpen = false;
-	let currentToolWindow: { name: string; icon: any; component: any };
-	let toolsWindowSize = 30;
-	let unmaximizedSize = toolsWindowSize;
+	let unmaximizedSize: number;
 
-	export const toggleToolsWindow = () => {
-		toolsWindowOpen = !toolsWindowOpen;
-	};
+	// Subscriptions
+	let size: number;
+	let status: WindowState;
+	let window: Window;
 
-	export const setToolsWindow = (window: { name: string; icon: any; component: any }) => {
-		currentToolWindow = window;
-	};
+	toolsWindowSize.subscribe((value) => {
+		size = value;
+	});
 
+	toolsWindowState.subscribe((value) => {
+		status = value;
+	});
+
+	currentToolsWindow.subscribe((value) => {
+		window = value;
+	});
+
+	// Size methods
 	const maximizeToolsWindow = () => {
-		unmaximizedSize = toolsWindowSize;
-		toolsWindowSize = 100;
+		unmaximizedSize = size;
+		toolsWindowSize.set(100);
 	};
 
 	const restoreToolsWindow = () => {
-		toolsWindowSize = unmaximizedSize;
+		toolsWindowSize.set(unmaximizedSize);
 	};
 
 	const minimizeToolsWindow = () => {
-		toolsWindowSize = 0;
+		toolsWindowSize.set(0);
 	};
 </script>
 
@@ -36,20 +51,20 @@
 	<Pane size={30} snapSize={5} maxSize={50} class="bg-primary-600" />
 	<Pane class="bg-primary-700">
 		<Splitpanes theme="neon-theme" dblClickSplitter={false} horizontal={true}>
-			<Pane snapSize={10} size={toolsWindowOpen ? 100 - toolsWindowSize : 100}>
+			<Pane snapSize={10} size={100 - size}>
 				<slot />
 			</Pane>
 
-			{#if toolsWindowOpen}
-				<Pane snapSize={10} bind:size={toolsWindowSize} class="flex flex-col">
+			{#if status == 'visible'}
+				<Pane snapSize={10} bind:size class="flex flex-col">
 					<ToolsWindow
-						icon={currentToolWindow.icon}
-						isMaximized={toolsWindowSize == 100}
+						icon={window.icon}
+						isMaximized={size == 100}
 						on:minimize={minimizeToolsWindow}
 						on:restore={restoreToolsWindow}
 						on:maximize={maximizeToolsWindow}
 						on:close={toggleToolsWindow}
-						tool={currentToolWindow.component}
+						tool={window.component}
 					/>
 				</Pane>
 			{/if}
