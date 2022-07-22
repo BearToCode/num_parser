@@ -34,7 +34,7 @@ impl Token {
 
 /// Builds a stream of tokens.
 fn build_stream(mut source: String) -> EvalResult<TokenStream> {
-    remove_whitespaces(&mut source);
+    source = remove_whitespaces(&source);
 
     let mut stream: TokenStream = vec![];
     let mut content_iter = source.chars();
@@ -48,13 +48,8 @@ fn build_stream(mut source: String) -> EvalResult<TokenStream> {
     Ok(stream)
 }
 
-fn remove_whitespaces(string: &mut String) {
-    string.replace(" ", "");
-}
-
-/// Adds star tokens (multiplications) when no operator is present
-fn add_implicit_multiplication(stream: &mut TokenStream) {
-    // TODO
+fn remove_whitespaces(string: &String) -> String {
+    string.replace(" ", "")
 }
 
 /// Joins all identifiers.
@@ -129,6 +124,8 @@ fn tokenize(character: &char) -> EvalResult<Token> {
         '*' => Token::new(TokenType::Star, 1, ""),
         '/' => Token::new(TokenType::Slash, 1, ""),
         '.' => Token::new(TokenType::Comma, 1, ""),
+        '(' => Token::new(TokenType::OpeningBracket, 1, ""),
+        ')' => Token::new(TokenType::ClosingBracket, 1, ""),
         other => {
             let as_string = format!("{}", other);
             if other.is_numeric() {

@@ -1,5 +1,5 @@
 use super::ErrorType::{self, *};
-use std::fmt;
+use std::fmt::{self, write};
 
 impl fmt::Display for ErrorType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
@@ -34,7 +34,10 @@ impl fmt::Display for ErrorType {
             DivideByZero { numerator } => {
                 write!(f, "MATH ERROR: trying to divide {} by zero.", numerator)
             }
-
+            NotAnOperator { token } => {
+                write!(f, "SYNTAX ERROR: `{}` is not a valid operator!", token)
+            }
+            InvalidClosingBracket => write!(f, "SYNTAX ERROR: Invalid closing bracket."),
             ErrorDuring {
                 operation_name,
                 error,

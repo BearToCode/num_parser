@@ -10,7 +10,7 @@
 	import Rbar from './nav/rbar.svelte';
 
 	// Windows
-	import { toolsWindows, toggleToolsWindow, toolsWindowState, currentToolsWindow } from './windows-manager';
+	import { toolsWindows, toggleToolsWindow, currentToolsWindow } from './windows-manager';
 </script>
 
 <div

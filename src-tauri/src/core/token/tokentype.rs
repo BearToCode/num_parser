@@ -1,3 +1,6 @@
+use self::TokenType::*;
+use super::super::out::{ErrorType, EvalResult};
+
 /// Contains all the possible input tokens type.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum TokenType {
@@ -11,6 +14,11 @@ pub enum TokenType {
     /// A slash '/' character.
     Slash,
 
+    /// An opening bracket '(' character.
+    OpeningBracket,
+    /// A closing bracket ')' character.
+    ClosingBracket,
+
     /// A dot '.' character.
     Comma,
     /// A string representing a value.
@@ -20,11 +28,31 @@ pub enum TokenType {
 }
 
 impl TokenType {
+    pub fn is_expression(&self) -> bool {
+        *self == TokenType::Identifier || // Function or variable
+        *self == TokenType::Literal ||  // A number
+        self.is_binary_operator() // An operator
+    }
+
     pub fn is_binary_operator(&self) -> bool {
-        use self::TokenType::*;
         match self {
             Plus | Minus | Star | Slash => true,
             _ => false,
         }
+    }
+
+    pub fn precedence(&self) -> EvalResult<u16> {
+        Ok(match self {
+            Plus | Minus => 10,
+            Star | Slash => 20,
+
+            Identifier => 200,
+            Literal => 300,
+            _ => return Err(ErrorType::NotAnOperator { token: *self }),
+        })
+    }
+
+    pub fn max_precedence() -> u16 {
+        500
     }
 }

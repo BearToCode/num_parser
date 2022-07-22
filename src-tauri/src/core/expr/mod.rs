@@ -10,6 +10,8 @@ use num::complex::Complex;
 
 pub struct Identifier(String);
 
+// TODO: STATEMENTS
+
 pub enum Expression {
     /// A binary operation between two expression.
     Binary(Box<Expression>, TokenType, Box<Expression>),
