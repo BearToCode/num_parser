@@ -7,10 +7,13 @@ use super::out::{
 };
 use tokentype::TokenType;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct Token {
+    /// The generic token type.
     pub r#type: TokenType,
+    /// The token size inside the original input.
     pub length: usize,
+    /// The token content. Only useful for literals and identifiers.
     pub value: String,
 }
 

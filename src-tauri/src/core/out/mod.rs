@@ -42,6 +42,8 @@ pub enum ErrorType {
     MissingOperatorArgument { token: TokenType },
     /// An error occurred while parsing a literal.
     FailedParse { value: String },
+    /// Two brackets with nothing inside.
+    EmptyBrackets,
 
     /// An error wrapper to add additional information.
     ErrorDuring {

@@ -43,6 +43,7 @@ impl fmt::Display for ErrorType {
                 write!(f, "SYNTAX ERROR: missing argument for operator `{}`", token)
             }
             FailedParse { value } => write!(f, "SYNTAX ERROR: could not parse value `{}`.", value),
+            EmptyBrackets => write!(f, "SYNTAX ERROR: invalid empty brackets."),
 
             ErrorDuring {
                 operation_name,
