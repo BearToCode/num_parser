@@ -1,7 +1,4 @@
-use super::{
-    out::{ErrorType, EvalResult},
-    value::Value,
-};
+use super::{out::EvalResult, value::Value};
 
 pub struct Function {
     function: Box<dyn ClonableFunc>,

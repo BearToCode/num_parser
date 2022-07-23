@@ -22,7 +22,7 @@ pub enum ErrorType {
     FailedCast {
         value: Value,
         from: ValueType,
-        To: ValueType,
+        to: ValueType,
     },
     /// Two arrays with different lengths.
     MismatchedArrayLengths {

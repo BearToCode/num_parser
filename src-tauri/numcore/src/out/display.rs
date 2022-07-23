@@ -17,10 +17,10 @@ impl fmt::Display for ErrorType {
             InvalidTokenAtPosition { token } => {
                 write!(f, "SYNTAX ERROR: invalid position for token `{}`.", token)
             }
-            FailedCast { value, from, To } => write!(
+            FailedCast { value, from, to } => write!(
                 f,
                 "MATH ERROR: could not cast value `{}` from type {} to type {}.",
-                value, from, To
+                value, from, to
             ),
             MismatchedArrayLengths {
                 first,

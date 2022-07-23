@@ -65,7 +65,7 @@ impl Value {
                     Err(ErrorType::FailedCast {
                         value: self.clone(),
                         from: ValueType::ComplexType,
-                        To: ValueType::FloatType,
+                        to: ValueType::FloatType,
                     })
                 }
             }

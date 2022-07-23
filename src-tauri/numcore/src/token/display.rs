@@ -12,7 +12,9 @@ impl fmt::Display for Token {
             }
 
             Literal => write!(f, "{}", self.value),
-            FunctionIdentifier | VariableIdentifier => write!(f, "{}", self.value),
+            UnknownIdentifier | FunctionIdentifier | VariableIdentifier => {
+                write!(f, "{}", self.value)
+            }
         }
     }
 }
@@ -30,6 +32,7 @@ impl fmt::Display for TokenType {
 
             Dot => write!(f, "."),
             Literal => write!(f, "<literal>"),
+            UnknownIdentifier => write!(f, "<unknown>"),
             FunctionIdentifier => write!(f, "<func>"),
             VariableIdentifier => write!(f, "<var>"),
         }

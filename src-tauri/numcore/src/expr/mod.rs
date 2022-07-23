@@ -1,12 +1,9 @@
-use super::out::{ErrorType, EvalResult};
-use super::token::tokentype::TokenType;
-use super::value::*;
 use super::{
     function::Function,
-    token::Token,
-    value::{valuetype::ValueType, Value},
+    out::{ErrorType, EvalResult},
+    token::tokentype::TokenType,
+    value::Value,
 };
-use num::complex::Complex;
 
 pub struct Identifier(String);
 
@@ -28,7 +25,7 @@ pub enum Expression {
 }
 
 impl Expression {
-    fn eval(&self) -> EvalResult<Value> {
+    pub fn eval(&self) -> EvalResult<Value> {
         match self {
             Self::Binary(left_expr, token_type, right_expr) => {
                 let left_value = (**left_expr).eval()?;
@@ -42,7 +39,16 @@ impl Expression {
                     _ => return Err(ErrorType::InvalidTokenAtPosition { token: *token_type }),
                 })
             }
-            _ => unimplemented!(),
+            Self::Unary(token_type, expr) => {
+                unimplemented!()
+            }
+            Self::Var(identifier) => {
+                unimplemented!()
+            }
+            Self::Func(function, arguments) => {
+                unimplemented!()
+            }
+            Self::Value(value) => Ok(value.clone()),
         }
     }
 }

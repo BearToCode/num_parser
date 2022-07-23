@@ -24,6 +24,8 @@ pub enum TokenType {
     /// A string representing a value.
     Literal,
 
+    /// An unknown identifier waiting to be processed.
+    UnknownIdentifier,
     /// A string representing a function call.
     FunctionIdentifier,
     /// A string representing a variable.
