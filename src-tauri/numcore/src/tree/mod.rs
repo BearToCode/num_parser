@@ -1,5 +1,7 @@
 use std::slice::Iter;
 
+use crate::token::tokentype;
+
 use super::expr::Expression;
 use super::function::*;
 use super::out::{ErrorType, EvalResult};
@@ -14,6 +16,7 @@ pub fn build_tree(stream: TokenStream) -> EvalResult<Node> {
     check_brackets(&stream)?;
     // Sort by precedence
     let mut sorted_node_tokens = sort_node_tokens(&stream)?;
+    println!("SORTED: {:?}", sorted_node_tokens);
     // For every token, starting from the token node
     // with the lowest precedence:
 
@@ -25,7 +28,12 @@ pub fn build_tree(stream: TokenStream) -> EvalResult<Node> {
     //     their nodes.
     //     - If it is a function call, retrieve all parameters
     //     and build their nodes.
-    Ok(create_node(&mut sorted_node_tokens, &stream, 0)?)
+    Ok(create_node(
+        &mut sorted_node_tokens,
+        &stream,
+        None,
+        (0, stream.len()),
+    )?)
 }
 
 fn check_brackets(stream: &TokenStream) -> EvalResult<()> {
@@ -50,7 +58,7 @@ fn check_brackets(stream: &TokenStream) -> EvalResult<()> {
 }
 
 /// Contains the token info inside the token stream.
-#[derive(Clone, PartialEq)]
+#[derive(Clone, PartialEq, Debug)]
 struct TokenInfo {
     /// The contained token.
     pub token: Token,
@@ -81,7 +89,7 @@ fn sort_node_tokens(stream: &TokenStream) -> EvalResult<Vec<TokenInfo>> {
             });
         }
     }
-    sorted.sort_by_key(|v| (v.depth, v.precedence));
+    sorted.sort_by_key(|v| (v.depth, v.precedence, -(v.position as i16)));
     Ok(sorted)
 }
 
@@ -90,20 +98,36 @@ fn sort_node_tokens(stream: &TokenStream) -> EvalResult<Vec<TokenInfo>> {
 fn create_node(
     sorted_node_tokens: &mut Vec<TokenInfo>,
     stream: &TokenStream,
-    index: usize,
+    index: Option<usize>,
+    range: (usize, usize),
 ) -> EvalResult<Node> {
+    let index = match index {
+        Some(value) => {
+            // Find the node in the sorted ones with the corresponding index
+            match sorted_node_tokens.iter().position(|x| x.position == value) {
+                Some(position) => position,
+                None => {
+                    unimplemented!()
+                }
+            }
+        }
+        None => 0,
+    };
+
     let token_info = sorted_node_tokens.remove(index);
+    println!("REMOVED: {:?}", token_info);
 
     // Get the node type.
     if token_info.token.r#type.is_binary_operator() && token_info.token.r#type.is_unary_operator() {
         // In this case we need to check for both unary and binary
-        match build_unary_operator(sorted_node_tokens, stream, &token_info) {
+        match build_unary_operator(sorted_node_tokens, stream, &token_info, range) {
             Ok(node) => return Ok(node),
             Err(_) => {
                 return Ok(build_binary_operator(
                     sorted_node_tokens,
                     stream,
                     &token_info,
+                    range,
                 )?)
             }
         }
@@ -113,6 +137,7 @@ fn create_node(
             sorted_node_tokens,
             stream,
             &token_info,
+            range,
         )?);
     } else if token_info.token.r#type.is_unary_operator() {
         // Try just unary
@@ -120,6 +145,7 @@ fn create_node(
             sorted_node_tokens,
             stream,
             &token_info,
+            range,
         )?);
     } else {
         // Match for functions, variables or literals.
@@ -138,11 +164,17 @@ fn build_unary_operator(
     sorted_node_tokens: &mut Vec<TokenInfo>,
     stream: &TokenStream,
     token_info: &TokenInfo,
+    range: (usize, usize),
 ) -> EvalResult<Node> {
     Ok(Node::Unary(
         token_info.token.r#type,
         Box::new(
-            match get_next_node(sorted_node_tokens, stream, &token_info) {
+            match get_lowest_precedence_successive_node(
+                sorted_node_tokens,
+                stream,
+                &token_info,
+                range,
+            )? {
                 Some(next_node) => next_node,
                 None => {
                     return Err(ErrorType::MissingOperatorArgument {
@@ -159,10 +191,16 @@ fn build_binary_operator(
     sorted_node_tokens: &mut Vec<TokenInfo>,
     stream: &TokenStream,
     token_info: &TokenInfo,
+    range: (usize, usize),
 ) -> EvalResult<Node> {
     Ok(Node::Binary(
         Box::new(
-            match get_previous_node(sorted_node_tokens, stream, &token_info)? {
+            match get_lowest_precedence_previous_node(
+                sorted_node_tokens,
+                stream,
+                &token_info,
+                range,
+            )? {
                 Some(previous_node) => previous_node,
                 None => {
                     return Err(ErrorType::MissingOperatorArgument {
@@ -173,7 +211,12 @@ fn build_binary_operator(
         ),
         token_info.token.r#type,
         Box::new(
-            match get_next_node(sorted_node_tokens, stream, &token_info) {
+            match get_lowest_precedence_successive_node(
+                sorted_node_tokens,
+                stream,
+                &token_info,
+                range,
+            )? {
                 Some(next_node) => next_node,
                 None => {
                     return Err(ErrorType::MissingOperatorArgument {
@@ -186,109 +229,78 @@ fn build_binary_operator(
 }
 
 /// Returns, if it exists, the node before the position specified.
-fn get_previous_node(
+fn get_lowest_precedence_previous_node(
     sorted_node_tokens: &mut Vec<TokenInfo>,
     stream: &TokenStream,
     pivot_token_info: &TokenInfo,
+    range: (usize, usize),
 ) -> EvalResult<Option<Node>> {
     // If there is a valid node-token, build it and return it, otherwise return None
-
-    if pivot_token_info.position == 0 {
-        return Ok(None);
-    }
-
-    // There can either be:
-    Ok(match stream[pivot_token_info.position - 1].r#type {
-        // an opening bracket,
-        TokenType::OpeningBracket => None,
-        // a value,
-        // a variable,
-        TokenType::Literal | TokenType::VariableIdentifier => Some(create_node(
-            sorted_node_tokens,
-            stream,
-            pivot_token_info.position - 1,
-        )?),
-        // a closing bracket
-        TokenType::ClosingBracket => {
-            // In this case, we need to get the corresponding opening bracket
-            let opening_bracket_index = get_corresponding_opening_bracket(
-                stream,
-                pivot_token_info.position - 1,
-                pivot_token_info.depth as i16,
-            )?;
-            if opening_bracket_index != 0 {
-                // Now check if the brackets were delimiting a function call.
-                // Search for a function at position index-1
-                match sorted_node_tokens.iter().position(|x| {
-                    x.position == opening_bracket_index - 1
-                        && x.token.r#type == TokenType::FunctionIdentifier
-                }) {
-                    // Build the function node if it found
-                    Some(index) => Some(create_node(sorted_node_tokens, stream, index)?),
-                    // Otherwise find the lowest precedence node in the brackets.
-                    None => Some(create_node(
-                        sorted_node_tokens,
-                        stream,
-                        get_lowest_precedence_node_token_index_in_range(
-                            sorted_node_tokens,
-                            opening_bracket_index,
-                            pivot_token_info.position - 1,
-                        )?,
-                    )?),
-                }
-            } else {
-                None
-            }
-        }
-        other => return Err(ErrorType::InvalidTokenAtPosition { token: other }),
-    })
-
-    // let starting_depth = pivot_token_info.depth;
+    get_lowest_precedence_node_in_range(
+        sorted_node_tokens,
+        stream,
+        (range.0, pivot_token_info.position),
+    )
 }
 
 /// Returns, if it exists, the token after the position specified.
-fn get_next_node(
-    sorted_node_tokens: &Vec<TokenInfo>,
+fn get_lowest_precedence_successive_node(
+    sorted_node_tokens: &mut Vec<TokenInfo>,
     stream: &TokenStream,
     pivot_token_info: &TokenInfo,
-) -> Option<Node> {
-    unimplemented!()
+    range: (usize, usize),
+) -> EvalResult<Option<Node>> {
+    // If there is a valid node-token, build it and return it, otherwise return None
+    get_lowest_precedence_node_in_range(
+        sorted_node_tokens,
+        stream,
+        (pivot_token_info.position, range.1),
+    )
 }
 
-/// Get the lowest node-token index in the range. The range is start-inclusive, end-exclusive.
-fn get_lowest_precedence_node_token_index_in_range(
-    sorted_node_tokens: &Vec<TokenInfo>,
-    start: usize,
-    end: usize,
-) -> EvalResult<usize> {
+/// Get the lowest precedence node in the range. The range is start-inclusive, end-exclusive.
+fn get_lowest_precedence_node_in_range(
+    sorted_node_tokens: &mut Vec<TokenInfo>,
+    stream: &TokenStream,
+    range: (usize, usize),
+) -> EvalResult<Option<Node>> {
     let candidates: Vec<TokenInfo> = sorted_node_tokens
         .iter()
-        .filter(|&x| x.position >= start && x.position < end)
+        .filter(|&x| x.position >= range.0 && x.position < range.1)
         .cloned()
         .collect();
 
     if candidates.len() == 0 {
-        Err(ErrorType::EmptyBrackets)
+        Ok(None)
     } else {
-        Ok(match candidates.iter().min_by_key(|&x| x.precedence) {
-            Some(value) => sorted_node_tokens.iter().position(|x| x == value).unwrap(),
-            None => return Err(ErrorType::EmptyBrackets),
-        })
+        Ok(
+            match candidates
+                .iter()
+                .min_by_key(|&x| (x.depth, x.precedence, -(x.position as i16)))
+            {
+                Some(value) => {
+                    // Create the node
+                    Some(create_node(
+                        sorted_node_tokens,
+                        stream,
+                        Some(sorted_node_tokens.iter().position(|x| x == value).unwrap()),
+                        range,
+                    )?)
+                }
+                None => return Err(ErrorType::EmptyBrackets),
+            },
+        )
     }
 }
 
-fn get_corresponding_opening_bracket(
-    stream: &TokenStream,
-    start: usize,
-    depth_at_start: i16,
-) -> EvalResult<usize> {
+fn get_corresponding_opening_bracket(stream: &TokenStream, start: usize) -> EvalResult<usize> {
     let mut index = (start - 1) as i16;
-    let mut current_depth = depth_at_start;
+    let mut current_depth = 0;
     while index >= 0 {
         let token: &Token = &stream[index as usize];
 
         if token.r#type == TokenType::OpeningBracket {
-            if current_depth == depth_at_start {
+            if current_depth == 0 {
                 return Ok(index.try_into().unwrap());
             }
             current_depth -= 1;
@@ -298,4 +310,23 @@ fn get_corresponding_opening_bracket(
         index -= 1;
     }
     Err(ErrorType::InvalidClosingBracket)
+}
+
+fn get_corresponding_closing_bracket(stream: &TokenStream, start: usize) -> EvalResult<usize> {
+    let mut index = (start + 1) as i16;
+    let mut current_depth = 0;
+    while (index as usize) < stream.len() {
+        let token: &Token = &stream[index as usize];
+
+        if token.r#type == TokenType::OpeningBracket {
+            current_depth -= 1;
+        } else if token.r#type == TokenType::ClosingBracket {
+            if current_depth == 0 {
+                return Ok(index.try_into().unwrap());
+            }
+            current_depth += 1;
+        }
+        index += 1;
+    }
+    Err(ErrorType::MissingClosingBracket)
 }
