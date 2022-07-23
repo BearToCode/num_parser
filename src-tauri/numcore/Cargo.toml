@@ -1,0 +1,12 @@
+[package]
+name = "numcore"
+version = "0.1.0"
+edition = "2021"
+authors = ["BearToCode"]
+
+[lib]
+name = "numcore"
+"path" = "src/lib.rs"
+
+[dependencies]
+num = "0.4.0"
