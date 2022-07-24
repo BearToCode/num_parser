@@ -44,6 +44,12 @@ pub enum ErrorType {
     FailedParse { value: String },
     /// Two brackets with nothing inside.
     EmptyBrackets,
+    ///
+    WrongFunctionArgumentsAmount {
+        func_name: String,
+        expected: u8,
+        given: u8,
+    },
 
     /// An error wrapper to add additional information.
     ErrorDuring {

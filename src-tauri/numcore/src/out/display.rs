@@ -44,6 +44,15 @@ impl fmt::Display for ErrorType {
             }
             FailedParse { value } => write!(f, "SYNTAX ERROR: could not parse value `{}`.", value),
             EmptyBrackets => write!(f, "SYNTAX ERROR: invalid empty brackets."),
+            WrongFunctionArgumentsAmount {
+                func_name,
+                expected,
+                given,
+            } => write!(
+                f,
+                "SYNTAX ERROR: function `{}` expected {} arguments, but got {}.",
+                func_name, expected, given
+            ),
 
             ErrorDuring {
                 operation_name,

@@ -8,8 +8,11 @@ use std::ops;
 impl Value {
     pub fn add(self, rhs: Self) -> EvalResult<Self> {
         // Maximum complexity between the two types, but cannot be lower than an int.
-        let highest_complexity =
-            ValueType::highest_complexity(vec![self.to_type(), rhs.to_type(), ValueType::IntType]);
+        let highest_complexity = ValueType::highest_complexity(vec![
+            &self.to_type(),
+            &rhs.to_type(),
+            &ValueType::IntType,
+        ]);
         let self_converted = self.as_type(&highest_complexity)?;
         let rhs_converted = rhs.as_type(&highest_complexity)?;
 
@@ -22,8 +25,8 @@ impl Value {
                 Value::Complex(self_converted.as_complex()? + rhs_converted.as_complex()?)
             }
             ValueType::VectorType => Value::Vector({
-                let self_as_vector = self_converted.as_vector()?;
-                let rhs_as_vector = rhs_converted.as_vector()?;
+                let self_as_vector = self_converted.as_vector();
+                let rhs_as_vector = rhs_converted.as_vector();
                 let mut out_vector: Vec<Value> = vec![];
 
                 if self_as_vector.len() != rhs_as_vector.len() {
@@ -84,8 +87,11 @@ impl Value {
 
     pub fn mul(self, rhs: Self) -> EvalResult<Self> {
         // Maximum complexity between the two types, but cannot be lower than an int.
-        let highest_complexity =
-            ValueType::highest_complexity(vec![self.to_type(), rhs.to_type(), ValueType::IntType]);
+        let highest_complexity = ValueType::highest_complexity(vec![
+            &self.to_type(),
+            &rhs.to_type(),
+            &ValueType::IntType,
+        ]);
         let self_converted = self.as_type(&highest_complexity)?;
         let rhs_converted = rhs.as_type(&highest_complexity)?;
 
@@ -99,8 +105,8 @@ impl Value {
             }
             ValueType::VectorType => Value::Vector({
                 // TODO: add support for multiplication of a single number and a vector
-                let self_as_vector = self_converted.as_vector()?;
-                let rhs_as_vector = rhs_converted.as_vector()?;
+                let self_as_vector = self_converted.as_vector();
+                let rhs_as_vector = rhs_converted.as_vector();
                 let mut out_vector: Vec<Value> = vec![];
 
                 if self_as_vector.len() != rhs_as_vector.len() {
@@ -136,9 +142,9 @@ impl Value {
     pub fn div(self, rhs: Self) -> EvalResult<Self> {
         // Maximum complexity between the two types, but cannot be lower than a float.
         let highest_complexity = ValueType::highest_complexity(vec![
-            self.to_type(),
-            rhs.to_type(),
-            ValueType::FloatType,
+            &self.to_type(),
+            &rhs.to_type(),
+            &ValueType::FloatType,
         ]);
         let self_converted = self.as_type(&highest_complexity)?;
         let rhs_converted = rhs.as_type(&highest_complexity)?;
@@ -160,8 +166,8 @@ impl Value {
                 Value::Complex(self_converted.as_complex()? / rhs_converted.as_complex()?)
             }
             ValueType::VectorType => Value::Vector({
-                let self_as_vector = self_converted.as_vector()?;
-                let rhs_as_vector = rhs_converted.as_vector()?;
+                let self_as_vector = self_converted.as_vector();
+                let rhs_as_vector = rhs_converted.as_vector();
                 let mut out_vector: Vec<Value> = vec![];
 
                 if self_as_vector.len() != rhs_as_vector.len() {

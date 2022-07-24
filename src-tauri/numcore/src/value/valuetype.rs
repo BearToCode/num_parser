@@ -34,11 +34,11 @@ impl ValueType {
         }
     }
 
-    pub fn highest_complexity(types: Vec<ValueType>) -> ValueType {
+    pub fn highest_complexity(types: Vec<&ValueType>) -> ValueType {
         let mut highest = ValueType::BoolType;
         for t in types {
             if t.complexity() > highest.complexity() {
-                highest = t;
+                highest = t.clone();
             }
         }
         highest

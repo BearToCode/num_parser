@@ -3,7 +3,7 @@ pub mod valuetype;
 
 use self::valuetype::ValueType::{self, *};
 use super::out::*;
-use num::complex::Complex64;
+use num::complex::{self, Complex64};
 
 pub type IntValue = i64;
 pub type FloatValue = f64;
@@ -22,6 +22,16 @@ pub enum Value {
 }
 
 impl Value {
+    pub fn get_type(&self) -> ValueType {
+        match self {
+            Value::Float(_) => ValueType::FloatType,
+            Value::Int(_) => ValueType::IntType,
+            Value::Complex(_) => ValueType::ComplexType,
+            Value::Vector(_) => ValueType::VectorType,
+            Value::Bool(_) => ValueType::BoolType,
+        }
+    }
+
     pub fn is_int(&self) -> bool {
         matches!(self, Value::Int(_))
     }
@@ -45,11 +55,30 @@ impl Value {
     pub fn as_int(&self) -> EvalResult<IntValue> {
         match self {
             Value::Int(n) => Ok(*n),
+            Value::Float(n) => {
+                if n.fract() == 0.0 {
+                    Ok(*n as IntValue)
+                } else {
+                    Err(ErrorType::FailedCast {
+                        value: self.clone(),
+                        from: ValueType::FloatType,
+                        to: ValueType::IntType,
+                    })
+                }
+            }
             Value::Bool(n) => Ok(*n as i64),
-            other => Err(ErrorType::TypeError {
-                expected: IntType,
-                given: other.to_type(),
-            }),
+            _ => match self.as_float() {
+                Ok(float) => Value::Float(float).as_int(),
+                // Overwrite error with the current types
+                Err(err) => match err {
+                    ErrorType::FailedCast { value, from, to: _ } => Err(ErrorType::FailedCast {
+                        value,
+                        from,
+                        to: ValueType::IntType,
+                    }),
+                    other => Err(other),
+                },
+            },
         }
     }
 
@@ -69,10 +98,18 @@ impl Value {
                     })
                 }
             }
-            other => Err(ErrorType::TypeError {
-                expected: FloatType,
-                given: other.to_type(),
-            }),
+            _ => match self.as_complex() {
+                Ok(complex) => Value::Complex(complex).as_float(),
+                // Overwrite error with the current types
+                Err(err) => match err {
+                    ErrorType::FailedCast { value, from, to: _ } => Err(ErrorType::FailedCast {
+                        value,
+                        from,
+                        to: ValueType::FloatType,
+                    }),
+                    other => Err(other),
+                },
+            },
         }
     }
 
@@ -82,30 +119,58 @@ impl Value {
             Value::Float(n) => Ok(Complex64::new(*n, 0.0)),
             Value::Int(n) => Ok(Complex64::new(*n as f64, 0.0)),
             Value::Bool(n) => Ok(Complex64::new(*n as i64 as f64, 0.0)),
-            other => Err(ErrorType::TypeError {
-                expected: ComplexType,
-                given: other.to_type(),
-            }),
+            Value::Vector(v) => {
+                if v.len() == 1 {
+                    v[1].as_complex()
+                } else {
+                    Err(ErrorType::FailedCast {
+                        value: self.clone(),
+                        from: ValueType::VectorType,
+                        to: ValueType::ComplexType,
+                    })
+                }
+            }
         }
     }
 
-    pub fn as_vector(&self) -> EvalResult<VectorValue> {
+    pub fn as_vector(&self) -> VectorValue {
         match self {
-            Value::Vector(v) => Ok(v.clone()),
-            Value::Int(n) => Ok(vec![Value::Int(*n)]),
-            Value::Float(n) => Ok(vec![Value::Float(*n)]),
-            Value::Complex(n) => Ok(vec![Value::Complex(*n)]),
-            Value::Bool(n) => Ok(vec![Value::Bool(*n)]),
+            Value::Vector(v) => v.clone(),
+            Value::Int(n) => vec![Value::Int(*n)],
+            Value::Float(n) => vec![Value::Float(*n)],
+            Value::Complex(n) => vec![Value::Complex(*n)],
+            Value::Bool(n) => vec![Value::Bool(*n)],
         }
     }
 
     pub fn as_bool(&self) -> EvalResult<BoolValue> {
         match self {
             Value::Bool(n) => Ok(*n),
-            other => Err(ErrorType::TypeError {
-                expected: BoolType,
-                given: other.to_type(),
-            }),
+            Value::Int(n) => {
+                if *n == 1 {
+                    Ok(true)
+                } else if *n == 0 {
+                    Ok(false)
+                } else {
+                    Err(ErrorType::FailedCast {
+                        value: self.clone(),
+                        from: ValueType::IntType,
+                        to: ValueType::BoolType,
+                    })
+                }
+            }
+            _ => match self.as_int() {
+                Ok(value) => Value::Int(value).as_bool(),
+                // Overwrite error with the current types
+                Err(err) => match err {
+                    ErrorType::FailedCast { value, from, to: _ } => Err(ErrorType::FailedCast {
+                        value,
+                        from,
+                        to: ValueType::BoolType,
+                    }),
+                    other => Err(other),
+                },
+            },
         }
     }
 
@@ -115,7 +180,7 @@ impl Value {
             ValueType::IntType => Ok(Value::Int(self.as_int()?)),
             ValueType::FloatType => Ok(Value::Float(self.as_float()?)),
             ValueType::ComplexType => Ok(Value::Complex(self.as_complex()?)),
-            ValueType::VectorType => Ok(Value::Vector(self.as_vector()?)),
+            ValueType::VectorType => Ok(Value::Vector(self.as_vector())),
         }
     }
 
@@ -143,6 +208,35 @@ impl Value {
                         Err(_) => Err(ErrorType::FailedParse { value: string }),
                     }
                 }
+            }
+        }
+    }
+
+    /// Tries to convert the value to the requested value-type. If it fails, it returns the lowest
+    /// complexity value achieved.
+    pub fn try_as_type(&self, valuetype: ValueType) -> Value {
+        // If target complexity is same or higher, return the value
+        if ValueType::highest_complexity(vec![&self.get_type(), &valuetype]) == self.get_type() {
+            self.clone()
+        } else {
+            match valuetype {
+                ValueType::BoolType => match self.as_bool() {
+                    Ok(value) => Value::Bool(value),
+                    Err(_) => self.try_as_type(ValueType::IntType),
+                },
+                ValueType::IntType => match self.as_int() {
+                    Ok(value) => Value::Int(value),
+                    Err(_) => self.try_as_type(ValueType::FloatType),
+                },
+                ValueType::FloatType => match self.as_float() {
+                    Ok(value) => Value::Float(value),
+                    Err(_) => self.try_as_type(ValueType::ComplexType),
+                },
+                ValueType::ComplexType => match self.as_complex() {
+                    Ok(value) => Value::Complex(value),
+                    Err(_) => self.try_as_type(ValueType::VectorType),
+                },
+                ValueType::VectorType => Value::Vector(self.as_vector()),
             }
         }
     }
