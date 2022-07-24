@@ -1,9 +1,10 @@
 mod display;
 pub mod valuetype;
 
-use self::valuetype::ValueType::{self, *};
+use self::valuetype::ValueType;
 use super::out::*;
-use num::complex::{self, Complex64};
+use crate::token::tokentype::TokenType;
+use num::complex::Complex64;
 
 pub type IntValue = i64;
 pub type FloatValue = f64;
@@ -184,12 +185,39 @@ impl Value {
         }
     }
 
-    /// Creates a new value from a string. Only accepts booleans, ints or floats.
+    /// Creates a new value from a string.
     pub fn from_string(string: String) -> EvalResult<Self> {
         match &string[..] {
             "true" => Ok(Value::Bool(true)),
             "false" => Ok(Value::Bool(false)),
             other => {
+                let mut other = String::from(other);
+
+                // Check for imaginary numbers
+                let i_count = other.matches("i").count();
+                if i_count != 0 {
+                    if i_count == 1 {
+                        other = String::from(other).replace("i", "");
+
+                        let other = if other == "" {
+                            String::from("1")
+                        } else {
+                            other
+                        };
+
+                        return Ok(Value::Complex(Complex64::new(
+                            0.0,
+                            match other.parse::<f64>() {
+                                Ok(value) => value,
+                                Err(_) => return Err(ErrorType::FailedParse { value: string }),
+                            },
+                        )));
+                    } else {
+                        return Err(ErrorType::FailedParse { value: string });
+                    }
+                }
+
+                // Check for floats
                 let count = other.matches(".").count();
                 if count != 0 {
                     if count == 1 {
@@ -199,7 +227,7 @@ impl Value {
                         }
                     } else {
                         Err(ErrorType::InvalidTokenAtPosition {
-                            token: super::token::tokentype::TokenType::Dot,
+                            token: TokenType::Dot,
                         })
                     }
                 } else {

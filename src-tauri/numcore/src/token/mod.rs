@@ -53,6 +53,7 @@ pub fn build_stream(mut source: String) -> EvalResult<TokenStream> {
 
 fn add_implicit_multiplications(stream: &TokenStream) -> TokenStream {
     // Add token '*' between:
+    // literal-literal
     // literal-bracket: 2(4) or (4)2
     // bracket-bracket: (2)(4)
     // variable-bracket: pi(2) or (2)pi
@@ -72,6 +73,7 @@ fn add_implicit_multiplications(stream: &TokenStream) -> TokenStream {
         let current_type = stream[index].r#type;
 
         if previous_token_type == TokenType::Literal && current_type == TokenType::OpeningBracket
+            || previous_token_type == TokenType::Literal && current_type == TokenType::Literal
             || previous_token_type == TokenType::ClosingBracket
                 && current_type == TokenType::Literal
             || previous_token_type == TokenType::ClosingBracket
@@ -197,9 +199,10 @@ fn tokenize(character: &char) -> EvalResult<Token> {
         ')' => Token::new(TokenType::ClosingBracket, 1, ""),
         other => {
             let as_string = format!("{}", other);
-            if other.is_numeric() {
+            if other.is_numeric() || *other == 'i' {
                 Token::new(TokenType::Literal, 1, &as_string)
             } else if other.is_alphabetic() {
+                Token::new(TokenType::UnknownIdentifier, 1, &as_string)
                 // TODO: VECTORS (CHECK COMMAS)
 
                 // TODO: TO FUNCTION OR IDENTIFIER
@@ -209,7 +212,6 @@ fn tokenize(character: &char) -> EvalResult<Token> {
 
                 // SHOULD NOT BE DONE HERE
                 // unimplemented!()
-                Token::new(TokenType::UnknownIdentifier, 1, &as_string)
             } else {
                 return Err(ErrorType::UnknownToken {
                     token: String::from(&as_string),

@@ -6,7 +6,7 @@ use crate::ErrorType;
 
 use super::{out::EvalResult, value::Value};
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Function {
     /// The identifier needed to call this function.
     func_identifier: &'static str,
@@ -30,7 +30,7 @@ impl Function {
     }
 }
 
-#[derive(Clone, Copy, PartialEq)]
+#[derive(Clone, Copy, PartialEq, Debug)]
 pub enum FunctionType {
     // Expects only one argument
     Unary,
@@ -41,7 +41,7 @@ pub enum FunctionType {
 }
 
 impl Function {
-    fn eval(&self, arguments: Value) -> EvalResult<Value> {
+    fn call(&self, arguments: Value) -> EvalResult<Value> {
         let arguments = match self.func_type {
             FunctionType::Unary => {
                 // Avoid vectors

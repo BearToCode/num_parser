@@ -199,4 +199,16 @@ impl Value {
             _ => unimplemented!(),
         })
     }
+
+    pub fn negate(self) -> EvalResult<Self> {
+        let highest_complexity =
+            ValueType::highest_complexity(vec![&self.to_type(), &ValueType::IntType]);
+        let self_converted = self.as_type(&highest_complexity)?;
+        match self_converted {
+            Self::Bool(_) => Err(ErrorType::InternalError {
+                message: "Failed type conversion in negate operator".to_owned(),
+            }),
+            other => Ok(Value::sub(Value::Int(0), other)?),
+        }
+    }
 }

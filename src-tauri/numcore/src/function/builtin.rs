@@ -18,7 +18,7 @@ lazy_static! {
 
         m
     };
-    pub static ref BUILTIN_FUNCTIONS: Vec<Function> = vec![
+    pub static ref BUILT_IN_FUNCTIONS: Vec<Function> = vec![
         Function::new("sin", sin, FunctionType::Unary),
         Function::new("cos", cos, FunctionType::Unary),
         Function::new("tan", tan, FunctionType::Unary)
@@ -27,7 +27,7 @@ lazy_static! {
 
 /// Returns `Some(Function)` if the identifier matches some.
 pub fn built_in_function(identifier: &'static str) -> Option<Function> {
-    BUILTIN_FUNCTIONS
+    BUILT_IN_FUNCTIONS
         .iter()
         .find(|x| x.func_identifier == identifier)
         .cloned()
@@ -36,6 +36,19 @@ pub fn built_in_function(identifier: &'static str) -> Option<Function> {
 /// Returns `Some(Value)` if the identifier matches some.
 pub fn consts(identifier: &'static str) -> Option<Value> {
     CONSTANTS.get(identifier).cloned()
+}
+
+/// Returns all reserved keywords.
+pub fn reserved_keywords() -> Vec<&'static str> {
+    [
+        vec!["i", "true", "false"],
+        CONSTANTS.keys().cloned().collect(),
+        BUILT_IN_FUNCTIONS
+            .iter()
+            .map(|x| x.func_identifier)
+            .collect(),
+    ]
+    .concat()
 }
 
 // Built in functions:

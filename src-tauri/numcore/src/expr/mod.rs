@@ -5,10 +5,12 @@ use super::{
     value::Value,
 };
 
+#[derive(Debug)]
 pub struct Identifier(String);
 
 // TODO: STATEMENTS
 
+#[derive(Debug)]
 pub enum Expression {
     /// A binary operation between two expression.
     Binary(Box<Expression>, TokenType, Box<Expression>),
@@ -31,7 +33,6 @@ impl Expression {
                 let left_value = (**left_expr).eval()?;
                 let right_value = (**right_expr).eval()?;
                 Ok(match token_type {
-                    // Sum
                     TokenType::Plus => Value::add(left_value, right_value)?,
                     TokenType::Minus => Value::sub(left_value, right_value)?,
                     TokenType::Star => Value::mul(left_value, right_value)?,
@@ -39,15 +40,16 @@ impl Expression {
                     _ => return Err(ErrorType::InvalidTokenAtPosition { token: *token_type }),
                 })
             }
-            Self::Unary(token_type, expr) => {
-                unimplemented!()
-            }
-            Self::Var(identifier) => {
-                unimplemented!()
-            }
-            Self::Func(function, arguments) => {
-                unimplemented!()
-            }
+            Self::Unary(token_type, expr) => Ok(match token_type {
+                TokenType::Minus => Value::negate(expr.eval()?)?,
+                _ => return Err(ErrorType::InvalidTokenAtPosition { token: *token_type }),
+            }),
+            Self::Var(identifier) => Err(ErrorType::InternalError {
+                message: "unimplemented".to_owned(),
+            }),
+            Self::Func(function, arguments) => Err(ErrorType::InternalError {
+                message: "unimplemented".to_owned(),
+            }),
             Self::Value(value) => Ok(value.clone()),
         }
     }

@@ -22,7 +22,30 @@ impl fmt::Display for Value {
             Self::Bool(v) => write!(f, "{}", v),
             Self::Int(v) => write!(f, "{}", v),
             Self::Float(v) => write!(f, "{}", v),
-            Self::Complex(v) => write!(f, "{}", v),
+            Self::Complex(v) => write!(
+                f,
+                "{}",
+                if v.re == 0.0 {
+                    if v.im == 1.0 {
+                        String::from("i")
+                    } else {
+                        format!("{}i", v.im)
+                    }
+                } else if v.im == 0.0 {
+                    format!("{}", v.re)
+                } else {
+                    format!(
+                        "{}{}{}i",
+                        v.re,
+                        if v.im > 0.0 { "+" } else { "-" },
+                        if v.im == 1.0 {
+                            String::from("")
+                        } else {
+                            format!("{}", v.im)
+                        }
+                    )
+                }
+            ),
             Self::Vector(v) => write!(f, "{:?}", v),
         }
     }
