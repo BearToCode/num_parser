@@ -50,6 +50,9 @@ pub enum ErrorType {
         operation_name: &'static str,
         error: Box<ErrorType>,
     },
+    /// An error due to a missing implementation or a bug. This should
+    /// never occur.
+    InternalError { message: String },
 }
 
 impl std::error::Error for ErrorType {}

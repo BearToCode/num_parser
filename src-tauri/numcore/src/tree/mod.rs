@@ -116,6 +116,18 @@ fn create_node(
         None => 0,
     };
 
+    if sorted_node_tokens.len() == 0 {
+        if position == None {
+            // First iteration, so input is empty
+            return Ok(Node::Value(Value::Int(0)));
+        } else {
+            // This is an error
+            return Err(ErrorType::InternalError {
+                message: String::from("trying to remove non-existing token"),
+            });
+        }
+    }
+
     let token_info = sorted_node_tokens.remove(index);
     println!("REMOVED: {:?}", token_info);
 

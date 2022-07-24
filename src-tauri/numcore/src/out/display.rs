@@ -53,6 +53,7 @@ impl fmt::Display for ErrorType {
                 "An error occurred during operation `{}`: \n {}",
                 operation_name, *error
             ),
+            InternalError { message } => write!(f, "INTERNAL ERROR: {}.", message),
         }
     }
 }
