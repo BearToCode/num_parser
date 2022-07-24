@@ -1,6 +1,5 @@
-use super::out::{self, *};
+use super::out::*;
 use super::value::{valuetype::ValueType, Value};
-use std::ops;
 
 // Implement operators for values. The values should be converted
 // to the highest complex type of the operands.

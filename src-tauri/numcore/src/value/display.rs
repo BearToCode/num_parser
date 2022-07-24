@@ -1,3 +1,5 @@
+use num::complex::ComplexFloat;
+
 use super::{
     valuetype::ValueType::{self, *},
     Value,
@@ -38,10 +40,10 @@ impl fmt::Display for Value {
                         "{}{}{}i",
                         v.re,
                         if v.im > 0.0 { "+" } else { "-" },
-                        if v.im == 1.0 {
+                        if v.im.abs() == 1.0 {
                             String::from("")
                         } else {
-                            format!("{}", v.im)
+                            format!("{}", v.im.abs())
                         }
                     )
                 }

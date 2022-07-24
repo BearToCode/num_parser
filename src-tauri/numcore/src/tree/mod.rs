@@ -101,8 +101,6 @@ fn create_node(
     position: Option<usize>,
     range: (usize, usize),
 ) -> EvalResult<Node> {
-    println!("INDEX: {:?}", position);
-    println!("SORTED: {:?}", sorted_node_tokens);
     let index = match position {
         Some(value) => {
             // Find the node in the sorted ones with the corresponding index
@@ -129,15 +127,14 @@ fn create_node(
     }
 
     let token_info = sorted_node_tokens.remove(index);
-    println!("REMOVED: {:?}", token_info);
 
     // Get the node type.
     if token_info.token.r#type.is_binary_operator() && token_info.token.r#type.is_unary_operator() {
         // In this case we need to check for both unary and binary
-        match build_unary_operator(sorted_node_tokens, stream, &token_info, range) {
+        match build_binary_operator(sorted_node_tokens, stream, &token_info, range) {
             Ok(node) => return Ok(node),
             Err(_) => {
-                return Ok(build_binary_operator(
+                return Ok(build_unary_operator(
                     sorted_node_tokens,
                     stream,
                     &token_info,
