@@ -134,9 +134,12 @@ impl Value {
     }
 
     pub fn div(self, rhs: Self) -> EvalResult<Self> {
-        // Maximum complexity between the two types, but cannot be lower than an int.
-        let highest_complexity =
-            ValueType::highest_complexity(vec![self.to_type(), rhs.to_type(), ValueType::IntType]);
+        // Maximum complexity between the two types, but cannot be lower than a float.
+        let highest_complexity = ValueType::highest_complexity(vec![
+            self.to_type(),
+            rhs.to_type(),
+            ValueType::FloatType,
+        ]);
         let self_converted = self.as_type(&highest_complexity)?;
         let rhs_converted = rhs.as_type(&highest_complexity)?;
 
