@@ -1,10 +1,9 @@
-mod builtin;
+pub mod builtin;
 
-use std::task::Context;
-
-use crate::ErrorType;
-
-use super::{out::EvalResult, value::Value};
+use crate::{
+    out::{ErrorType, EvalResult},
+    value::Value,
+};
 
 #[derive(Clone, Debug)]
 pub struct Function {
@@ -41,7 +40,7 @@ pub enum FunctionType {
 }
 
 impl Function {
-    fn call(&self, arguments: Value) -> EvalResult<Value> {
+    pub fn call(&self, arguments: Value) -> EvalResult<Value> {
         let arguments = match self.func_type {
             FunctionType::Unary => {
                 // Avoid vectors

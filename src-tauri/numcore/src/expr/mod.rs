@@ -19,7 +19,7 @@ pub enum Expression {
     /// A variable.
     Var(Identifier),
     /// A function call and its parameters.
-    Func(Function, Vec<Expression>),
+    Func(Function, Box<Expression>),
     /// A literal value.
     Value(Value),
     // TODO: An equation.
@@ -47,9 +47,7 @@ impl Expression {
             Self::Var(identifier) => Err(ErrorType::InternalError {
                 message: "unimplemented".to_owned(),
             }),
-            Self::Func(function, arguments) => Err(ErrorType::InternalError {
-                message: "unimplemented".to_owned(),
-            }),
+            Self::Func(function, arguments) => Ok(function.call(arguments.eval()?)?),
             Self::Value(value) => Ok(value.clone()),
         }
     }

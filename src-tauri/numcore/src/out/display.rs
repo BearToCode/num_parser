@@ -1,5 +1,5 @@
 use super::ErrorType::{self, *};
-use std::fmt::{self, write};
+use std::fmt;
 
 impl fmt::Display for ErrorType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {

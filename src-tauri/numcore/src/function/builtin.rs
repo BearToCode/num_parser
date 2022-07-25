@@ -26,7 +26,7 @@ lazy_static! {
 }
 
 /// Returns `Some(Function)` if the identifier matches some.
-pub fn built_in_function(identifier: &'static str) -> Option<Function> {
+pub fn functions(identifier: &str) -> Option<Function> {
     BUILT_IN_FUNCTIONS
         .iter()
         .find(|x| x.func_identifier == identifier)
@@ -34,7 +34,7 @@ pub fn built_in_function(identifier: &'static str) -> Option<Function> {
 }
 
 /// Returns `Some(Value)` if the identifier matches some.
-pub fn consts(identifier: &'static str) -> Option<Value> {
+pub fn consts(identifier: &str) -> Option<Value> {
     CONSTANTS.get(identifier).cloned()
 }
 

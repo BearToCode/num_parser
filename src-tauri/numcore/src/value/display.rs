@@ -1,9 +1,4 @@
-use num::complex::ComplexFloat;
-
-use super::{
-    valuetype::ValueType::{self, *},
-    Value,
-};
+use super::{valuetype::ValueType, Value};
 use std::fmt;
 
 impl fmt::Display for ValueType {

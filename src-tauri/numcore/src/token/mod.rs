@@ -1,8 +1,11 @@
 mod display;
 pub mod tokentype;
 
-use super::out::{ErrorType, EvalResult};
-use tokentype::TokenType;
+use crate::{
+    function::builtin,
+    out::{ErrorType, EvalResult},
+    token::tokentype::TokenType,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
@@ -58,6 +61,8 @@ fn add_implicit_multiplications(stream: &TokenStream) -> TokenStream {
     // bracket-bracket: (2)(4)
     // variable-bracket: pi(2) or (2)pi
     // variable-literal: 2pi or pi2
+    // literal-function: 2sin(x)
+    // bracket-function: (2)sin(x)
 
     // Return if empty.
     if stream.len() == 0 {
@@ -86,6 +91,10 @@ fn add_implicit_multiplications(stream: &TokenStream) -> TokenStream {
                 && current_type == TokenType::VariableIdentifier
             || previous_token_type == TokenType::VariableIdentifier
                 && current_type == TokenType::Literal
+            || previous_token_type == TokenType::Literal
+                && current_type == TokenType::FunctionIdentifier
+            || previous_token_type == TokenType::ClosingBracket
+                && current_type == TokenType::FunctionIdentifier
         {
             out_stream.push(Token::new(TokenType::Star, 1, ""));
         }
@@ -127,24 +136,48 @@ fn join_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
 
 /// Determine if the identifier is a value, a function or a variable.
 fn categorize_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
-    Ok(stream
+    stream
         .iter()
         .map(|x| {
             if x.r#type == TokenType::UnknownIdentifier {
                 match &x.value[..] {
-                    "true" => Token::new(TokenType::Literal, 4, "true"),
-                    "false" => Token::new(TokenType::Literal, 5, "false"),
-                    // TODO:
-                    _ => unimplemented!(),
+                    "true" => Ok(Token::new(TokenType::Literal, 4, "true")),
+                    "false" => Ok(Token::new(TokenType::Literal, 5, "false")),
+
+                    other => {
+                        // TODO: CONTEXT
+
+                        // Check for function
+                        match builtin::functions(&other) {
+                            Some(_func) => Ok(Token::new(
+                                TokenType::FunctionIdentifier,
+                                other.len(),
+                                &other,
+                            )),
+                            None => {
+                                // Check for variable
+                                match builtin::consts(&other) {
+                                    Some(_value) => Ok(Token::new(
+                                        TokenType::VariableIdentifier,
+                                        other.len(),
+                                        &other,
+                                    )),
+                                    None => Err(ErrorType::UnknownToken {
+                                        token: other.to_owned(),
+                                    }),
+                                }
+                            }
+                        }
+                    }
                 }
             } else {
-                x.clone()
+                Ok(x.clone())
             }
         })
-        .collect())
+        .collect()
 }
 
-/// Joins numbers handling commas.
+/// Join numbers handling commas.
 fn join_literals(stream: &TokenStream) -> EvalResult<TokenStream> {
     let mut joined_stream: TokenStream = vec![];
 
@@ -204,9 +237,6 @@ fn tokenize(character: &char) -> EvalResult<Token> {
             } else if other.is_alphabetic() {
                 Token::new(TokenType::UnknownIdentifier, 1, &as_string)
                 // TODO: VECTORS (CHECK COMMAS)
-
-                // TODO: TO FUNCTION OR IDENTIFIER
-                // TODO: IMAGINARY NUMBERS
 
                 // TODO: CREATE LIST OF RESERVED KEYWORDS TO NOT USE AS STATEMENTS
 

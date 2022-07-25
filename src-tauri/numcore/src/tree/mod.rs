@@ -1,12 +1,10 @@
-use std::slice::Iter;
-
-use crate::token::tokentype;
-
-use super::expr::Expression;
-use super::function::*;
-use super::out::{ErrorType, EvalResult};
-use super::token::{tokentype::TokenType, Token, TokenStream};
-use super::value::Value;
+use crate::{
+    expr::Expression,
+    function::builtin,
+    out::{ErrorType, EvalResult},
+    token::{tokentype::TokenType, Token, TokenStream},
+    value::Value,
+};
 
 /// An expression is a node in the expression tree.
 type Node = Expression;
@@ -107,7 +105,9 @@ fn create_node(
             match sorted_node_tokens.iter().position(|x| x.position == value) {
                 Some(position) => position,
                 None => {
-                    unimplemented!()
+                    return Err(ErrorType::InternalError {
+                        message: String::from("trying to remove non-existing token"),
+                    });
                 }
             }
         }
@@ -163,6 +163,29 @@ fn create_node(
         match token_info.token.r#type {
             TokenType::Literal => {
                 return Ok(Node::Value(Value::from_string(token_info.token.value)?))
+            }
+            TokenType::VariableIdentifier => {
+                match builtin::consts(&token_info.token.value) {
+                    Some(value) => return Ok(Node::Value(value)),
+                    // TODO: CONTEXT
+                    None => unimplemented!(),
+                }
+            }
+            TokenType::FunctionIdentifier => {
+                match builtin::functions(&token_info.token.value) {
+                    Some(func) => {
+                        return Ok(Node::Func(
+                            func,
+                            Box::new(get_function_parameters(
+                                sorted_node_tokens,
+                                stream,
+                                token_info.position,
+                            )?),
+                        ))
+                    }
+                    // TODO: CONTEXT
+                    None => unimplemented!(),
+                }
             }
             // TODO:
             _ => unimplemented!(),
@@ -250,8 +273,6 @@ fn get_lowest_precedence_node_in_range(
         .cloned()
         .collect();
 
-    println!("CANDIDATES: {:?}", candidates);
-
     if candidates.len() == 0 {
         Ok(None)
     } else {
@@ -273,4 +294,13 @@ fn get_lowest_precedence_node_in_range(
             },
         )
     }
+}
+
+/// Returns a node with can contains multiple values as a vector.
+fn get_function_parameters(
+    sorted_node_tokens: &mut Vec<TokenInfo>,
+    stream: &TokenStream,
+    func_index: usize,
+) -> EvalResult<Node> {
+    unimplemented!()
 }
