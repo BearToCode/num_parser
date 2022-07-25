@@ -44,12 +44,14 @@ pub enum ErrorType {
     FailedParse { value: String },
     /// Two brackets with nothing inside.
     EmptyBrackets,
-    ///
+    /// A function call with the wrong function arguments amount.
     WrongFunctionArgumentsAmount {
         func_name: String,
         expected: u8,
         given: u8,
     },
+    /// A function with no parameters
+    MissingFunctionParameters { func_name: String },
 
     /// An error wrapper to add additional information.
     ErrorDuring {

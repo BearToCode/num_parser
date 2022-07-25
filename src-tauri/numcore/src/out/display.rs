@@ -53,6 +53,11 @@ impl fmt::Display for ErrorType {
                 "SYNTAX ERROR: function `{}` expected {} arguments, but got {}.",
                 func_name, expected, given
             ),
+            MissingFunctionParameters { func_name } => write!(
+                f,
+                "SYNTAX ERROR: no arguments provided for function `{}`.",
+                func_name
+            ),
 
             ErrorDuring {
                 operation_name,

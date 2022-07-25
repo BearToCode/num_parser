@@ -91,8 +91,8 @@ fn sort_node_tokens(stream: &TokenStream) -> EvalResult<Vec<TokenInfo>> {
     Ok(sorted)
 }
 
-/// This function consumes the element at the provided index of the iterator and builds a node. It finds
-/// eventual required node parameters inside the iterator.
+/// Consumes the token with the provided stream position and builds a node. It finds
+/// eventual required node parameters inside the same vectors within the specified range.
 fn create_node(
     sorted_node_tokens: &mut Vec<TokenInfo>,
     stream: &TokenStream,
@@ -179,7 +179,7 @@ fn create_node(
                             Box::new(get_function_parameters(
                                 sorted_node_tokens,
                                 stream,
-                                token_info.position,
+                                &token_info,
                             )?),
                         ))
                     }
@@ -300,7 +300,85 @@ fn get_lowest_precedence_node_in_range(
 fn get_function_parameters(
     sorted_node_tokens: &mut Vec<TokenInfo>,
     stream: &TokenStream,
-    func_index: usize,
+    func_token: &TokenInfo,
 ) -> EvalResult<Node> {
-    unimplemented!()
+    let func_pos = func_token.position;
+    // Check if in range
+    if func_pos + 1 < stream.len() {
+        // Check for bracket
+        if stream[func_pos + 1].r#type == TokenType::OpeningBracket {
+            // Builds the node inside the brackets
+            match get_lowest_precedence_node_in_range(
+                sorted_node_tokens,
+                stream,
+                (
+                    func_pos + 1,
+                    get_corresponding_closing_bracket(stream, func_pos + 1)?,
+                ),
+            )? {
+                Some(node) => Ok(node),
+                None => Err(ErrorType::MissingFunctionParameters {
+                    func_name: func_token.token.value.clone(),
+                }),
+            }
+        } else {
+            // See if there is an available token to be built after the function token
+            match sorted_node_tokens
+                .iter()
+                .find(|x| x.position == func_pos + 1)
+            {
+                Some(token_info) => {
+                    // an available token has been found, see if it a literal, a variable or a function
+                    match token_info.token.r#type {
+                        TokenType::Literal
+                        | TokenType::VariableIdentifier
+                        | TokenType::FunctionIdentifier => Ok(create_node(
+                            sorted_node_tokens,
+                            stream,
+                            Some(token_info.position),
+                            (token_info.position, token_info.position + 1),
+                        )?),
+                        // this token cannot be used as a function parameter,
+                        // we only want implicit tokens that do not require other nodes,
+                        // like: sin2 = sin(2), sinpi = sin(pi), sincos(2) = sin(cos(2))
+                        _ => Err(ErrorType::MissingFunctionParameters {
+                            func_name: func_token.token.value.clone(),
+                        }),
+                    }
+                }
+                None => {
+                    // No available token
+                    Err(ErrorType::MissingFunctionParameters {
+                        func_name: func_token.token.value.clone(),
+                    })
+                }
+            }
+        }
+    } else {
+        Err(ErrorType::MissingFunctionParameters {
+            func_name: func_token.token.value.clone(),
+        })
+    }
+}
+
+fn get_corresponding_closing_bracket(
+    stream: &TokenStream,
+    opening_bracket_pos: usize,
+) -> EvalResult<usize> {
+    let mut index = opening_bracket_pos + 1;
+    let mut current_depth = 0;
+    while index < stream.len() {
+        let token: &Token = &stream[index];
+
+        if token.r#type == TokenType::ClosingBracket {
+            if current_depth == 0 {
+                return Ok(index.try_into().unwrap());
+            }
+            current_depth -= 1;
+        } else if token.r#type == TokenType::OpeningBracket {
+            current_depth += 1;
+        }
+        index += 1;
+    }
+    Err(ErrorType::MissingClosingBracket)
 }

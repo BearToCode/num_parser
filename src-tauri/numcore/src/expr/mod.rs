@@ -33,10 +33,16 @@ impl Expression {
                 let left_value = (**left_expr).eval()?;
                 let right_value = (**right_expr).eval()?;
                 Ok(match token_type {
+                    // Sum
                     TokenType::Plus => Value::add(left_value, right_value)?,
+                    // Subtraction
                     TokenType::Minus => Value::sub(left_value, right_value)?,
+                    // Multiplication
                     TokenType::Star => Value::mul(left_value, right_value)?,
+                    // Division
                     TokenType::Slash => Value::div(left_value, right_value)?,
+                    // Aggregation
+                    TokenType::Comma => Value::aggregate(left_value, right_value),
                     _ => return Err(ErrorType::InvalidTokenAtPosition { token: *token_type }),
                 })
             }

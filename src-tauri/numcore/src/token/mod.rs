@@ -143,9 +143,12 @@ fn categorize_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
                 match &x.value[..] {
                     "true" => Ok(Token::new(TokenType::Literal, 4, "true")),
                     "false" => Ok(Token::new(TokenType::Literal, 5, "false")),
+                    "i" => Ok(Token::new(TokenType::Literal, 1, "i")),
 
                     other => {
                         // TODO: CONTEXT
+
+                        println!("IDENTIFIER: {}", other);
 
                         // Check for function
                         match builtin::functions(&other) {
@@ -227,12 +230,13 @@ fn tokenize(character: &char) -> EvalResult<Token> {
         '-' => Token::new(TokenType::Minus, 1, ""),
         '*' => Token::new(TokenType::Star, 1, ""),
         '/' => Token::new(TokenType::Slash, 1, ""),
+        ',' => Token::new(TokenType::Comma, 1, ""),
         '.' => Token::new(TokenType::Dot, 1, "."),
         '(' => Token::new(TokenType::OpeningBracket, 1, ""),
         ')' => Token::new(TokenType::ClosingBracket, 1, ""),
         other => {
             let as_string = format!("{}", other);
-            if other.is_numeric() || *other == 'i' {
+            if other.is_numeric() {
                 Token::new(TokenType::Literal, 1, &as_string)
             } else if other.is_alphabetic() {
                 Token::new(TokenType::UnknownIdentifier, 1, &as_string)

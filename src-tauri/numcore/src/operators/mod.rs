@@ -210,4 +210,9 @@ impl Value {
             other => Ok(Value::sub(Value::Int(0), other)?),
         }
     }
+
+    pub fn aggregate(self, rhs: Self) -> Self {
+        // Convert both values to a vector and concatenate them
+        Value::Vector([self.as_vector(), rhs.as_vector()].concat())
+    }
 }

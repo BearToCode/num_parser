@@ -1,13 +1,14 @@
+use std::fmt;
+
 use super::{
     tokentype::TokenType::{self, *},
     Token,
 };
-use std::fmt;
 
 impl fmt::Display for Token {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self.r#type {
-            Plus | Minus | Star | Slash | Dot | OpeningBracket | ClosingBracket => {
+            Plus | Minus | Star | Slash | Dot | Comma | OpeningBracket | ClosingBracket => {
                 write!(f, "{}", self.r#type)
             }
 
@@ -26,6 +27,7 @@ impl fmt::Display for TokenType {
             Minus => write!(f, "-"),
             Star => write!(f, "*"),
             Slash => write!(f, "/"),
+            Comma => write!(f, ","),
 
             OpeningBracket => write!(f, "("),
             ClosingBracket => write!(f, ")"),

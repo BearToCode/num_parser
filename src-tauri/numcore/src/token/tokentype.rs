@@ -13,6 +13,8 @@ pub enum TokenType {
     Star,
     /// A slash '/' character.
     Slash,
+    /// A comma ',' character.
+    Comma,
 
     /// An opening bracket '(' character.
     OpeningBracket,
@@ -34,14 +36,15 @@ pub enum TokenType {
 
 impl TokenType {
     pub fn is_expression(&self) -> bool {
-        *self == TokenType::FunctionIdentifier || // Function or variable
+        *self == TokenType::VariableIdentifier || // A variable or a constant
+        *self == TokenType::FunctionIdentifier || // A function
         *self == TokenType::Literal ||  // A number
         self.is_binary_operator() // An operator
     }
 
     pub fn is_binary_operator(&self) -> bool {
         match self {
-            Plus | Minus | Star | Slash => true,
+            Plus | Minus | Star | Slash | Comma => true,
             _ => false,
         }
     }
@@ -55,8 +58,9 @@ impl TokenType {
 
     pub fn precedence(&self) -> EvalResult<u16> {
         Ok(match self {
-            Plus | Minus => 10,
-            Star | Slash => 20,
+            Comma => 10,
+            Plus | Minus => 30,
+            Star | Slash => 40,
 
             FunctionIdentifier | VariableIdentifier => 200,
 
