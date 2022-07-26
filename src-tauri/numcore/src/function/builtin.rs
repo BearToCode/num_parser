@@ -26,7 +26,7 @@ lazy_static! {
 }
 
 /// Returns `Some(Function)` if the identifier matches some.
-pub fn functions(identifier: &str) -> Option<Function> {
+pub fn get_function(identifier: &str) -> Option<Function> {
     BUILT_IN_FUNCTIONS
         .iter()
         .find(|x| x.func_identifier == identifier)
@@ -34,8 +34,26 @@ pub fn functions(identifier: &str) -> Option<Function> {
 }
 
 /// Returns `Some(Value)` if the identifier matches some.
-pub fn consts(identifier: &str) -> Option<Value> {
+pub fn get_const(identifier: &str) -> Option<Value> {
     CONSTANTS.get(identifier).cloned()
+}
+
+/// Returns true if the identifier refers to a built-in function.
+pub fn is_function(identifier: &str) -> bool {
+    if let Some(_) = get_function(identifier) {
+        true
+    } else {
+        false
+    }
+}
+
+/// Returns true if the identifier refers to a built-in constant.
+pub fn is_const(identifier: &str) -> bool {
+    if let Some(_) = get_const(identifier) {
+        true
+    } else {
+        false
+    }
 }
 
 /// Returns all reserved keywords.

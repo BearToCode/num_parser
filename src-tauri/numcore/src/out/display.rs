@@ -14,7 +14,7 @@ impl fmt::Display for ErrorType {
                 "SYNTAX ERROR: an invalid token was provided: `{}`.",
                 token
             ),
-            InvalidTokenAtPosition { token } => {
+            InvalidTokenPosition { token } => {
                 write!(f, "SYNTAX ERROR: invalid position for token `{}`.", token)
             }
             FailedCast { value, from, to } => write!(
@@ -58,6 +58,11 @@ impl fmt::Display for ErrorType {
                 "SYNTAX ERROR: no arguments provided for function `{}`.",
                 func_name
             ),
+            InvalidDeclaration => write!(f, "SYNTAX ERROR: invalid declaration."),
+            UnknownFunction { func_name } => {
+                write!(f, "SYNTAX ERROR: unknown function `{}`.", func_name)
+            }
+            UnknownVar { var_name } => write!(f, "SYNTAX ERROR: unknown variable `{}`.", var_name),
 
             ErrorDuring {
                 operation_name,

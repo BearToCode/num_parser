@@ -2,8 +2,10 @@ extern crate num;
 
 mod api;
 
-mod expr;
+mod context;
 mod function;
+mod interpreter;
+mod objects;
 mod operators;
 mod out;
 mod token;

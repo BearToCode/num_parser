@@ -13,7 +13,7 @@ pub type VectorValue = Vec<Value>;
 pub type BoolValue = bool;
 
 /// Every possible value.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Value {
     Int(IntValue),
     Float(FloatValue),
@@ -226,7 +226,7 @@ impl Value {
                             Err(_) => Err(ErrorType::FailedParse { value: string }),
                         }
                     } else {
-                        Err(ErrorType::InvalidTokenAtPosition {
+                        Err(ErrorType::InvalidTokenPosition {
                             token: TokenType::Dot,
                         })
                     }

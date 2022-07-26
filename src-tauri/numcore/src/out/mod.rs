@@ -17,7 +17,7 @@ pub enum ErrorType {
     /// An unknown token found while parsing the string.
     UnknownToken { token: String },
     /// A known token placed in an invalid position.
-    InvalidTokenAtPosition { token: TokenType },
+    InvalidTokenPosition { token: TokenType },
     /// A failed cast due to data loss.
     FailedCast {
         value: Value,
@@ -50,8 +50,14 @@ pub enum ErrorType {
         expected: u8,
         given: u8,
     },
-    /// A function with no parameters
+    /// A function with no parameters.
     MissingFunctionParameters { func_name: String },
+    /// An invalid declaration.
+    InvalidDeclaration,
+    /// An unknown function.
+    UnknownFunction { func_name: String },
+    /// An unknown variable.
+    UnknownVar { var_name: String },
 
     /// An error wrapper to add additional information.
     ErrorDuring {

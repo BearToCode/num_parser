@@ -8,11 +8,11 @@ use crate::{
 #[derive(Clone, Debug)]
 pub struct Function {
     /// The identifier needed to call this function.
-    func_identifier: &'static str,
+    pub func_identifier: &'static str,
     /// The actual function.
-    func: fn(Value) -> EvalResult<Value>,
+    pub func: fn(Value) -> EvalResult<Value>,
     /// The function arguments type.
-    func_type: FunctionType,
+    pub func_type: FunctionType,
 }
 
 impl Function {
@@ -48,7 +48,7 @@ impl Function {
                     Value::Vector(vector) => {
                         if vector.len() != 1 {
                             return Err(ErrorType::WrongFunctionArgumentsAmount {
-                                func_name: String::from(self.func_identifier),
+                                func_name: self.func_identifier.to_owned(),
                                 expected: 1,
                                 given: vector.len() as u8,
                             });
@@ -65,7 +65,7 @@ impl Function {
                     Value::Vector(ref vector) => {
                         if vector.len() != 2 {
                             return Err(ErrorType::WrongFunctionArgumentsAmount {
-                                func_name: String::from(self.func_identifier),
+                                func_name: self.func_identifier.to_owned(),
                                 expected: 2,
                                 given: vector.len() as u8,
                             });
@@ -75,7 +75,7 @@ impl Function {
                     }
                     _ => {
                         return Err(ErrorType::WrongFunctionArgumentsAmount {
-                            func_name: String::from(self.func_identifier),
+                            func_name: self.func_identifier.to_owned(),
                             expected: 2,
                             given: 1,
                         })

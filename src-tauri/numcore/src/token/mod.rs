@@ -2,10 +2,14 @@ mod display;
 pub mod tokentype;
 
 use crate::{
+    context::Context,
     function::builtin,
-    out::{ErrorType, EvalResult},
+    out::{self, ErrorType, EvalResult},
     token::tokentype::TokenType,
 };
+
+use self::tokentype::IdentifierType;
+use itertools::Itertools;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Token {
@@ -36,7 +40,7 @@ impl Token {
 }
 
 /// Builds a stream of tokens.
-pub fn build_stream(mut source: String) -> EvalResult<TokenStream> {
+pub fn build_stream(mut source: String, context: &Context) -> EvalResult<TokenStream> {
     source = remove_whitespaces(&source);
 
     let mut stream: TokenStream = vec![];
@@ -47,23 +51,205 @@ pub fn build_stream(mut source: String) -> EvalResult<TokenStream> {
     }
 
     stream = join_identifiers(&stream)?;
-    stream = categorize_identifiers(&stream)?;
+    stream = filter_identifiers(&stream)?;
     stream = join_literals(&stream)?;
+    stream = format_identifiers(&stream, context);
+    stream = predict_unknown_identifiers(&stream);
+    stream = add_implicit_brackets(&stream)?;
     stream = add_implicit_multiplications(&stream);
 
     Ok(stream)
 }
 
-fn add_implicit_multiplications(stream: &TokenStream) -> TokenStream {
-    // Add token '*' between:
-    // literal-literal
-    // literal-bracket: 2(4) or (4)2
-    // bracket-bracket: (2)(4)
-    // variable-bracket: pi(2) or (2)pi
-    // variable-literal: 2pi or pi2
-    // literal-function: 2sin(x)
-    // bracket-function: (2)sin(x)
+fn predict_unknown_identifiers(stream: &TokenStream) -> TokenStream {
+    // Return if empty.
+    if stream.len() == 0 {
+        return stream.clone();
+    }
 
+    let mut out_stream = vec![];
+
+    let stream_as_iter = stream.iter();
+
+    let mut convert = |prev: &Token, next: Option<&Token>| {
+        let next_is_bracket = match next {
+            Some(token) => token.r#type == TokenType::OpeningBracket,
+            None => false,
+        };
+
+        if prev.r#type == TokenType::Identifier(IdentifierType::Unknown) {
+            if next_is_bracket {
+                // Categorize as function
+                out_stream.push(Token::new(
+                    TokenType::Identifier(IdentifierType::Function),
+                    prev.value.len(),
+                    &prev.value[..],
+                ));
+            } else {
+                // Categorize as var
+                out_stream.push(Token::new(
+                    TokenType::Identifier(IdentifierType::Var),
+                    prev.value.len(),
+                    &prev.value[..],
+                ));
+            }
+        } else {
+            out_stream.push(prev.clone());
+        }
+    };
+
+    // Convert unknown identifiers to function if they are followed by a parenthesis
+    for (prev, next) in stream_as_iter.tuple_windows() {
+        convert(prev, Some(next));
+    }
+
+    // Add last token, not included in the previous identifier
+    let last_token = stream.iter().last().unwrap();
+    convert(last_token, None);
+
+    out_stream
+}
+
+fn add_implicit_brackets(stream: &TokenStream) -> EvalResult<TokenStream> {
+    // Return if empty.
+    if stream.len() == 0 {
+        return Ok(stream.clone());
+    }
+
+    let mut out_stream = vec![];
+
+    let mut skip_iteration = false;
+
+    let stream_as_iter = stream.iter();
+    // Add implicit brackets for all functions not followed by an opening bracket
+    for (prev, next) in stream_as_iter.tuple_windows() {
+        if skip_iteration {
+            skip_iteration = false;
+            continue;
+        }
+
+        if prev.r#type == TokenType::Identifier(IdentifierType::Function)
+            && next.r#type != TokenType::OpeningBracket
+        {
+            if next.r#type == TokenType::Literal
+                || next.r#type == TokenType::Identifier(IdentifierType::Var)
+            {
+                out_stream.push(prev.clone());
+                out_stream.push(Token::new(TokenType::OpeningBracket, 1, ""));
+                out_stream.push(next.clone());
+                out_stream.push(Token::new(TokenType::ClosingBracket, 1, ""));
+            } else {
+                return Err(ErrorType::MissingFunctionParameters {
+                    func_name: prev.value.clone(),
+                });
+            }
+        } else {
+            out_stream.push(prev.clone());
+        }
+    }
+
+    if !skip_iteration {
+        // Push last item if it was not included during the previous iteration.
+        out_stream.push(stream.iter().last().unwrap().clone());
+    }
+    Ok(out_stream)
+}
+
+fn format_identifiers(stream: &TokenStream, context: &Context) -> TokenStream {
+    let mut out_stream = vec![];
+
+    let mut stream_as_iter = stream.iter();
+    while let Some(token) = stream_as_iter.next() {
+        if token.r#type == TokenType::Identifier(IdentifierType::Unknown) {
+            let content = token.value.clone();
+            let splitted = split_into_identifiers(content, context);
+            for (i, i_type) in splitted {
+                out_stream.push(Token::new(TokenType::Identifier(i_type), i.len(), &i[..]));
+            }
+        } else {
+            out_stream.push(token.clone());
+        }
+    }
+    out_stream
+}
+
+/// Given a string, returns a vector with all identified vars and function.
+fn split_into_identifiers(input: String, context: &Context) -> Vec<(String, IdentifierType)> {
+    let mut out = vec![];
+
+    /// Given a string tries to find a match from all possible categories.
+    fn try_to_categorize(
+        sorted_patterns: &Vec<(IdentifierType, Vec<&str>)>,
+        candidate: &String,
+    ) -> Option<IdentifierType> {
+        let mut patterns_as_iter = sorted_patterns.iter();
+        while let Some((i_type, patterns)) = patterns_as_iter.next() {
+            for pattern in patterns {
+                if &&candidate[..] == pattern {
+                    return Some(*i_type);
+                }
+            }
+        }
+        None
+    }
+
+    // In order of priority:
+    // Built-in functions
+    // Built-in consts
+    // User-defined functions
+    // User-defined vars
+    let patterns = vec![
+        (
+            IdentifierType::Function,
+            builtin::BUILT_IN_FUNCTIONS
+                .iter()
+                .map(|x| x.func_identifier)
+                .collect::<Vec<&str>>(),
+        ),
+        (
+            IdentifierType::Var,
+            builtin::CONSTANTS
+                .iter()
+                .map(|x| x.0)
+                .cloned()
+                .collect::<Vec<&str>>(),
+        ),
+        (
+            IdentifierType::Function,
+            context
+                .functions
+                .iter()
+                .map(|x| &x.0[..])
+                .collect::<Vec<&str>>(),
+        ),
+        (
+            IdentifierType::Var,
+            context
+                .variables
+                .iter()
+                .map(|x| &x.0[..])
+                .collect::<Vec<&str>>(),
+        ),
+    ];
+
+    let mut current = "".to_owned();
+
+    for char in input.chars() {
+        current.push(char);
+        if let Some(identifier) = try_to_categorize(&patterns, &current) {
+            out.push((current, identifier));
+            current = "".to_owned();
+        }
+    }
+
+    if current != "" {
+        out.push((current, IdentifierType::Unknown));
+    }
+
+    out
+}
+
+fn add_implicit_multiplications(stream: &TokenStream) -> TokenStream {
     // Return if empty.
     if stream.len() == 0 {
         return stream.clone();
@@ -77,24 +263,26 @@ fn add_implicit_multiplications(stream: &TokenStream) -> TokenStream {
     while index < stream.len() {
         let current_type = stream[index].r#type;
 
-        if previous_token_type == TokenType::Literal && current_type == TokenType::OpeningBracket
-            || previous_token_type == TokenType::Literal && current_type == TokenType::Literal
-            || previous_token_type == TokenType::ClosingBracket
-                && current_type == TokenType::Literal
-            || previous_token_type == TokenType::ClosingBracket
-                && current_type == TokenType::OpeningBracket
-            || previous_token_type == TokenType::VariableIdentifier
-                && current_type == TokenType::OpeningBracket
-            || previous_token_type == TokenType::ClosingBracket
-                && current_type == TokenType::VariableIdentifier
-            || previous_token_type == TokenType::Literal
-                && current_type == TokenType::VariableIdentifier
-            || previous_token_type == TokenType::VariableIdentifier
-                && current_type == TokenType::Literal
-            || previous_token_type == TokenType::Literal
-                && current_type == TokenType::FunctionIdentifier
-            || previous_token_type == TokenType::ClosingBracket
-                && current_type == TokenType::FunctionIdentifier
+        use IdentifierType::*;
+        use TokenType::*;
+        // Add token '*' between:
+        // literal-bracket: 2(4) or (4)2
+        if previous_token_type == Literal               && current_type == OpeningBracket
+            || previous_token_type == ClosingBracket        && current_type == Literal
+            // literal-literal
+            || previous_token_type == Literal               && current_type == Literal
+            // bracket-bracket: (2)(4)
+            || previous_token_type == ClosingBracket        && current_type == OpeningBracket
+            // bracket-any identifier: (2)pi
+            || previous_token_type == ClosingBracket        && matches!(current_type, Identifier(_))
+            // var-bracket
+            || previous_token_type == Identifier(Var)       && current_type == OpeningBracket
+            // literal-any identifier: 2pi
+            || previous_token_type == Literal               && matches!(current_type, Identifier(_))
+            // any identifier-literal
+            || matches!(previous_token_type, Identifier(_)) && current_type == Literal
+            // any identifier-any identifier
+            || matches!(previous_token_type, Identifier(_)) && matches!(current_type, Identifier(_))
         {
             out_stream.push(Token::new(TokenType::Star, 1, ""));
         }
@@ -118,12 +306,12 @@ fn join_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
     let mut is_previous_identifier: bool = false;
     // Iterate over the stream and join any literal
     for token in stream {
-        let is_identifier = token.r#type == TokenType::UnknownIdentifier;
+        let is_identifier = token.r#type == TokenType::Identifier(IdentifierType::Unknown);
 
         if is_identifier && is_previous_identifier {
             // Join with the previous token and avoid pushing the current one.
             let previous_token = joined_stream.last_mut().unwrap();
-            previous_token.join_with(token, TokenType::UnknownIdentifier);
+            previous_token.join_with(token, TokenType::Identifier(IdentifierType::Unknown));
         } else {
             joined_stream.push(token.clone());
         }
@@ -134,44 +322,18 @@ fn join_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
     Ok(joined_stream)
 }
 
-/// Determine if the identifier is a value, a function or a variable.
-fn categorize_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
+/// Convert some identifier to their literal values.
+fn filter_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
     stream
         .iter()
         .map(|x| {
-            if x.r#type == TokenType::UnknownIdentifier {
+            if matches!(x.r#type, TokenType::Identifier(_)) {
                 match &x.value[..] {
                     "true" => Ok(Token::new(TokenType::Literal, 4, "true")),
                     "false" => Ok(Token::new(TokenType::Literal, 5, "false")),
                     "i" => Ok(Token::new(TokenType::Literal, 1, "i")),
 
-                    other => {
-                        // TODO: CONTEXT
-
-                        println!("IDENTIFIER: {}", other);
-
-                        // Check for function
-                        match builtin::functions(&other) {
-                            Some(_func) => Ok(Token::new(
-                                TokenType::FunctionIdentifier,
-                                other.len(),
-                                &other,
-                            )),
-                            None => {
-                                // Check for variable
-                                match builtin::consts(&other) {
-                                    Some(_value) => Ok(Token::new(
-                                        TokenType::VariableIdentifier,
-                                        other.len(),
-                                        &other,
-                                    )),
-                                    None => Err(ErrorType::UnknownToken {
-                                        token: other.to_owned(),
-                                    }),
-                                }
-                            }
-                        }
-                    }
+                    other => Ok(x.clone()),
                 }
             } else {
                 Ok(x.clone())
@@ -196,7 +358,7 @@ fn join_literals(stream: &TokenStream) -> EvalResult<TokenStream> {
             if is_comma {
                 // Allow only one comma
                 if comma_found {
-                    return Err(ErrorType::InvalidTokenAtPosition {
+                    return Err(ErrorType::InvalidTokenPosition {
                         token: token.r#type,
                     });
                 }
@@ -231,7 +393,10 @@ fn tokenize(character: &char) -> EvalResult<Token> {
         '*' => Token::new(TokenType::Star, 1, ""),
         '/' => Token::new(TokenType::Slash, 1, ""),
         ',' => Token::new(TokenType::Comma, 1, ""),
+        '=' => Token::new(TokenType::Equal, 1, ""),
+
         '.' => Token::new(TokenType::Dot, 1, "."),
+
         '(' => Token::new(TokenType::OpeningBracket, 1, ""),
         ')' => Token::new(TokenType::ClosingBracket, 1, ""),
         other => {
@@ -239,7 +404,11 @@ fn tokenize(character: &char) -> EvalResult<Token> {
             if other.is_numeric() {
                 Token::new(TokenType::Literal, 1, &as_string)
             } else if other.is_alphabetic() {
-                Token::new(TokenType::UnknownIdentifier, 1, &as_string)
+                Token::new(
+                    TokenType::Identifier(IdentifierType::Unknown),
+                    1,
+                    &as_string,
+                )
                 // TODO: VECTORS (CHECK COMMAS)
 
                 // TODO: CREATE LIST OF RESERVED KEYWORDS TO NOT USE AS STATEMENTS

@@ -20,7 +20,10 @@ pub fn evaluate_with_mutable_context(
     mut context: evalexpr::HashMapContext,
 ) -> Result<(String, evalexpr::HashMapContext), String> {
     match eval(&input) {
-        Ok(value) => println!("RES: {}", value),
+        Ok(value) => match value {
+            Some(res) => println!("RES: {}", res),
+            None => println!("NONE"),
+        },
         Err(err) => println!("{:?}", err),
     };
 

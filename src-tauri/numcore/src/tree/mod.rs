@@ -1,37 +1,31 @@
 use crate::{
-    expr::Expression,
-    function::builtin,
+    objects::Expression,
     out::{ErrorType, EvalResult},
-    token::{tokentype::TokenType, Token, TokenStream},
+    token::{
+        tokentype::{IdentifierType, TokenType},
+        Token, TokenStream,
+    },
     value::Value,
 };
 
 /// An expression is a node in the expression tree.
-type Node = Expression;
+pub type Node = Expression;
+
+/// A tree needs to be interpreted to determine the requested operation.
+pub struct Tree(pub Node);
 
 /// Builds an expression tree, effectively parsing the token stream.
-pub fn build_tree(stream: TokenStream) -> EvalResult<Node> {
+pub fn build_tree(stream: TokenStream) -> EvalResult<Tree> {
     check_brackets(&stream)?;
     // Sort by precedence
     let mut sorted_node_tokens = sort_node_tokens(&stream)?;
-    println!("SORTED: {:?}", sorted_node_tokens);
-    // For every token, starting from the token node
-    // with the lowest precedence:
 
-    //   Match between all the possible expressions:
-    //     - If literal, do nothing.
-    //     - If it is an operator, get the previous
-    //     and successive tokens, which, once built,
-    //     will return the necessary value and build
-    //     their nodes.
-    //     - If it is a function call, retrieve all parameters
-    //     and build their nodes.
-    Ok(create_node(
+    Ok(Tree(create_node(
         &mut sorted_node_tokens,
         &stream,
         None,
         (0, stream.len()),
-    )?)
+    )?))
 }
 
 fn check_brackets(stream: &TokenStream) -> EvalResult<()> {
@@ -81,7 +75,7 @@ fn sort_node_tokens(stream: &TokenStream) -> EvalResult<Vec<TokenInfo>> {
             let precedence = token.r#type.precedence()?;
             sorted.push(TokenInfo {
                 token: token.clone(),
-                position: position,
+                position,
                 depth,
                 precedence,
             });
@@ -117,7 +111,7 @@ fn create_node(
     if sorted_node_tokens.len() == 0 {
         if position == None {
             // First iteration, so input is empty
-            return Ok(Node::Value(Value::Int(0)));
+            return Ok(Node::Literal(Value::Int(0)));
         } else {
             // This is an error
             return Err(ErrorType::InternalError {
@@ -159,36 +153,29 @@ fn create_node(
             range,
         )?);
     } else {
-        // Match for functions, variables or literals.
+        // Match for literals, constants, functions and variables.
         match token_info.token.r#type {
             TokenType::Literal => {
-                return Ok(Node::Value(Value::from_string(token_info.token.value)?))
+                return Ok(Node::Literal(Value::from_string(token_info.token.value)?))
             }
-            TokenType::VariableIdentifier => {
-                match builtin::consts(&token_info.token.value) {
-                    Some(value) => return Ok(Node::Value(value)),
-                    // TODO: CONTEXT
-                    None => unimplemented!(),
+            TokenType::Identifier(i_type) => {
+                let val = &token_info.token.value;
+                match i_type {
+                    IdentifierType::Var => Ok(Node::Var(val.clone())),
+                    IdentifierType::Function => Ok(Node::Func(
+                        val.clone(),
+                        Box::new(get_function_parameters(
+                            sorted_node_tokens,
+                            stream,
+                            &token_info,
+                        )?),
+                    )),
+                    IdentifierType::Unknown => Err(ErrorType::UnknownToken { token: val.clone() }),
                 }
             }
-            TokenType::FunctionIdentifier => {
-                match builtin::functions(&token_info.token.value) {
-                    Some(func) => {
-                        return Ok(Node::Func(
-                            func,
-                            Box::new(get_function_parameters(
-                                sorted_node_tokens,
-                                stream,
-                                &token_info,
-                            )?),
-                        ))
-                    }
-                    // TODO: CONTEXT
-                    None => unimplemented!(),
-                }
-            }
-            // TODO:
-            _ => unimplemented!(),
+            _ => Err(ErrorType::InternalError {
+                message: format!("token `{}` is not a valid node", token_info.token.value),
+            }),
         }
     }
 }
@@ -306,6 +293,7 @@ fn get_function_parameters(
     // Check if in range
     if func_pos + 1 < stream.len() {
         // Check for bracket
+        // Brackets should have all been added during "tokenization" phase.
         if stream[func_pos + 1].r#type == TokenType::OpeningBracket {
             // Builds the node inside the brackets
             match get_lowest_precedence_node_in_range(
@@ -322,37 +310,10 @@ fn get_function_parameters(
                 }),
             }
         } else {
-            // See if there is an available token to be built after the function token
-            match sorted_node_tokens
-                .iter()
-                .find(|x| x.position == func_pos + 1)
-            {
-                Some(token_info) => {
-                    // an available token has been found, see if it a literal, a variable or a function
-                    match token_info.token.r#type {
-                        TokenType::Literal
-                        | TokenType::VariableIdentifier
-                        | TokenType::FunctionIdentifier => Ok(create_node(
-                            sorted_node_tokens,
-                            stream,
-                            Some(token_info.position),
-                            (token_info.position, token_info.position + 1),
-                        )?),
-                        // this token cannot be used as a function parameter,
-                        // we only want implicit tokens that do not require other nodes,
-                        // like: sin2 = sin(2), sinpi = sin(pi), sincos(2) = sin(cos(2))
-                        _ => Err(ErrorType::MissingFunctionParameters {
-                            func_name: func_token.token.value.clone(),
-                        }),
-                    }
-                }
-                None => {
-                    // No available token
-                    Err(ErrorType::MissingFunctionParameters {
-                        func_name: func_token.token.value.clone(),
-                    })
-                }
-            }
+            // No available token
+            Err(ErrorType::MissingFunctionParameters {
+                func_name: func_token.token.value.clone(),
+            })
         }
     } else {
         Err(ErrorType::MissingFunctionParameters {
