@@ -88,6 +88,14 @@ impl Expression {
                     return Ok(var);
                 }
 
+                // Check scope vars
+                if let Some(c) = scope {
+                    if let Some(expr) = c.get_var(identifier) {
+                        return Ok(expr.eval(context, scope)?);
+                    }
+                }
+
+                // Check context
                 if let Some(expr) = context.get_var(identifier) {
                     return Ok(expr.eval(context, scope)?);
                 }
@@ -135,13 +143,13 @@ impl Expression {
                         Some(cont) => inner_scope.join_with(cont),
                         None => (),
                     };
+
                     return Ok(body.eval(context, Some(&inner_scope))?);
                 }
 
                 Err(ErrorType::UnknownFunction {
                     func_name: identifier.clone(),
                 })
-                // Ok(function.call(arguments.eval()?)?),
             }
             Self::Literal(value) => Ok(value.clone()),
         }
