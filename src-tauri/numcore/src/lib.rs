@@ -12,4 +12,9 @@ mod token;
 mod tree;
 mod value;
 
-pub use crate::{api::*, context::*, out::*, value::*};
+pub use crate::{
+    api::*,
+    context::*,
+    out::*,
+    value::{valuetype::*, Value},
+};
