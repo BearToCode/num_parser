@@ -79,20 +79,33 @@
 //! let mut my_context = numcore::Context::new();
 //!
 //! // Add a variable to the context
-//! let res = numcore::eval_with_mutable_context("a = 2", my_context);
+//! let res = numcore::eval_with_mutable_context("a = 2", &mut my_context);
 //!
 //! assert_eq!(res, None);
 //!
-//! let res = numcore::eval_with_mutable_context("a", my_context);
+//! // Read the variable
+//! let res = numcore::eval_with_mutable_context("a", &mut my_context);
 //!
 //! assert_eq!(res, Value::Int(2));
 //! ```
 //!
 //! ### Serde
 //!
+//! You can use the optional feature `serde_support` to let all the public structs
+//! derive  [`Serialize`](https://docs.rs/serde/1.0.71/serde/trait.Serializer.html) and
+//! [`Deserialize`](https://docs.rs/serde/1.0.71/serde/trait.Serializer.html).
+//!
+//! ```rust
+//! [dependencies]
+//! num = { version = "<version>", features = [ "serde_support" ] }
+//! ```
+//!
 //! ## License
 //!
 //!
+
+#[cfg(feature = "serde_support")]
+extern crate serde;
 
 extern crate num;
 
