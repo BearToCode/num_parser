@@ -63,6 +63,16 @@ impl fmt::Display for ErrorType {
                 write!(f, "SYNTAX ERROR: unknown function `{}`.", func_name)
             }
             UnknownVar { var_name } => write!(f, "SYNTAX ERROR: unknown variable `{}`.", var_name),
+            ReservedVarName { var_name } => write!(
+                f,
+                "INTERNAL ERROR: `{}` is a keyword and cannot be used as a variable name.",
+                var_name
+            ),
+            ReservedFunctionName { func_name } => write!(
+                f,
+                "INTERNAL ERROR: `{}` is a keyword cannot be used as a function name.",
+                func_name
+            ),
 
             ErrorDuring {
                 operation_name,

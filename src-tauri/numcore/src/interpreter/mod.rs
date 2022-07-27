@@ -2,7 +2,7 @@ use crate::{
     objects::Expression,
     objects::Request,
     out::{ErrorType, EvalResult},
-    token::{self, tokentype::TokenType},
+    token::tokentype::TokenType,
     tree::{Node, Tree},
 };
 

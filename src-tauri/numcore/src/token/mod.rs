@@ -4,7 +4,7 @@ pub mod tokentype;
 use crate::{
     context::Context,
     function::builtin,
-    out::{self, ErrorType, EvalResult},
+    out::{ErrorType, EvalResult},
     token::tokentype::TokenType,
 };
 
@@ -333,7 +333,7 @@ fn filter_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
                     "false" => Ok(Token::new(TokenType::Literal, 5, "false")),
                     "i" => Ok(Token::new(TokenType::Literal, 1, "i")),
 
-                    other => Ok(x.clone()),
+                    _ => Ok(x.clone()),
                 }
             } else {
                 Ok(x.clone())

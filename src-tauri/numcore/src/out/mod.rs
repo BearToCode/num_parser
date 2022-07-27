@@ -1,7 +1,7 @@
 mod display;
 
 use super::{
-    token::{tokentype::TokenType, Token},
+    token::tokentype::TokenType,
     value::{valuetype::ValueType, Value},
 };
 
@@ -58,6 +58,10 @@ pub enum ErrorType {
     UnknownFunction { func_name: String },
     /// An unknown variable.
     UnknownVar { var_name: String },
+    /// A reserved variable name.
+    ReservedVarName { var_name: String },
+    /// A reserved function name.
+    ReservedFunctionName { func_name: String },
 
     /// An error wrapper to add additional information.
     ErrorDuring {

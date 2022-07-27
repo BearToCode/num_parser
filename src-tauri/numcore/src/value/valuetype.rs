@@ -1,6 +1,4 @@
-use std::vec;
-
-use super::Value;
+use crate::value::Value;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum ValueType {

@@ -1,9 +1,9 @@
 use crate::{
-    context::{self, Context},
-    function::{builtin, Function},
+    context::Context,
+    function::builtin,
     out::{ErrorType, EvalResult},
     token::tokentype::TokenType,
-    value::{self, Value},
+    value::Value,
 };
 
 #[derive(Debug)]
@@ -18,12 +18,24 @@ impl Request {
         match self {
             Self::Evaluation(expr) => Ok(Some(expr.eval(context, None)?)),
             Self::FuncDeclaration(identifier, params, body) => {
-                context.add_function(identifier.clone(), params.clone(), body.clone());
-                Ok(None)
+                if builtin::reserved_keywords().contains(&&identifier[..]) {
+                    Err(ErrorType::ReservedVarName {
+                        var_name: identifier.clone(),
+                    })
+                } else {
+                    context.add_function(identifier.clone(), params.clone(), body.clone());
+                    Ok(None)
+                }
             }
             Self::VarDeclaration(identifier, expression) => {
-                context.add_variable(identifier.clone(), expression.clone());
-                Ok(None)
+                if builtin::reserved_keywords().contains(&&identifier[..]) {
+                    Err(ErrorType::ReservedFunctionName {
+                        func_name: identifier.clone(),
+                    })
+                } else {
+                    context.add_variable(identifier.clone(), expression.clone());
+                    Ok(None)
+                }
             }
         }
     }
