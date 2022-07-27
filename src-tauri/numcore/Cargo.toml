@@ -1,7 +1,14 @@
 [package]
 name = "numcore"
 version = "0.1.0"
+description = "A math interpreter and evaluator"
+keywords = ["math", "parser", "evaluator", "complex", "analysis"]
 edition = "2021"
+repository = "https://github.com/BearToCode/Numerus.git"
+homepage = "https://github.com/BearToCode/Numerus/tree/master/src-tauri/numcore"
+documentation = "https://docs.rs/numcore"
+readme = "README.md"
+license = "MIT"
 authors = ["BearToCode"]
 
 [lib]
