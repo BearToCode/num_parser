@@ -105,7 +105,7 @@ pub fn interpret_tree(tree: &Tree) -> EvalResult<Request> {
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct NodeInfo<'a> {
     node: &'a Node,
     depth: u32,
@@ -120,22 +120,22 @@ fn match_all<'a, P>(
 where
     P: Fn(&Node) -> bool,
 {
+    let mut out = vec![];
+
     if predicate(start) {
-        Some(vec![NodeInfo {
+        out.push(NodeInfo {
             node: start,
             depth: starting_depth,
-        }])
+        });
+    }
+    for branch in start.branches() {
+        if let Some(results) = match_all(branch, starting_depth + 1, predicate) {
+            out = [out, results].concat();
+        }
+    }
+    if out.is_empty() {
+        None
     } else {
-        let mut out = vec![];
-        for branch in start.branches() {
-            if let Some(results) = match_all(branch, starting_depth + 1, predicate) {
-                out = [out, results].concat();
-            }
-        }
-        if out.is_empty() {
-            None
-        } else {
-            Some(out)
-        }
+        Some(out)
     }
 }
