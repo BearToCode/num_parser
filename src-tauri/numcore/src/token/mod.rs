@@ -174,7 +174,7 @@ fn format_identifiers(stream: &TokenStream, context: &Context) -> TokenStream {
 }
 
 /// Given a string, returns a vector with all identified vars and function.
-fn split_into_identifiers(input: String, context: &Context) -> Vec<(String, IdentifierType)> {
+pub fn split_into_identifiers(input: String, context: &Context) -> Vec<(String, IdentifierType)> {
     let mut out = vec![];
 
     /// Given a string tries to find a match from all possible categories.

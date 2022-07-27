@@ -2,7 +2,10 @@ use crate::{
     context::Context,
     function::builtin,
     out::{ErrorType, EvalResult},
-    token::tokentype::TokenType,
+    token::{
+        self,
+        tokentype::{IdentifierType, TokenType},
+    },
     value::Value,
 };
 
@@ -100,9 +103,37 @@ impl Expression {
                     return Ok(expr.eval(context, scope)?);
                 }
 
-                Err(ErrorType::UnknownVar {
-                    var_name: identifier.clone(),
-                })
+                // Try to split the variable, as it might have not been interpreted correctly
+                // in a function declaration, where function parameters were not know at the
+                // time of "tokenization".
+                let mut joined_context = Context::new();
+                // Create a new context with all the data.
+                joined_context.join_with(context);
+                if let Some(c) = scope {
+                    joined_context.join_with(&c);
+                }
+
+                let identifiers =
+                    token::split_into_identifiers(identifier.clone(), &joined_context);
+                let mut product = Value::Float(1.0);
+                let mut valid = true;
+                // Iterate over results
+                for (i, i_type) in identifiers {
+                    if i_type != IdentifierType::Var {
+                        // Invalidate result if it is not a variable
+                        valid = false;
+                        break;
+                    }
+                    product = Value::mul(product, Self::Var(i).eval(context, scope)?)?;
+                }
+
+                if valid {
+                    Ok(product)
+                } else {
+                    Err(ErrorType::UnknownVar {
+                        var_name: identifier.clone(),
+                    })
+                }
             }
             Self::Func(identifier, arguments) => {
                 // Check built-in functions
