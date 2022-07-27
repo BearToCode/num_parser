@@ -101,7 +101,7 @@ impl Expression {
                     return Ok(expr.eval(context, scope)?);
                 }
 
-                // Try to split the variable, as it might have not been interpreted correctly
+                // Try to split the identifier, as it might have not been interpreted correctly
                 // in a function declaration, where function parameters were not know at the
                 // time of "tokenization".
                 let mut joined_context = Context::new();
@@ -195,9 +195,69 @@ impl Expression {
                     return Ok(body.eval(context, Some(&inner_scope))?);
                 }
 
-                Err(ErrorType::UnknownFunction {
-                    func_name: identifier.clone(),
-                })
+                // Try to split the identifier, as it might have not been interpreted correctly
+                // in a function declaration, where function parameters were not know at the
+                // time of "tokenization".
+                let mut joined_context = Context::new();
+                // Create a new context with all the data.
+                joined_context.join_with(context);
+                if let Some(c) = scope {
+                    joined_context.join_with(&c);
+                }
+
+                let identifiers =
+                    token::split_into_identifiers(identifier.clone(), &joined_context);
+                let mut product = Value::Float(1.0);
+                let mut valid = true;
+                let mut argument = Option::None;
+
+                let mut last_i = identifier.clone();
+                let mut last_i_type = IdentifierType::Unknown;
+                // Iterate over results
+                for (i, i_type) in identifiers {
+                    match i_type {
+                        IdentifierType::Unknown => {
+                            // Invalidate result if it still unknown
+                            valid = false;
+                            break;
+                        }
+                        IdentifierType::Function => {
+                            // use the following identifier as argument
+                            // if this is the last identifier, return an error
+                            argument = Option::Some(i.clone());
+                        }
+                        IdentifierType::Var => {
+                            if let Some(func_ident) = argument {
+                                product = Value::mul(
+                                    product,
+                                    Self::Func(func_ident, Box::new(Self::Var(i.clone())))
+                                        .eval(context, scope)?,
+                                )?;
+                                argument = Option::None;
+                            } else {
+                                product = Value::mul(
+                                    product,
+                                    Self::Var(i.clone()).eval(context, scope)?,
+                                )?;
+                            }
+                        }
+                    }
+                    (last_i, last_i_type) = (i.clone(), i_type);
+                }
+
+                // If there are no unknown token and last token is a function multiply
+                // the product of all the previous vars/functions and the result of the
+                // current one.
+                if valid && last_i_type == IdentifierType::Function {
+                    Value::mul(
+                        product,
+                        Self::Func(last_i, arguments.clone()).eval(context, scope)?,
+                    )
+                } else {
+                    Err(ErrorType::UnknownFunction {
+                        func_name: identifier.clone(),
+                    })
+                }
             }
             Self::Literal(value) => Ok(value.clone()),
         }
