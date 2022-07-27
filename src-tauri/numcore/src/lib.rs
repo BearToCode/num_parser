@@ -1,7 +1,7 @@
 //!
-//! # A math interpreter and evaluator
-//! Numcore allows you to easily parse strings into math expressions
-//! and evaluate them.
+//! # Numcore: a math interpreter and evaluator
+//! **Numcore** allows you to easily **parse** strings into math expressions
+//! and **evaluate** them.
 //!
 //! Numcore is part of [Numerus](https://github.com/BearToCode/Numerus).
 //!
@@ -19,11 +19,12 @@
 //! * User-defined var: `a = pi/2` or `b = a+2`
 //! * Understands ambiguous syntax, like: `g(x) = pisinx`
 //! * Serde support
+//! * No panicking
 //!
 //! Much more will be implemented in future releases!
 //!
 //! ## Values
-//! Values are contained inside the [Value enum](Value), which provides useful functions
+//! **Values** are contained inside the [Value enum](Value), which provides useful functions
 //! to access the contained data:
 //!
 //! ```rust
@@ -38,12 +39,12 @@
 //! assert_eq!(value.as_vector(), vec![1.0]);
 //! ```
 //!
-//! Note that, even thought the initial value was a float, it has been cast into ints and bools. This
+//! Note that, even thought the initial value was a float, it has been **cast** into ints and bools. This
 //! was possible since the value had no decimal part and it was a one. If these conditions were not
 //! met, the cast would have failed.
 //!
 //! ## Operators
-//! Binary operators:
+//! **Binary** operators:
 //!
 //! | Operator | Description | Precedence |
 //! |----------|-------------|------------|
@@ -54,7 +55,7 @@
 //! | , | Aggregation. Creates vectors             | 20 |
 //! | = | Used for functions and vars declarations | 10 |
 //!
-//! Unary operators:
+//! **Unary** operators:
 //!
 //! | Operator | Description | Precedence |
 //! |----------|-------------|------------|
@@ -70,7 +71,7 @@
 //!
 //! ## Context
 //!
-//! [Contexts](Context) allows you keep track of user-defined functions and variables, as well
+//! [Contexts](Context) allows you keep track of **user-defined functions** and **variables**, as well
 //! as settings. They can be created as follows:
 //!
 //! ```rust
@@ -100,8 +101,15 @@
 //! num = { version = "<version>", features = [ "serde_support" ] }
 //! ```
 //!
-//! ## License
+//! ## License and contribution
+//! Differently from Numerus, Numcore is licensed under a **MIT License**.
 //!
+//! Numcore is currently under heavy development, but feel free to open issues and
+//! pull requests for any problems or ideas you come up with.
+//!
+//! **IMPORTANT**: after staging files use the `npm run commit` command to commit and then
+//! follow the prompts. Use all **lowercase** and **imperative** descriptions. This
+//! ensures that all commits follow the same format and help to keep a clean commit history.
 //!
 
 #[cfg(feature = "serde_support")]
