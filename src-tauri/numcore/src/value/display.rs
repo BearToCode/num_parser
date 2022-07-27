@@ -43,7 +43,15 @@ impl fmt::Display for Value {
                     )
                 }
             ),
-            Self::Vector(v) => write!(f, "{:?}", v),
+            Self::Vector(v) => write!(f, "[{}]", {
+                let mut as_string = vec![];
+
+                for elem in v {
+                    as_string.push(elem.to_string());
+                }
+
+                as_string.join(", ")
+            }),
         }
     }
 }

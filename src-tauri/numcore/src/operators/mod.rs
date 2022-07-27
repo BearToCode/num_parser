@@ -103,10 +103,19 @@ impl Value {
                 Value::Complex(self_converted.as_complex()? * rhs_converted.as_complex()?)
             }
             ValueType::VectorType => Value::Vector({
-                // TODO: add support for multiplication of a single number and a vector
-                let self_as_vector = self_converted.as_vector();
-                let rhs_as_vector = rhs_converted.as_vector();
+                let mut self_as_vector = self_converted.as_vector();
+                let mut rhs_as_vector = rhs_converted.as_vector();
                 let mut out_vector: Vec<Value> = vec![];
+
+                if self_as_vector.len() == 1 {
+                    while self_as_vector.len() != rhs_as_vector.len() {
+                        self_as_vector.push(self_as_vector[0].clone());
+                    }
+                } else if rhs_as_vector.len() == 1 {
+                    while self_as_vector.len() != rhs_as_vector.len() {
+                        rhs_as_vector.push(rhs_as_vector[0].clone());
+                    }
+                }
 
                 if self_as_vector.len() != rhs_as_vector.len() {
                     return Err(ErrorType::MismatchedArrayLengths {
@@ -165,9 +174,19 @@ impl Value {
                 Value::Complex(self_converted.as_complex()? / rhs_converted.as_complex()?)
             }
             ValueType::VectorType => Value::Vector({
-                let self_as_vector = self_converted.as_vector();
-                let rhs_as_vector = rhs_converted.as_vector();
+                let mut self_as_vector = self_converted.as_vector();
+                let mut rhs_as_vector = rhs_converted.as_vector();
                 let mut out_vector: Vec<Value> = vec![];
+
+                if self_as_vector.len() == 1 {
+                    while self_as_vector.len() != rhs_as_vector.len() {
+                        self_as_vector.push(self_as_vector[0].clone());
+                    }
+                } else if rhs_as_vector.len() == 1 {
+                    while self_as_vector.len() != rhs_as_vector.len() {
+                        rhs_as_vector.push(rhs_as_vector[0].clone());
+                    }
+                }
 
                 if self_as_vector.len() != rhs_as_vector.len() {
                     return Err(ErrorType::MismatchedArrayLengths {
@@ -213,6 +232,13 @@ impl Value {
 
     pub fn aggregate(self, rhs: Self) -> Self {
         // Convert both values to a vector and concatenate them
-        Value::Vector([self.as_vector(), rhs.as_vector()].concat())
+        if rhs.as_vector().len() == 1 {
+            Value::Vector([self.as_vector(), rhs.as_vector()].concat())
+        } else {
+            // Allow multi-dimensional vectors
+            let mut self_as_vector = self.as_vector();
+            self_as_vector.push(Value::Vector(rhs.as_vector()));
+            Value::Vector(self_as_vector)
+        }
     }
 }

@@ -409,12 +409,6 @@ fn tokenize(character: &char) -> EvalResult<Token> {
                     1,
                     &as_string,
                 )
-                // TODO: VECTORS (CHECK COMMAS)
-
-                // TODO: CREATE LIST OF RESERVED KEYWORDS TO NOT USE AS STATEMENTS
-
-                // SHOULD NOT BE DONE HERE
-                // unimplemented!()
             } else {
                 return Err(ErrorType::UnknownToken {
                     token: String::from(&as_string),

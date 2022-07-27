@@ -57,8 +57,6 @@ pub enum Expression {
     Func(String, Box<Expression>),
     /// A literal value.
     Literal(Value),
-    // TODO: An equation.
-    // Equation(Box<Expression>, Box<Expression>),
 }
 
 impl Expression {
