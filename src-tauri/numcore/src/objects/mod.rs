@@ -117,17 +117,36 @@ impl Expression {
                     token::split_into_identifiers(identifier.clone(), &joined_context);
                 let mut product = Value::Float(1.0);
                 let mut valid = true;
+                let mut argument = Option::None;
                 // Iterate over results
                 for (i, i_type) in identifiers {
-                    if i_type != IdentifierType::Var {
-                        // Invalidate result if it is not a variable
-                        valid = false;
-                        break;
+                    match i_type {
+                        IdentifierType::Unknown => {
+                            // Invalidate result if it still unknown
+                            valid = false;
+                            break;
+                        }
+                        IdentifierType::Function => {
+                            // use the following identifier as argument
+                            // if this is the last identifier, return an error
+                            argument = Option::Some(i);
+                        }
+                        IdentifierType::Var => {
+                            if let Some(func_ident) = argument {
+                                product = Value::mul(
+                                    product,
+                                    Self::Func(func_ident, Box::new(Self::Var(i)))
+                                        .eval(context, scope)?,
+                                )?;
+                                argument = Option::None;
+                            } else {
+                                product = Value::mul(product, Self::Var(i).eval(context, scope)?)?;
+                            }
+                        }
                     }
-                    product = Value::mul(product, Self::Var(i).eval(context, scope)?)?;
                 }
 
-                if valid {
+                if valid && argument == Option::None {
                     Ok(product)
                 } else {
                     Err(ErrorType::UnknownVar {
