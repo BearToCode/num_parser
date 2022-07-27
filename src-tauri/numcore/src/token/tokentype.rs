@@ -2,6 +2,7 @@ use self::TokenType::*;
 use super::super::out::{ErrorType, EvalResult};
 
 #[derive(Debug, PartialEq, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum IdentifierType {
     Var,
     Function,
@@ -10,6 +11,7 @@ pub enum IdentifierType {
 
 /// Contains all the possible input tokens type.
 #[derive(Debug, PartialEq, Clone, Copy)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum TokenType {
     // OPERATORS
     /// A plus '+' character.

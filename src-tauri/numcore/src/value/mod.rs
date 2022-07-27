@@ -14,6 +14,7 @@ pub type BoolValue = bool;
 
 /// Every possible value.
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Value {
     Int(IntValue),
     Float(FloatValue),

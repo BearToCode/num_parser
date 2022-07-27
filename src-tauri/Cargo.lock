@@ -57,7 +57,6 @@ checksum = "bb07d2053ccdbe10e2af2995a2f116c1330396493dc1269f6a91d0ae82e19704"
 name = "app"
 version = "0.1.0"
 dependencies = [
- "evalexpr",
  "numcore",
  "serde",
  "serde_json",
@@ -615,16 +614,6 @@ name = "embed_plist"
 version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4ef6b89e5b37196644d8796de5268852ff179b44e96276cf4290264843743bb7"
-
-[[package]]
-name = "evalexpr"
-version = "8.0.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2b62f8e24f69931f90f1ca2a86e320916dcc22883b93c5453bbc57307e38618b"
-dependencies = [
- "serde",
- "serde_derive",
-]
 
 [[package]]
 name = "fastrand"
@@ -1602,6 +1591,7 @@ dependencies = [
  "autocfg",
  "num-integer",
  "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -1611,6 +1601,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7ae39348c8bc5fbd7f40c727a9925f03517afd2ab27d46702108b6a7e5414c19"
 dependencies = [
  "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -1644,6 +1635,7 @@ dependencies = [
  "num-bigint",
  "num-integer",
  "num-traits",
+ "serde",
 ]
 
 [[package]]
@@ -1702,6 +1694,7 @@ dependencies = [
  "itertools",
  "lazy_static",
  "num",
+ "serde",
 ]
 
 [[package]]

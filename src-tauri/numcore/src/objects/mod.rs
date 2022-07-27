@@ -42,6 +42,7 @@ impl Request {
 }
 
 #[derive(Debug, Clone, PartialEq)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Expression {
     /// A binary operation between two expression.
     Binary(Box<Expression>, TokenType, Box<Expression>),

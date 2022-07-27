@@ -3,6 +3,8 @@ use std::collections::HashMap;
 use crate::objects::Expression;
 
 /// Contains user-defined functions and constants.
+#[derive(Debug, Clone)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Context {
     pub functions: HashMap<String, (Vec<String>, Box<Expression>)>,
     pub variables: HashMap<String, Box<Expression>>,

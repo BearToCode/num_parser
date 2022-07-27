@@ -12,7 +12,4 @@ mod token;
 mod tree;
 mod value;
 
-pub use crate::{
-    api::*,
-    out::{ErrorType, EvalResult},
-};
+pub use crate::{api::*, context::*, out::*, value::*};
