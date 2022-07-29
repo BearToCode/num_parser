@@ -69,7 +69,8 @@ met, the cast would have failed.
 
 | Operator | Description | Precedence |
 |----------|-------------|------------|
-| - | Negation | 30 |
+| ! | Logical Not | 80 |
+| - | Negation    | 60 |
 
 ## Functions
 

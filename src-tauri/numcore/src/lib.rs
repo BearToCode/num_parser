@@ -70,7 +70,7 @@
 //! | Operator | Description | Precedence |
 //! |----------|-------------|------------|
 //! | ! | Logical Not | 80 |
-//! | - | Negation    | 30 |
+//! | - | Negation    | 60 |
 //!
 //! ## Functions
 //!
