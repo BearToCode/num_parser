@@ -241,11 +241,11 @@ impl Value {
         }
     }
 
-    /// Tries to convert the value to the requested value-type. If it fails, it returns the lowest
+    /// Tries to convert the value to the requested value-type. It returns the lowest
     /// complexity value achieved.
     pub fn try_as_type(&self, valuetype: ValueType) -> Value {
         // If target complexity is same or higher, return the value
-        if ValueType::highest_complexity(vec![&self.get_type(), &valuetype]) == self.get_type() {
+        if self.to_type().complexity() <= valuetype.complexity() {
             self.clone()
         } else {
             match valuetype {

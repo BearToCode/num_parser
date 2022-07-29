@@ -37,7 +37,6 @@ pub fn eval_with_mutable_context(input: &str, context: &mut Context) -> EvalResu
             })
         }
     };
-    println!("REQUEST: {:?}", request);
     match request.execute(context) {
         Ok(value) => Ok(value),
         Err(err) => {

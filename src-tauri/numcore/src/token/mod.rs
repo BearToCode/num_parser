@@ -50,8 +50,8 @@ pub fn build_stream(mut source: String, context: &Context) -> EvalResult<TokenSt
         stream.push(tokenize(&c)?);
     }
 
+    stream = join_operators(&stream);
     stream = join_identifiers(&stream)?;
-    stream = filter_identifiers(&stream)?;
     stream = join_literals(&stream)?;
     stream = format_identifiers(&stream, context);
     stream = predict_unknown_identifiers(&stream);
@@ -59,6 +59,65 @@ pub fn build_stream(mut source: String, context: &Context) -> EvalResult<TokenSt
     stream = add_implicit_multiplications(&stream);
 
     Ok(stream)
+}
+
+fn join_operators(stream: &TokenStream) -> TokenStream {
+    fn find_and_join(
+        stream: &TokenStream,
+        pattern: Vec<TokenType>,
+        replacement: TokenType,
+    ) -> TokenStream {
+        let mut out_v = vec![];
+
+        let mut start_index = 0;
+        let mut end_index = pattern.len();
+
+        let mut stream_as_iter = stream.iter();
+
+        while end_index <= stream.len() {
+            let slice = &stream[start_index..end_index]
+                .iter()
+                .map(|token| token.r#type)
+                .collect::<Vec<TokenType>>();
+
+            if *slice == pattern {
+                out_v.push(Token::new(replacement, pattern.len(), ""));
+
+                for _ in 0..pattern.len() {
+                    // Advance the iterator, consuming the replaced tokens.
+                    stream_as_iter.next();
+                }
+
+                start_index += pattern.len();
+                end_index += pattern.len();
+            } else {
+                out_v.push(stream[start_index].clone());
+                stream_as_iter.next();
+
+                start_index += 1;
+                end_index += 1;
+            }
+        }
+
+        // Add the remaining data
+        for token in stream_as_iter {
+            out_v.push(token.clone());
+        }
+
+        out_v
+    }
+
+    use TokenType::*;
+
+    let mut new_stream = stream.clone();
+    new_stream = find_and_join(&new_stream, vec![LessThan, Equal], LessOrEqualTo);
+    new_stream = find_and_join(&new_stream, vec![GreaterThan, Equal], GreaterOrEqualTo);
+    new_stream = find_and_join(&new_stream, vec![Equal, Equal], DoubleEqual);
+    new_stream = find_and_join(&new_stream, vec![Exclamation, Equal], NotEqual);
+    new_stream = find_and_join(&new_stream, vec![And, And], DoubleAnd);
+    new_stream = find_and_join(&new_stream, vec![Or, Or], DoubleOr);
+
+    new_stream
 }
 
 fn predict_unknown_identifiers(stream: &TokenStream) -> TokenStream {
@@ -322,26 +381,6 @@ fn join_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
     Ok(joined_stream)
 }
 
-/// Convert some identifier to their literal values.
-fn filter_identifiers(stream: &TokenStream) -> EvalResult<TokenStream> {
-    stream
-        .iter()
-        .map(|x| {
-            if matches!(x.r#type, TokenType::Identifier(_)) {
-                match &x.value[..] {
-                    "true" => Ok(Token::new(TokenType::Literal, 4, "true")),
-                    "false" => Ok(Token::new(TokenType::Literal, 5, "false")),
-                    "i" => Ok(Token::new(TokenType::Literal, 1, "i")),
-
-                    _ => Ok(x.clone()),
-                }
-            } else {
-                Ok(x.clone())
-            }
-        })
-        .collect()
-}
-
 /// Join numbers handling commas.
 fn join_literals(stream: &TokenStream) -> EvalResult<TokenStream> {
     let mut joined_stream: TokenStream = vec![];
@@ -394,6 +433,13 @@ fn tokenize(character: &char) -> EvalResult<Token> {
         '/' => Token::new(TokenType::Slash, 1, ""),
         ',' => Token::new(TokenType::Comma, 1, ""),
         '=' => Token::new(TokenType::Equal, 1, ""),
+        '^' => Token::new(TokenType::Caret, 1, ""),
+        '%' => Token::new(TokenType::Percentage, 1, ""),
+        '<' => Token::new(TokenType::LessThan, 1, ""),
+        '>' => Token::new(TokenType::GreaterOrEqualTo, 1, ""),
+        '&' => Token::new(TokenType::And, 1, ""),
+        '|' => Token::new(TokenType::Or, 1, ""),
+        '!' => Token::new(TokenType::Exclamation, 1, ""),
 
         '.' => Token::new(TokenType::Dot, 1, "."),
 

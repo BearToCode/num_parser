@@ -82,6 +82,7 @@ fn sort_node_tokens(stream: &TokenStream) -> EvalResult<Vec<TokenInfo>> {
         }
     }
     sorted.sort_by_key(|v| (v.depth, v.precedence, -(v.position as i16)));
+
     Ok(sorted)
 }
 
@@ -193,7 +194,7 @@ fn build_unary_operator(
             match get_lowest_precedence_node_in_range(
                 sorted_node_tokens,
                 stream,
-                (range.0, token_info.position),
+                (token_info.position + 1, range.1),
             )? {
                 Some(next_node) => next_node,
                 None => {

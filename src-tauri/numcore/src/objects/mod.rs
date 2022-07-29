@@ -74,13 +74,39 @@ impl Expression {
                     TokenType::Star => Value::mul(left_value, right_value)?,
                     // Division
                     TokenType::Slash => Value::div(left_value, right_value)?,
+                    // Exponentiation
+                    TokenType::Caret => Value::exponentiation(left_value, right_value)?,
                     // Aggregation
                     TokenType::Comma => Value::aggregate(left_value, right_value),
+                    // Modulo
+                    TokenType::Percentage => Value::modulo(left_value, right_value)?,
+                    // Less than
+                    TokenType::LessThan => Value::less_than(left_value, right_value)?,
+                    // Greater than
+                    TokenType::GreaterThan => Value::greater_than(left_value, right_value)?,
+                    // Less or equal to
+                    TokenType::LessOrEqualTo => Value::less_or_equal_to(left_value, right_value)?,
+                    // Greater or equal to
+                    TokenType::GreaterOrEqualTo => {
+                        Value::greater_or_equal_to(left_value, right_value)?
+                    }
+                    // Logical AND
+                    TokenType::DoubleAnd => Value::logical_and(left_value, right_value)?,
+                    // Logical OR
+                    TokenType::DoubleOr => Value::logical_or(left_value, right_value)?,
+                    // Equal to
+                    TokenType::DoubleEqual => Value::equal_to(left_value, right_value)?,
+                    // Not equal to
+                    TokenType::NotEqual => Value::not_equal_to(left_value, right_value)?,
+
                     _ => return Err(ErrorType::InvalidTokenPosition { token: *token_type }),
                 })
             }
             Self::Unary(token_type, expr) => Ok(match token_type {
+                // Negate
                 TokenType::Minus => Value::negate(expr.eval(context, scope)?)?,
+                // Not
+                TokenType::Exclamation => Value::not(expr.eval(context, scope)?)?,
                 _ => return Err(ErrorType::InvalidTokenPosition { token: *token_type }),
             }),
             Self::Var(identifier) => {

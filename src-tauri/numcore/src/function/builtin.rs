@@ -15,6 +15,9 @@ lazy_static! {
         m.insert("e", Value::Float(consts::E));
         m.insert("tau", Value::Float(consts::TAU));
         m.insert("phi", Value::Float(1.618_033_988_749_894));
+        m.insert("true", Value::Bool(true));
+        m.insert("false", Value::Bool(false));
+        m.insert("i", Value::Complex(num::Complex::i()));
 
         m
     };
@@ -41,8 +44,7 @@ pub fn get_const(identifier: &str) -> Option<Value> {
 /// Returns all reserved keywords.
 pub fn reserved_keywords() -> Vec<&'static str> {
     [
-        vec!["i", "true", "false"],
-        CONSTANTS.keys().cloned().collect(),
+        CONSTANTS.keys().cloned().collect::<Vec<&'static str>>(),
         BUILT_IN_FUNCTIONS
             .iter()
             .map(|x| x.func_identifier)

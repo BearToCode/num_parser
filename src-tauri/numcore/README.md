@@ -36,7 +36,7 @@ assert_eq!(value.as_bool().unwrap(), true);
 assert_eq!(value.as_int().unwrap(), 1);
 assert_eq!(value.as_float().unwrap(), 1.0);
 assert_eq!(value.as_complex().unwrap(), num::complex::Complex::new(1.0, 0.0));
-assert_eq!(value.as_vector(), vec![1.0]);
+assert_eq!(value.as_vector(), vec![Value::Float(1.0)]);
 ```
 
 Note that, even thought the initial value was a float, it has been **cast** into ints and bools. This
@@ -48,12 +48,22 @@ met, the cast would have failed.
 
 | Operator | Description | Precedence |
 |----------|-------------|------------|
-| / | Division                                 | 40 |
-| * | Multiplication                           | 40 |
-| + | Sum                                      | 30 |
-| - | Subtraction                              | 30 |
-| , | Aggregation. Creates vectors             | 20 |
-| = | Used for functions and vars declarations | 10 |
+| ^  | Exponentiation                                       | 90 |
+| /  | Division                                             | 70 |
+| *  | Multiplication                                       | 70 |
+| %  | Modulo                                               | 70 |
+| +  | Sum                                                  | 60 |
+| -  | Subtraction                                          | 60 |
+| <  | Less than                                            | 50 |
+| >  | Greater than                                         | 50 |
+| <= | Less or equal to                                     | 50 |
+| >= | Greater or equal to                                  | 50 |
+| == | Equal to                                             | 40 |
+| != | Not equal to                                         | 40 |
+| && | Logical AND                                          | 30 |
+| &#124;&#124; | Logical OR                                 | 20 |
+| ,  | Aggregation. Creates vectors                         | 10 |
+| =  | Assignment. Used for functions and vars declarations | 0  |
 
 **Unary** operators:
 

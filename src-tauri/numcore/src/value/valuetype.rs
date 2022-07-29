@@ -1,6 +1,6 @@
 use crate::value::Value;
 
-#[derive(Debug, PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ValueType {
     IntType,
     FloatType,
@@ -22,7 +22,7 @@ impl Value {
 }
 
 impl ValueType {
-    fn complexity(&self) -> u8 {
+    pub fn complexity(&self) -> u8 {
         match self {
             Self::BoolType => 1,
             Self::IntType => 2,
@@ -40,5 +40,15 @@ impl ValueType {
             }
         }
         highest
+    }
+
+    pub fn lowest_complexity(types: Vec<&ValueType>) -> ValueType {
+        let mut lowest = ValueType::VectorType;
+        for t in types {
+            if t.complexity() < lowest.complexity() {
+                lowest = t.clone();
+            }
+        }
+        lowest
     }
 }
