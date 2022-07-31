@@ -12,7 +12,7 @@ pub type ComplexValue = Complex64;
 pub type VectorValue = Vec<Value>;
 pub type BoolValue = bool;
 
-/// Represent very possible output value.
+/// Represent every possible output value.
 #[derive(Debug, Clone, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Value {
@@ -123,7 +123,7 @@ impl Value {
             Value::Bool(n) => Ok(Complex64::new(*n as i64 as f64, 0.0)),
             Value::Vector(v) => {
                 if v.len() == 1 {
-                    v[1].as_complex()
+                    v[0].as_complex()
                 } else {
                     Err(ErrorType::FailedCast {
                         value: self.clone(),

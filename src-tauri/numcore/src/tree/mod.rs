@@ -1,3 +1,5 @@
+use itertools::Itertools;
+
 use crate::{
     objects::Expression,
     out::{ErrorType, EvalResult},
@@ -154,6 +156,13 @@ fn create_node(
             &token_info,
             range,
         )?);
+    } else if token_info.token.r#type.is_union_operator() {
+        return Ok(build_union_operator(
+            sorted_node_tokens,
+            stream,
+            &token_info,
+            range,
+        )?);
     } else {
         // Match for literals, constants, functions and variables.
         match token_info.token.r#type {
@@ -166,17 +175,13 @@ fn create_node(
                     IdentifierType::Var => Ok(Node::Var(val.clone())),
                     IdentifierType::Function => Ok(Node::Func(
                         val.clone(),
-                        Box::new(get_function_parameters(
-                            sorted_node_tokens,
-                            stream,
-                            &token_info,
-                        )?),
+                        get_function_parameters(sorted_node_tokens, stream, &token_info)?,
                     )),
                     IdentifierType::Unknown => Err(ErrorType::UnknownToken { token: val.clone() }),
                 }
             }
             _ => Err(ErrorType::InternalError {
-                message: format!("token `{}` is not a valid node", token_info.token.value),
+                message: format!("token `{}` is not a valid node", token_info.token),
             }),
         }
     }
@@ -285,42 +290,51 @@ fn get_lowest_precedence_node_in_range(
     }
 }
 
-/// Returns a node with can contains multiple values as a vector.
+/// Returns the node contained inside the function brackets.
 fn get_function_parameters(
     sorted_node_tokens: &mut Vec<TokenInfo>,
     stream: &TokenStream,
     func_token: &TokenInfo,
-) -> EvalResult<Node> {
+) -> EvalResult<Vec<Box<Node>>> {
     let func_pos = func_token.position;
     // Check if in range
-    if func_pos + 1 < stream.len() {
-        // Check for bracket
-        // Brackets should have all been added during "tokenization" phase.
-        if stream[func_pos + 1].r#type == TokenType::OpeningBracket {
-            // Builds the node inside the brackets
-            match get_lowest_precedence_node_in_range(
-                sorted_node_tokens,
-                stream,
-                (
-                    func_pos + 1,
-                    get_corresponding_closing_bracket(stream, func_pos + 1)?,
-                ),
-            )? {
-                Some(node) => Ok(node),
-                None => Err(ErrorType::MissingFunctionParameters {
+    let content_node = {
+        if func_pos + 1 < stream.len() {
+            // Check for bracket
+            // Brackets should have all been added during "tokenization" phase.
+            if stream[func_pos + 1].r#type == TokenType::OpeningBracket {
+                // Builds the node inside the brackets
+                match get_lowest_precedence_node_in_range(
+                    sorted_node_tokens,
+                    stream,
+                    (
+                        func_pos + 1,
+                        get_corresponding_closing_bracket(stream, func_pos + 1)?,
+                    ),
+                )? {
+                    Some(node) => Ok(node),
+                    None => {
+                        return Err(ErrorType::MissingFunctionParameters {
+                            func_name: func_token.token.value.clone(),
+                        })
+                    }
+                }
+            } else {
+                // No available token
+                return Err(ErrorType::MissingFunctionParameters {
                     func_name: func_token.token.value.clone(),
-                }),
+                });
             }
         } else {
-            // No available token
-            Err(ErrorType::MissingFunctionParameters {
+            return Err(ErrorType::MissingFunctionParameters {
                 func_name: func_token.token.value.clone(),
-            })
+            });
         }
-    } else {
-        Err(ErrorType::MissingFunctionParameters {
-            func_name: func_token.token.value.clone(),
-        })
+    }?;
+
+    match content_node {
+        Expression::Union(nodes) => Ok(nodes),
+        other => Ok(vec![Box::new(other)]),
     }
 }
 
@@ -344,4 +358,64 @@ fn get_corresponding_closing_bracket(
         index += 1;
     }
     Err(ErrorType::MissingClosingBracket)
+}
+
+fn build_union_operator(
+    sorted_node_tokens: &mut Vec<TokenInfo>,
+    stream: &TokenStream,
+    token_info: &TokenInfo,
+    range: (usize, usize),
+) -> EvalResult<Node> {
+    // Check for every other union operators (commas) at the same depth and
+    // in the same range.
+    let mut union_operators = [vec![token_info.clone()], {
+        let vec = sorted_node_tokens
+            .iter()
+            .filter(|x| {
+                x.token.r#type == token_info.token.r#type
+                    && x.depth == token_info.depth
+                    && x.position >= range.0
+                    && x.position < range.1
+            })
+            .cloned()
+            .collect_vec();
+
+        // Remove the found item from the sorted node tokens
+        let mut index = 0;
+        while index < vec.len() {
+            let elem = &vec[index];
+            sorted_node_tokens.remove(sorted_node_tokens.iter().position(|x| *x == *elem).unwrap());
+            index += 1;
+        }
+
+        vec
+    }]
+    .concat();
+
+    union_operators.sort_by(|a, b| a.position.cmp(&b.position));
+
+    let mut ranges: Vec<(usize, usize)> = vec![];
+    let mut pos = range.0;
+    // Create ranges for all the nodes to build
+    for elem in union_operators {
+        ranges.push((pos + 1, elem.position));
+        pos = elem.position;
+    }
+    // Add final range
+    ranges.push((pos + 1, range.1));
+
+    let nodes = {
+        let mut vec = vec![];
+        for r in ranges {
+            vec.push(Box::new(
+                match get_lowest_precedence_node_in_range(sorted_node_tokens, stream, r)? {
+                    Some(node) => node,
+                    None => return Err(ErrorType::EmptyUnion),
+                },
+            ))
+        }
+        vec
+    };
+
+    Ok(Node::Union(nodes))
 }

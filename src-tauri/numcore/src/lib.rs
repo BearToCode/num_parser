@@ -18,6 +18,7 @@
 //! * User-defined functions: `f(x,y) = xsin(y)+ysin(x)`
 //! * User-defined var: `a = pi/2` or `b = a+2`
 //! * Understands ambiguous syntax, like: `g(x) = pisinx`
+//! * Recursion: `f(x) = branch(x<2, 1, f(x-1)+f(x-2))`
 //! * Serde support
 //! * No panicking
 //!

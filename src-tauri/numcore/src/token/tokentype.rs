@@ -77,14 +77,16 @@ impl TokenType {
         matches!(*self, TokenType::Identifier(_)) || // An identifier
         *self == TokenType::Literal ||  // A number
         self.is_binary_operator() || // An operator
-        self.is_unary_operator()
+        self.is_unary_operator() ||
+        self.is_union_operator()
     }
 
     pub fn is_binary_operator(&self) -> bool {
         match self {
-            Plus | Minus | Star | Slash | Comma | Equal | Caret | Percentage | LessThan
-            | GreaterThan | LessOrEqualTo | GreaterOrEqualTo | DoubleAnd | DoubleOr
-            | DoubleEqual | NotEqual => true,
+            Plus | Minus | Star | Slash | Equal | Caret | Percentage | LessThan | GreaterThan
+            | LessOrEqualTo | GreaterOrEqualTo | DoubleAnd | DoubleOr | DoubleEqual | NotEqual => {
+                true
+            }
             _ => false,
         }
     }
@@ -92,6 +94,13 @@ impl TokenType {
     pub fn is_unary_operator(&self) -> bool {
         match self {
             Minus | Exclamation => true,
+            _ => false,
+        }
+    }
+
+    pub fn is_union_operator(&self) -> bool {
+        match self {
+            Comma => true,
             _ => false,
         }
     }

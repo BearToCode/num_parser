@@ -54,9 +54,11 @@ pub enum Expression {
     /// A variable.
     Var(String),
     /// A function call and its parameters.
-    Func(String, Box<Expression>),
+    Func(String, Vec<Box<Expression>>),
     /// A literal value.
     Literal(Value),
+    /// A union of values.
+    Union(Vec<Box<Expression>>),
 }
 
 impl Expression {
@@ -76,8 +78,6 @@ impl Expression {
                     TokenType::Slash => Value::div(left_value, right_value)?,
                     // Exponentiation
                     TokenType::Caret => Value::exponentiation(left_value, right_value)?,
-                    // Aggregation
-                    TokenType::Comma => Value::aggregate(left_value, right_value),
                     // Modulo
                     TokenType::Percentage => Value::modulo(left_value, right_value)?,
                     // Less than
@@ -109,6 +109,13 @@ impl Expression {
                 TokenType::Exclamation => Value::not(expr.eval(context, scope)?)?,
                 _ => return Err(ErrorType::InvalidTokenPosition { token: *token_type }),
             }),
+            Self::Union(expressions) => {
+                let mut vec = vec![];
+                for expr in expressions {
+                    vec.push(expr.eval(context, scope)?);
+                }
+                Ok(Value::Vector(vec))
+            }
             Self::Var(identifier) => {
                 // Check built-in vars
                 if let Some(var) = builtin::get_const(identifier) {
@@ -159,7 +166,7 @@ impl Expression {
                             if let Some(func_ident) = argument {
                                 product = Value::mul(
                                     product,
-                                    Self::Func(func_ident, Box::new(Self::Var(i)))
+                                    Self::Func(func_ident, vec![Box::new(Self::Var(i))])
                                         .eval(context, scope)?,
                                 )?;
                                 argument = Option::None;
@@ -181,14 +188,17 @@ impl Expression {
             Self::Func(identifier, arguments) => {
                 // Check built-in functions
                 if let Some(func) = builtin::get_function(identifier) {
-                    return Ok(func.call(arguments.eval(context, scope)?)?);
+                    return Ok(func.call(arguments, context, scope)?);
                 }
                 // Check user-defined ones
                 if let Some((names, body)) = context.get_function(&identifier) {
                     let mut inner_scope = {
                         let mut cont = Context::new();
-                        let params = match value_to_params(names, &arguments.eval(context, scope)?)
-                        {
+                        // Retrieve the parameters values
+                        let params = match value_to_params(
+                            names,
+                            &Expression::Union(arguments.clone()).eval(context, scope)?,
+                        ) {
                             Ok(value) => value,
                             Err(err) => {
                                 return match err {
@@ -217,8 +227,6 @@ impl Expression {
                         Some(cont) => inner_scope.join_with(cont),
                         None => (),
                     };
-
-                    println!("EVAL BODY");
 
                     return Ok(body.eval(context, Some(&inner_scope))?);
                 }
@@ -258,7 +266,7 @@ impl Expression {
                             if let Some(func_ident) = argument {
                                 product = Value::mul(
                                     product,
-                                    Self::Func(func_ident, Box::new(Self::Var(i.clone())))
+                                    Self::Func(func_ident, vec![Box::new(Self::Var(i.clone()))])
                                         .eval(context, scope)?,
                                 )?;
                                 argument = Option::None;

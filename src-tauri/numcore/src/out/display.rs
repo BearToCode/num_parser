@@ -73,6 +73,7 @@ impl fmt::Display for ErrorType {
                 "INTERNAL ERROR: `{}` is a keyword cannot be used as a function name.",
                 func_name
             ),
+            EmptyUnion => write!(f, "SYNTAX ERROR: trying to aggregate an empty value."),
 
             ErrorDuring {
                 operation_name,

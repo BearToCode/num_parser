@@ -62,6 +62,8 @@ pub enum ErrorType {
     ReservedVarName { var_name: String },
     /// A reserved function name.
     ReservedFunctionName { func_name: String },
+    /// An empty union ,,
+    EmptyUnion,
 
     /// An error wrapper to add additional information.
     ErrorDuring {

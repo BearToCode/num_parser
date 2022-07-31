@@ -195,18 +195,6 @@ impl Value {
         )
     }
 
-    pub fn aggregate(self, rhs: Self) -> Self {
-        // Convert both values to a vector and concatenate them
-        if rhs.as_vector().len() == 1 {
-            Value::Vector([self.as_vector(), rhs.as_vector()].concat())
-        } else {
-            // Allow multi-dimensional vectors
-            let mut self_as_vector = self.as_vector();
-            self_as_vector.push(Value::Vector(rhs.as_vector()));
-            Value::Vector(self_as_vector)
-        }
-    }
-
     pub fn exponentiation(self, rhs: Self) -> EvalResult<Self> {
         convert_and_apply(
             &self,

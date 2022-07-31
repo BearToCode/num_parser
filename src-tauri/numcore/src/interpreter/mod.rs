@@ -11,8 +11,11 @@ impl Node {
         match self {
             Self::Binary(lhs, _, rhs) => vec![&lhs, &rhs],
             Self::Unary(_, node) => vec![&node],
-            Self::Func(_, node) => vec![&node],
+            Self::Func(_, nodes) => {
+                (*nodes.iter().map(|x| &(**x)).collect::<Vec<&Node>>()).to_vec()
+            }
             Self::Literal(_) | Self::Var(_) => vec![],
+            Self::Union(nodes) => (*nodes.iter().map(|x| &(**x)).collect::<Vec<&Node>>()).to_vec(),
         }
     }
 }
@@ -65,38 +68,19 @@ pub fn interpret_tree(tree: &Tree) -> EvalResult<Request> {
                 ))
             }
             Expression::Func(identifier, arguments_node) => {
-                // Retrieve all sub nodes
-                let sub_nodes = match_all(&arguments_node, 0, &|_| true);
-                // Retrieve function parameters
-                match sub_nodes {
-                    None => {
-                        return Ok(Request::FuncDeclaration(
-                            identifier.clone(),
-                            vec![],
-                            Box::new(right.clone()),
-                        ))
-                    }
-                    Some(nodes) => {
-                        let mut params = vec![];
-                        for node_info in nodes {
-                            match node_info.node {
-                                Expression::Binary(_, op, _) => {
-                                    // Exclude all the aggregator operators
-                                    if *op != TokenType::Comma {
-                                        return Err(ErrorType::InvalidDeclaration);
-                                    }
-                                }
-                                Expression::Var(arg) => params.push(arg.clone()),
-                                _ => return Err(ErrorType::InvalidDeclaration),
-                            }
-                        }
-                        return Ok(Request::FuncDeclaration(
-                            identifier.clone(),
-                            params,
-                            Box::new(right.clone()),
-                        ));
+                let mut params: Vec<String> = vec![];
+                for node_box in arguments_node {
+                    let node = &**node_box;
+                    match node {
+                        Expression::Var(arg_name) => params.push(arg_name.clone()),
+                        _ => return Err(ErrorType::InvalidDeclaration),
                     }
                 }
+                return Ok(Request::FuncDeclaration(
+                    identifier.clone(),
+                    params,
+                    Box::new(right.clone()),
+                ));
             }
             _ => return Err(ErrorType::InvalidDeclaration),
         }

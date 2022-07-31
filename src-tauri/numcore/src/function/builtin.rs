@@ -1,6 +1,8 @@
 use std::collections::HashMap;
 
 use crate::{
+    create_func, decl_func,
+    function::*,
     function::{Arguments, Function},
     out::ErrorType,
     value::Value,
@@ -27,37 +29,38 @@ lazy_static! {
 
         m
     };
+    #[derive(Debug)]
     pub static ref BUILT_IN_FUNCTIONS: Vec<Function> = vec![
-        Function::new("min", min, Arguments::Dynamic),
-        Function::new("max", max, Arguments::Dynamic),
-        Function::new("floor", floor, Arguments::Const(1)),
-        Function::new("ceil", ceil, Arguments::Const(1)),
-        Function::new("round", round, Arguments::Const(1)),
-        Function::new("ln", ln, Arguments::Const(1)),
-        Function::new("log", log, Arguments::Const(2)),
-        Function::new("exp", exp, Arguments::Const(1)),
-        Function::new("rand", rand, Arguments::Const(2)),
+        create_func!(min, Arguments::Dynamic),
+        create_func!(max, Arguments::Dynamic),
+        create_func!(floor, Arguments::Const(1)),
+        create_func!(ceil, Arguments::Const(1)),
+        create_func!(round, Arguments::Const(1)),
+        create_func!(ln, Arguments::Const(1)),
+        create_func!(log, Arguments::Const(2)),
+        create_func!(exp, Arguments::Const(1)),
+        create_func!(rand, Arguments::Const(2)),
 
-        Function::new("branch", branch, Arguments::Const(3)),
+        create_func!(branch, Arguments::Const(3)),
 
-        Function::new("sin", sin, Arguments::Const(1)),
-        Function::new("cos", cos, Arguments::Const(1)),
-        Function::new("tan", tan, Arguments::Const(1)),
-        Function::new("asin", asin, Arguments::Const(1)),
-        Function::new("acos", acos, Arguments::Const(1)),
-        Function::new("atan", atan, Arguments::Const(1)),
-        Function::new("sinh", sinh, Arguments::Const(1)),
-        Function::new("cosh", cosh, Arguments::Const(1)),
-        Function::new("tanh", tanh, Arguments::Const(1)),
-        Function::new("asinh", asinh, Arguments::Const(1)),
-        Function::new("acosh", acosh, Arguments::Const(1)),
-        Function::new("atanh", atanh, Arguments::Const(1)),
+        create_func!(sin, Arguments::Const(1)),
+        create_func!(cos, Arguments::Const(1)),
+        create_func!(tan, Arguments::Const(1)),
+        create_func!(asin, Arguments::Const(1)),
+        create_func!(acos, Arguments::Const(1)),
+        create_func!(atan, Arguments::Const(1)),
+        create_func!(sinh, Arguments::Const(1)),
+        create_func!(cosh, Arguments::Const(1)),
+        create_func!(tanh, Arguments::Const(1)),
+        create_func!(asinh, Arguments::Const(1)),
+        create_func!(acosh, Arguments::Const(1)),
+        create_func!(atanh, Arguments::Const(1)),
 
-        Function::new("re", re, Arguments::Const(1)),
-        Function::new("im", im, Arguments::Const(1)),
-        Function::new("polar", polar, Arguments::Const(1)),
-        Function::new("arg", arg, Arguments::Const(1)),
-        Function::new("norm", norm, Arguments::Const(1)),
+        create_func!(re, Arguments::Const(1)),
+        create_func!(im, Arguments::Const(1)),
+        create_func!(polar, Arguments::Const(1)),
+        create_func!(arg, Arguments::Const(1)),
+        create_func!(norm, Arguments::Const(1)),
 
     ];
 }
@@ -87,15 +90,7 @@ pub fn reserved_keywords() -> Vec<&'static str> {
     .concat()
 }
 
-fn fn_wrapper<P, T>(value: Value, target_type: ValueType, mut predicate: P) -> EvalResult<Value>
-where
-    P: FnMut(Value) -> EvalResult<T>,
-    Value: From<T>,
-{
-    let original_type = value.get_type();
-    let value = value.as_type(&target_type)?;
-    Ok(Value::from(predicate(value)?).try_as_type(original_type))
-}
+// UTILS
 
 macro_rules! read_vec_values {
     ( $vec:expr, $($x:ident),* ) => {
@@ -113,8 +108,9 @@ macro_rules! read_vec_values {
 
 // STD
 
-fn min(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::VectorType, |v| {
+decl_func!(
+    min,
+    |v| {
         let vec = v.as_vector();
         let mut min = vec[0].as_float()?;
         for elem in vec {
@@ -123,163 +119,116 @@ fn min(value: Value) -> EvalResult<Value> {
             }
         }
         Ok(Value::Float(min))
-    })
-}
+    },
+    ValueType::VectorType
+);
 
-fn max(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::VectorType, |v| {
+decl_func!(
+    max,
+    |v| {
         let vec = v.as_vector();
-        let mut min = vec[0].as_float()?;
+        let mut max = vec[0].as_float()?;
         for elem in vec {
-            if elem.as_float()? > min {
-                min = elem.as_float()?;
+            if elem.as_float()? > max {
+                max = elem.as_float()?;
             }
         }
-        Ok(Value::Float(min))
-    })
-}
+        Ok(Value::Float(max))
+    },
+    ValueType::VectorType
+);
 
-fn floor(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::FloatType, |v| Ok(v.as_float()?.floor()))
-}
+decl_func!(floor, |v| Ok(v.as_float()?.floor()), ValueType::FloatType);
 
-fn ceil(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::FloatType, |v| Ok(v.as_float()?.ceil()))
-}
+decl_func!(ceil, |v| Ok(v.as_float()?.floor()), ValueType::FloatType);
 
-fn round(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::FloatType, |v| Ok(v.as_float()?.round()))
-}
+decl_func!(round, |v| Ok(v.as_float()?.round()), ValueType::FloatType);
 
-fn ln(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| Ok(v.as_float()?.ln()))
-}
+decl_func!(ln, |v| Ok(v.as_complex()?.ln()), ValueType::ComplexType);
 
-fn log(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::VectorType, |v| {
+decl_func!(
+    log,
+    |v| {
         read_vec_values!(v, base, argument);
         Ok(argument.as_complex()?.log(base.as_float()?))
-    })
-}
+    },
+    ValueType::VectorType
+);
 
-fn exp(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Value::exponentiation(CONSTANTS.get("e").unwrap().clone(), v)
-    })
-}
+decl_func!(exp, |v| Ok(v.as_complex()?.exp()), ValueType::ComplexType);
 
-fn rand(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::VectorType, |v| {
+decl_func!(
+    rand,
+    |v| {
         read_vec_values!(v, min, max);
         Ok(Value::Float(
             rand::thread_rng().gen_range(min.as_float()?..max.as_float()?),
         ))
-    })
-}
+    },
+    ValueType::VectorType
+);
 
 // LOGIC
 
-fn branch(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::VectorType, |v| {
-        read_vec_values!(v, condition, a, b);
-        if condition.as_bool()? {
-            Ok(a.clone())
-        } else {
-            Ok(b.clone())
-        }
-    })
+fn branch(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
+    let condition = arguments[0].eval(context, None)?.as_bool()?;
+    if condition {
+        Ok(arguments[1].eval(context, None)?)
+    } else {
+        Ok(arguments[2].eval(context, None)?)
+    }
 }
 
 // TRIGONOMETRY
 
-fn sin(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| Ok(v.as_complex()?.sin()))
-}
+decl_func!(sin, |v| Ok(v.as_complex()?.sin()), ValueType::ComplexType);
 
-fn cos(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| Ok(v.as_complex()?.cos()))
-}
+decl_func!(cos, |v| Ok(v.as_complex()?.cos()), ValueType::ComplexType);
 
-fn tan(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| Ok(v.as_complex()?.tan()))
-}
+decl_func!(tan, |v| Ok(v.as_complex()?.tan()), ValueType::ComplexType);
 
-fn asin(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.asin())
-    })
-}
+decl_func!(asin, |v| Ok(v.as_complex()?.asin()), ValueType::ComplexType);
 
-fn acos(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.acos())
-    })
-}
+decl_func!(acos, |v| Ok(v.as_complex()?.acos()), ValueType::ComplexType);
 
-fn atan(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.atan())
-    })
-}
+decl_func!(atan, |v| Ok(v.as_complex()?.atan()), ValueType::ComplexType);
 
-fn sinh(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.sinh())
-    })
-}
+decl_func!(sinh, |v| Ok(v.as_complex()?.sinh()), ValueType::ComplexType);
 
-fn cosh(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.cosh())
-    })
-}
+decl_func!(cosh, |v| Ok(v.as_complex()?.cosh()), ValueType::ComplexType);
 
-fn tanh(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.tanh())
-    })
-}
+decl_func!(tanh, |v| Ok(v.as_complex()?.tanh()), ValueType::ComplexType);
 
-fn asinh(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.asinh())
-    })
-}
+decl_func!(
+    asinh,
+    |v| Ok(v.as_complex()?.asinh()),
+    ValueType::ComplexType
+);
 
-fn acosh(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.acosh())
-    })
-}
+decl_func!(
+    acosh,
+    |v| Ok(v.as_complex()?.acosh()),
+    ValueType::ComplexType
+);
 
-fn atanh(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.atanh())
-    })
-}
+decl_func!(
+    atanh,
+    |v| Ok(v.as_complex()?.atanh()),
+    ValueType::ComplexType
+);
 
 // COMPLEX
 
-fn re(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| Ok(v.as_complex()?.re))
-}
+decl_func!(re, |v| Ok(v.as_complex()?.re), ValueType::ComplexType);
 
-fn im(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| Ok(v.as_complex()?.im))
-}
+decl_func!(im, |v| Ok(v.as_complex()?.im), ValueType::ComplexType);
 
-fn polar(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.to_polar().to_vec())
-    })
-}
+decl_func!(
+    polar,
+    |v| Ok(v.as_complex()?.to_polar().to_vec()),
+    ValueType::ComplexType
+);
 
-fn arg(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| Ok(v.as_complex()?.arg()))
-}
+decl_func!(arg, |v| Ok(v.as_complex()?.arg()), ValueType::ComplexType);
 
-fn norm(value: Value) -> EvalResult<Value> {
-    fn_wrapper(value, ValueType::ComplexType, |v| {
-        Ok(v.as_complex()?.norm())
-    })
-}
+decl_func!(norm, |v| Ok(v.as_complex()?.norm()), ValueType::ComplexType);

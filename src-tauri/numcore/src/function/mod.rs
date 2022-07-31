@@ -1,30 +1,39 @@
 pub mod builtin;
 
 use crate::{
+    objects::Expression,
     out::{ErrorType, EvalResult},
-    value::Value,
+    value::{valuetype::ValueType, Value},
+    Context,
 };
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Function {
     /// The identifier needed to call this function.
     pub func_identifier: &'static str,
     /// The actual function.
-    pub func: fn(Value) -> EvalResult<Value>,
+    pub func: fn(&Vec<Box<Expression>>, &Context) -> EvalResult<Value>,
     /// The function arguments type.
     pub args: Arguments,
+}
+
+#[macro_export]
+macro_rules! create_func {
+    ( $func:ident, $args:expr ) => {
+        Function::new(stringify!($func), $func, $args)
+    };
 }
 
 impl Function {
     pub fn new(
         func_identifier: &'static str,
-        func: fn(Value) -> EvalResult<Value>,
-        func_type: Arguments,
+        func: fn(&Vec<Box<Expression>>, &Context) -> EvalResult<Value>,
+        args: Arguments,
     ) -> Self {
         Self {
             func_identifier,
             func,
-            args: func_type,
+            args,
         }
     }
 }
@@ -38,53 +47,59 @@ pub enum Arguments {
 }
 
 impl Function {
-    pub fn call(&self, arguments: Value) -> EvalResult<Value> {
-        let arguments = match self.args {
+    pub fn call(
+        &self,
+        arguments: &Vec<Box<Expression>>,
+        context: &Context,
+        scope: Option<&Context>,
+    ) -> EvalResult<Value> {
+        match self.args {
             Arguments::Const(count) => {
-                if count == 1 {
-                    match arguments {
-                        Value::Vector(vector) => {
-                            if vector.len() != 1 {
-                                return Err(ErrorType::WrongFunctionArgumentsAmount {
-                                    func_name: self.func_identifier.to_owned(),
-                                    expected: 1,
-                                    given: vector.len() as u8,
-                                });
-                            } else {
-                                vector[0].clone()
-                            }
-                        }
-                        other => other,
-                    }
-                } else {
-                    match arguments {
-                        Value::Vector(vector) => {
-                            if vector.len() == count {
-                                Value::Vector(vector)
-                            } else {
-                                return Err(ErrorType::WrongFunctionArgumentsAmount {
-                                    func_name: self.func_identifier.to_owned(),
-                                    expected: count as u8,
-                                    given: vector.len() as u8,
-                                });
-                            }
-                        }
-                        _ => {
-                            return Err(ErrorType::WrongFunctionArgumentsAmount {
-                                func_name: self.func_identifier.to_owned(),
-                                expected: count as u8,
-                                given: 1,
-                            })
-                        }
-                    }
+                if arguments.len() != count {
+                    return Err(ErrorType::WrongFunctionArgumentsAmount {
+                        func_name: self.func_identifier.to_owned(),
+                        expected: count as u8,
+                        given: arguments.len() as u8,
+                    });
                 }
             }
-            Arguments::Dynamic => match arguments {
-                Value::Vector(_) => arguments,
-                other => Value::Vector(vec![other]),
-            },
-        };
+            _ => (),
+        }
 
-        (self.func)(arguments)
+        let mut joined_context = Context::new();
+        joined_context.join_with(context);
+        if let Some(c) = scope {
+            joined_context.join_with(c);
+        }
+
+        (self.func)(arguments, &joined_context)
     }
+}
+
+pub fn type_wrapper<P, T>(
+    value: Value,
+    target_type: ValueType,
+    mut predicate: P,
+) -> EvalResult<Value>
+where
+    P: FnMut(Value) -> EvalResult<T>,
+    Value: From<T>,
+{
+    let original_type = value.get_type();
+    let value = value.as_type(&target_type)?;
+    Ok(Value::from(predicate(value)?).try_as_type(original_type))
+}
+
+pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
+    Expression::Union(arguments.clone()).eval(context, None)
+}
+
+#[macro_export]
+macro_rules! decl_func {
+    ( $identifier:ident, $predicate:expr, $target:expr ) => {
+        fn $identifier(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
+            let unboxed = unbox_parameters(arguments, context)?;
+            type_wrapper(unboxed, $target, $predicate)
+        }
+    };
 }
