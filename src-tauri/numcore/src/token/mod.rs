@@ -291,18 +291,35 @@ pub fn split_into_identifiers(input: String, context: &Context) -> Vec<(String, 
         ),
     ];
 
-    let mut current = "".to_owned();
+    let mut to_identify = input.to_owned();
+    let mut current;
+    while to_identify.len() > 0 {
+        current = to_identify.clone();
+        to_identify = "".to_owned();
 
-    for char in input.chars() {
-        current.push(char);
-        if let Some(identifier) = try_to_categorize(&patterns, &current) {
-            out.push((current, identifier));
-            current = "".to_owned();
+        if current.is_empty() {
+            break;
         }
-    }
 
-    if current != "" {
-        out.push((current, IdentifierType::Unknown));
+        loop {
+            let categorized = try_to_categorize(&patterns, &current);
+            match categorized {
+                Some(identifier) => {
+                    out.push((current, identifier));
+                    break;
+                }
+                None => {
+                    if current.len() == 1 {
+                        out.push((current.clone(), IdentifierType::Unknown));
+                        break;
+                    } else {
+                        // Remove one char from current and push it to to_identify
+                        to_identify.insert(0, current.chars().last().unwrap());
+                        current = current[0..current.len() - 1].to_owned();
+                    }
+                }
+            }
+        }
     }
 
     out
@@ -436,7 +453,7 @@ fn tokenize(character: &char) -> EvalResult<Token> {
         '^' => Token::new(TokenType::Caret, 1, ""),
         '%' => Token::new(TokenType::Percentage, 1, ""),
         '<' => Token::new(TokenType::LessThan, 1, ""),
-        '>' => Token::new(TokenType::GreaterOrEqualTo, 1, ""),
+        '>' => Token::new(TokenType::GreaterThan, 1, ""),
         '&' => Token::new(TokenType::And, 1, ""),
         '|' => Token::new(TokenType::Or, 1, ""),
         '!' => Token::new(TokenType::Exclamation, 1, ""),

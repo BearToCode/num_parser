@@ -218,6 +218,8 @@ impl Expression {
                         None => (),
                     };
 
+                    println!("EVAL BODY");
+
                     return Ok(body.eval(context, Some(&inner_scope))?);
                 }
 

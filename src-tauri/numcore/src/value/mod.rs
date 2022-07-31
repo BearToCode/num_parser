@@ -270,3 +270,43 @@ impl Value {
         }
     }
 }
+
+impl From<BoolValue> for Value {
+    fn from(bool: BoolValue) -> Self {
+        Value::Bool(bool)
+    }
+}
+
+impl From<IntValue> for Value {
+    fn from(int: IntValue) -> Self {
+        Value::Int(int)
+    }
+}
+
+impl From<FloatValue> for Value {
+    fn from(float: FloatValue) -> Self {
+        Value::Float(float)
+    }
+}
+
+impl From<ComplexValue> for Value {
+    fn from(complex: ComplexValue) -> Self {
+        Value::Complex(complex)
+    }
+}
+
+// impl From<VectorValue> for Value {
+//     fn from(vector: VectorValue) -> Self {
+//         Value::Vector(vector)
+//     }
+// }
+
+impl<T> From<Vec<T>> for Value
+where
+    Value: From<T>,
+    T: Copy,
+{
+    fn from(vec: Vec<T>) -> Self {
+        Value::Vector(vec.iter().map(|v| Value::from(*v)).collect())
+    }
+}

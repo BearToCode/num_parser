@@ -12,6 +12,7 @@ use crate::{
 pub type Node = Expression;
 
 /// A tree needs to be interpreted to determine the requested operation.
+#[derive(Debug)]
 pub struct Tree(pub Node);
 
 /// Builds an expression tree, effectively parsing the token stream.

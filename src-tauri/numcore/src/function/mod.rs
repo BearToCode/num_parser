@@ -12,77 +12,74 @@ pub struct Function {
     /// The actual function.
     pub func: fn(Value) -> EvalResult<Value>,
     /// The function arguments type.
-    pub func_type: FunctionType,
+    pub args: Arguments,
 }
 
 impl Function {
     pub fn new(
         func_identifier: &'static str,
         func: fn(Value) -> EvalResult<Value>,
-        func_type: FunctionType,
+        func_type: Arguments,
     ) -> Self {
         Self {
             func_identifier,
             func,
-            func_type,
+            args: func_type,
         }
     }
 }
 
 #[derive(Clone, Copy, PartialEq, Debug)]
-pub enum FunctionType {
-    // Expects only one argument
-    Unary,
-    // Expects two arguments
-    Binary,
-    // Expects any amount
-    Vector,
+pub enum Arguments {
+    /// Expects a constant number of arguments.
+    Const(usize),
+    /// Expects any amount greater than one.
+    Dynamic,
 }
 
 impl Function {
     pub fn call(&self, arguments: Value) -> EvalResult<Value> {
-        let arguments = match self.func_type {
-            FunctionType::Unary => {
-                // Avoid vectors
-                match arguments {
-                    Value::Vector(vector) => {
-                        if vector.len() != 1 {
+        let arguments = match self.args {
+            Arguments::Const(count) => {
+                if count == 1 {
+                    match arguments {
+                        Value::Vector(vector) => {
+                            if vector.len() != 1 {
+                                return Err(ErrorType::WrongFunctionArgumentsAmount {
+                                    func_name: self.func_identifier.to_owned(),
+                                    expected: 1,
+                                    given: vector.len() as u8,
+                                });
+                            } else {
+                                vector[0].clone()
+                            }
+                        }
+                        other => other,
+                    }
+                } else {
+                    match arguments {
+                        Value::Vector(vector) => {
+                            if vector.len() == count {
+                                Value::Vector(vector)
+                            } else {
+                                return Err(ErrorType::WrongFunctionArgumentsAmount {
+                                    func_name: self.func_identifier.to_owned(),
+                                    expected: count as u8,
+                                    given: vector.len() as u8,
+                                });
+                            }
+                        }
+                        _ => {
                             return Err(ErrorType::WrongFunctionArgumentsAmount {
                                 func_name: self.func_identifier.to_owned(),
-                                expected: 1,
-                                given: vector.len() as u8,
-                            });
-                        } else {
-                            vector[0].clone()
+                                expected: count as u8,
+                                given: 1,
+                            })
                         }
-                    }
-                    other => other,
-                }
-            }
-            FunctionType::Binary => {
-                // Only vectors with two arguments
-                match arguments {
-                    Value::Vector(ref vector) => {
-                        if vector.len() != 2 {
-                            return Err(ErrorType::WrongFunctionArgumentsAmount {
-                                func_name: self.func_identifier.to_owned(),
-                                expected: 2,
-                                given: vector.len() as u8,
-                            });
-                        } else {
-                            arguments
-                        }
-                    }
-                    _ => {
-                        return Err(ErrorType::WrongFunctionArgumentsAmount {
-                            func_name: self.func_identifier.to_owned(),
-                            expected: 2,
-                            given: 1,
-                        })
                     }
                 }
             }
-            FunctionType::Vector => match arguments {
+            Arguments::Dynamic => match arguments {
                 Value::Vector(_) => arguments,
                 other => Value::Vector(vec![other]),
             },

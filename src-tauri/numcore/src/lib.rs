@@ -69,16 +69,40 @@
 //!
 //! | Operator | Description | Precedence |
 //! |----------|-------------|------------|
-//! | ! | Logical Not | 80 |
+//! | ! | Logical NOT | 80 |
 //! | - | Negation    | 60 |
 //!
 //! ## Functions
 //!
-//! | Function | Parameters Amount | Description                       |
-//! |----------|-------------------|-----------------------------------|
-//! | `sin`    | 1                 | Returns the sine of the angle.    |
-//! | `cos`    | 1                 | Returns the cosine of the angle.  |
-//! | `tan`    | 1                 | Returns the tangent of the angle. |
+//! | Function | Parameters Amount          | Description                                                   |
+//! |----------|----------------------------|---------------------------------------------------------------|
+//! | `min`    | >=1                        | Returns the minimum value.                                    |
+//! | `max`    | >=1                        | Returns the maximum value.                                    |
+//! | `floor`  | 1                          | Returns the greatest lower integer.                           |
+//! | `ceil`   | 1                          | Returns the lowest greater integer.                           |
+//! | `round`  | 1                          | Returns the rounded integer.                                  |
+//! | `ln`     | 1                          | Returns the natural log of the number.                        |
+//! | `log`    | 2 (base, arg)              | Returns the logarithm of the number with the specified base.  |
+//! | `exp`    | 1                          | Returns e^(arg).                                              |
+//! | `rand`   | 2 (min, max)               | Returns a random float between the two number specified.      |
+//! | `branch` | 3 (condition, true, false) | Returns the sine of the angle.                                |
+//! | `sin`    | 1                          | Returns the sine of the angle.                                |
+//! | `cos`    | 1                          | Returns the cosine of the angle.                              |
+//! | `tan`    | 1                          | Returns the tangent of the angle.                             |
+//! | `asin`   | 1                          | Returns the arcsine of the angle.                             |
+//! | `acos`   | 1                          | Returns the arccosine of the angle.                           |
+//! | `atan`   | 1                          | Returns the arctangent of the angle.                          |
+//! | `sinh`   | 1                          | Returns the hyperbolic sine of the angle.                     |
+//! | `cosh`   | 1                          | Returns the hyperbolic cosine of the angle.                   |
+//! | `tanh`   | 1                          | Returns the hyperbolic tangent of the angle.                  |
+//! | `asinh`  | 1                          | Returns the hyperbolic arcsine of the angle.                  |
+//! | `acosh`  | 1                          | Returns the hyperbolic arccosine of the angle.                |
+//! | `atanh`  | 1                          | Returns the hyperbolic arctangent of the angle.               |
+//! | `re`     | 1                          | Returns the natural part of the number.                       |
+//! | `im`     | 1                          | Returns the imaginary part of the number.                     |
+//! | `polar`  | 1                          | Returns the polar form (r, theta) of the complex number.      |
+//! | `arg`    | 1                          | Returns the principal arg of the number.                      |
+//! | `norm`   | 1                          | Returns the length of the vector (re, im).                    |
 //!
 //! ## Context
 //!

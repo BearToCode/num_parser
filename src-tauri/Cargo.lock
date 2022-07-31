@@ -1694,7 +1694,9 @@ dependencies = [
  "itertools",
  "lazy_static",
  "num",
+ "rand 0.8.5",
  "serde",
+ "tuple-conv",
 ]
 
 [[package]]
@@ -3156,6 +3158,12 @@ checksum = "761e8d5ad7ce14bb82b7e61ccc0ca961005a275a060b9644a2431aa11553c2ff"
 dependencies = [
  "serde_json",
 ]
+
+[[package]]
+name = "tuple-conv"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1fd6314683350324c1bb3d71a65fbeacb4e870cb4faf30b28d8a7787fb8116dd"
 
 [[package]]
 name = "typenum"
