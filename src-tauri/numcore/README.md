@@ -28,7 +28,7 @@ Much more will be implemented in future releases!
 ## Use Guide
 
 Evaluating **simple static expressions**:
-```
+```rust
 use numcore::*;
 
 assert_eq!(eval("2+2").unwrap(), Value::from(4));
