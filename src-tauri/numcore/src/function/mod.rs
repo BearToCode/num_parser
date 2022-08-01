@@ -66,7 +66,7 @@ impl Function {
             _ => (),
         }
 
-        let mut joined_context = Context::new();
+        let mut joined_context = Context::default();
         joined_context.join_with(context);
         if let Some(c) = scope {
             joined_context.join_with(c);

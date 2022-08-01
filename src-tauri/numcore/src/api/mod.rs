@@ -7,11 +7,11 @@ use crate::{
 };
 
 pub fn eval(input: &str) -> EvalResult<Option<Value>> {
-    eval_with_mutable_context(input, &mut Context::new())
+    eval_with_mutable_context(input, &mut Context::default())
 }
 
 pub fn create_empty_context() -> Context {
-    context::Context::new()
+    context::Context::default()
 }
 
 pub fn eval_with_static_context(input: &str, context: &Context) -> EvalResult<Value> {

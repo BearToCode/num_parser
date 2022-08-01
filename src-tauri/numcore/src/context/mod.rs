@@ -4,6 +4,8 @@ pub mod settings;
 
 use crate::objects::Expression;
 
+use self::settings::Rounding;
+
 /// Contains user-defined functions and constants.
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
@@ -14,12 +16,21 @@ pub struct Context {
 }
 
 impl Context {
-    /// Generates an empty context.
-    pub fn new() -> Self {
+    /// Generates an empty context with default settings.
+    pub fn default() -> Self {
         Self {
             functions: HashMap::new(),
             variables: HashMap::new(),
             rounding: settings::Rounding::Round(8),
+        }
+    }
+
+    /// Generates an empty context.
+    pub fn new(rounding: Rounding) -> Self {
+        Self {
+            functions: HashMap::new(),
+            variables: HashMap::new(),
+            rounding,
         }
     }
 
