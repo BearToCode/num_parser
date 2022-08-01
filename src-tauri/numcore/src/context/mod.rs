@@ -34,6 +34,7 @@ impl Context {
         }
     }
 
+    /// Add all the functions and variables of another context to this one.
     pub fn join_with(&mut self, context: &Self) {
         for (identifier, (params, body)) in context.functions.clone() {
             self.add_function(identifier, params, body);
@@ -48,7 +49,7 @@ impl Context {
         self.functions.insert(identifier, (params, body));
     }
 
-    // Add a variable to the user-defined ones.
+    /// Add a variable to the user-defined ones.
     pub fn add_variable(&mut self, identifier: String, expression: Box<Expression>) {
         self.variables.insert(identifier, expression);
     }

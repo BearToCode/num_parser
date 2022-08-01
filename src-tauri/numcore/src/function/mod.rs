@@ -66,7 +66,7 @@ impl Function {
             _ => (),
         }
 
-        let mut joined_context = Context::default();
+        let mut joined_context = Context::new(context.rounding);
         joined_context.join_with(context);
         if let Some(c) = scope {
             joined_context.join_with(c);
@@ -79,6 +79,7 @@ impl Function {
 pub fn type_wrapper<P, T>(
     value: Value,
     target_type: ValueType,
+    context: &Context,
     mut predicate: P,
 ) -> EvalResult<Value>
 where
@@ -87,7 +88,10 @@ where
 {
     let original_type = value.get_type();
     let value = value.as_type(&target_type)?;
-    Ok(Value::from(predicate(value)?).try_as_type(original_type))
+    println!("{:?}", original_type);
+    Ok(Value::from(predicate(value)?)
+        .round(context.rounding)
+        .try_as_type(original_type))
 }
 
 pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
@@ -99,7 +103,7 @@ macro_rules! decl_func {
     ( $identifier:ident, $predicate:expr, $target:expr ) => {
         fn $identifier(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
             let unboxed = unbox_parameters(arguments, context)?;
-            type_wrapper(unboxed, $target, $predicate)
+            type_wrapper(unboxed, $target, context, $predicate)
         }
     };
 }

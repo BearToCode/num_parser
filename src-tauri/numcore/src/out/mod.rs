@@ -7,8 +7,20 @@ use super::{
     value::{valuetype::ValueType, Value},
 };
 
+/// A type alias for `Result<T, ErrorType>`
 pub type EvalResult<T> = Result<T, ErrorType>;
 
+/// Contains all possible error messages. Implements `Display`.
+///
+/// ```
+/// use numcore::*;
+///
+/// let msg = ErrorType::DivideByZero{
+///     numerator: Value::from(2)
+/// }.to_string();
+///
+/// assert_eq!(msg, "MATH ERROR: trying to divide 2 by zero.");
+/// ```
 #[derive(Debug)]
 pub enum ErrorType {
     /// A mismatched type.

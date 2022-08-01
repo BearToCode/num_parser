@@ -7,7 +7,7 @@
 //!
 //! ## Features
 //! * Binary and unary operators
-//! * Supports multiple value types:
+//! * Supports **multiple value types**:
 //!     * Bool,
 //!     * Int,
 //!     * Float,
@@ -15,14 +15,46 @@
 //!     * Vector
 //! * Built-in functions
 //! * Built-in constants
-//! * User-defined functions: `f(x,y) = xsin(y)+ysin(x)`
-//! * User-defined var: `a = pi/2` or `b = a+2`
-//! * Understands ambiguous syntax, like: `g(x) = pisinx`
-//! * Recursion: `f(x) = branch(x<2, 1, f(x-1)+f(x-2))`
+//! * **User-defined functions**: `f(x,y) = xsin(y)+ysin(x)`
+//! * **User-defined var**: `a = pi/2` or `b = a+2`
+//! * Define you own functions with **macros**.
+//! * Understands **ambiguous syntax**, like: `g(x) = pisinx`
+//! * **Recursion**: `f(x) = branch(x<=2, 1, f(x-1)+f(x-2))`
 //! * Serde support
 //! * No panicking
 //!
 //! Much more will be implemented in future releases!
+//!
+//! ## Use Guide
+//!
+//! Evaluating **simple static expressions**:
+//! ```
+//! use numcore::*;
+//!
+//! assert_eq!(eval("2+2").unwrap(), Value::from(4));
+//! assert_eq!(eval("sin(pi)").unwrap(), Value::from(0));
+//! assert_eq!(eval("re(10+3i)").unwrap(), Value::from(10));
+//! ```
+//!
+//! Using **contexts**:
+//!
+//! ```
+//! use numcore::*;
+//!
+//! let mut context = Context::default();
+//! // Declaring a function
+//! let res = eval_with_mutable_context(
+//!     "f(x) = branch(x<=2, 1, f(x-1) + f(x-2))",
+//!     &mut context
+//! ).unwrap();
+//!
+//! // Result is None
+//! assert_eq!(res, None);
+//! // Calling the function. We could just use eval_with_static_context at this point
+//! let res = eval_with_mutable_context("f(10)", &mut context).unwrap();
+//!
+//! assert_eq!(res, Some(Value::from(55)));
+//! ```
 //!
 //! ## Values
 //! **Values** are contained inside the [Value enum](Value), which provides useful functions
@@ -38,6 +70,11 @@
 //! assert_eq!(value.as_float().unwrap(), 1.0);
 //! assert_eq!(value.as_complex().unwrap(), num::complex::Complex::new(1.0, 0.0));
 //! assert_eq!(value.as_vector(), vec![Value::Float(1.0)]);
+//!
+//! // Assign type implicitly:
+//! let implicit = Value::from(1.0);
+//!
+//! assert_eq!(value, implicit);
 //! ```
 //!
 //! Note that, even thought the initial value was a float, it has been **cast** into ints and bools. This
@@ -111,19 +148,9 @@
 //! as settings. They can be created as follows:
 //!
 //! ```rust
-//! use numcore;
+//! use numcore::*;
 //!
-//! let mut my_context = numcore::Context::new();
-//!
-//! // Add a variable to the context
-//! let res = numcore::eval_with_mutable_context("a = 2", &mut my_context);
-//!
-//! assert_eq!(res, None);
-//!
-//! // Read the variable
-//! let res = numcore::eval_with_mutable_context("a", &mut my_context);
-//!
-//! assert_eq!(res, Value::Int(2));
+//! let mut my_context = Context::new(settings::Rounding::Round(8));
 //! ```
 //!
 //! ### Serde
@@ -132,7 +159,7 @@
 //! derive  [`Serialize`](https://docs.rs/serde/1.0.71/serde/trait.Serializer.html) and
 //! [`Deserialize`](https://docs.rs/serde/1.0.71/serde/trait.Serializer.html).
 //!
-//! ```rust
+//! ```ignore
 //! [dependencies]
 //! num = { version = "<version>", features = [ "serde_support" ] }
 //! ```
@@ -167,7 +194,7 @@ mod value;
 
 pub use crate::{
     api::*,
-    context::*,
+    context::{settings, Context},
     out::*,
     value::{valuetype::*, Value},
 };

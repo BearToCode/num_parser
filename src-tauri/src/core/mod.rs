@@ -2,7 +2,7 @@ use numcore;
 
 #[tauri::command]
 pub fn create_empty_context() -> numcore::Context {
-    numcore::create_empty_context()
+    numcore::Context::default()
 }
 
 #[tauri::command]

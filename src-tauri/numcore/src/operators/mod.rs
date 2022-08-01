@@ -290,14 +290,41 @@ impl Value {
     }
 
     pub fn equal_to(self, rhs: Self) -> EvalResult<Self> {
-        convert_and_apply(
+        // Only accepts bools and vectors
+        fn is_vector_true(values: &Vec<Value>) -> EvalResult<bool> {
+            for elem in values {
+                match elem {
+                    Value::Vector(vec) => {
+                        if !is_vector_true(vec)? {
+                            return Ok(false);
+                        }
+                    }
+                    Value::Bool(val) => {
+                        if !val {
+                            return Ok(false);
+                        }
+                    }
+                    other => {
+                        return Err(ErrorType::InternalError {
+                            message: format!("unexpected type during comparison: {}", other),
+                        })
+                    }
+                }
+            }
+            Ok(true)
+        }
+
+        match convert_and_apply(
             &self,
             &rhs,
-            &mut |lhs, rhs| Ok(Value::Bool(lhs.as_bool()? == rhs.as_bool()?)),
+            &mut |lhs, rhs| Ok(Value::Bool(lhs.as_complex()? == rhs.as_complex()?)),
             "Equal to",
             ValueType::ComplexType,
             false,
-        )
+        )? {
+            Self::Vector(vec) => Ok(Value::Bool(is_vector_true(&vec)?)),
+            other => Ok(other),
+        }
     }
 
     pub fn not_equal_to(self, rhs: Self) -> EvalResult<Self> {

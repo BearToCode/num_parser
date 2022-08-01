@@ -1,11 +1,17 @@
 use crate::value::Value;
 
+/// Contains all possible values types.
 #[derive(Debug, PartialEq, Clone, Copy)]
 pub enum ValueType {
+    /// Type for `i64`
     IntType,
+    /// Type for `f64`
     FloatType,
+    /// Type for `num::complex::Complex`
     ComplexType,
+    /// Type for `Vec<Value>`
     VectorType,
+    /// Type for `bool`
     BoolType,
 }
 
@@ -22,6 +28,8 @@ impl Value {
 }
 
 impl ValueType {
+    /// Returns a `u8` higher the more complex the valuetype is. Useful for
+    /// comparisons.
     pub fn complexity(&self) -> u8 {
         match self {
             Self::BoolType => 1,
@@ -32,6 +40,7 @@ impl ValueType {
         }
     }
 
+    /// Returns the highest complexity value type of all one provided.
     pub fn highest_complexity(types: Vec<&ValueType>) -> ValueType {
         let mut highest = ValueType::BoolType;
         for t in types {
@@ -42,6 +51,7 @@ impl ValueType {
         highest
     }
 
+    /// Returns the lowest complexity value type of all the one provided.
     pub fn lowest_complexity(types: Vec<&ValueType>) -> ValueType {
         let mut lowest = ValueType::VectorType;
         for t in types {

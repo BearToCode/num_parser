@@ -13,7 +13,7 @@ pub type VectorValue = Vec<Value>;
 pub type BoolValue = bool;
 
 /// Represent every possible output value.
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Value {
     Int(IntValue),
@@ -319,12 +319,6 @@ impl From<ComplexValue> for Value {
     }
 }
 
-// impl From<VectorValue> for Value {
-//     fn from(vector: VectorValue) -> Self {
-//         Value::Vector(vector)
-//     }
-// }
-
 impl<T> From<Vec<T>> for Value
 where
     Value: From<T>,
@@ -332,5 +326,16 @@ where
 {
     fn from(vec: Vec<T>) -> Self {
         Value::Vector(vec.iter().map(|v| Value::from(*v)).collect())
+    }
+}
+
+impl PartialEq for Value {
+    fn eq(&self, other: &Self) -> bool {
+        // This should never panics, as it converts the two operands
+        // to their highest complexity and return a Value::Bool
+        match self.clone().equal_to(other.clone()) {
+            Ok(bool_value) => bool_value.as_bool().unwrap(),
+            Err(_) => false,
+        }
     }
 }
