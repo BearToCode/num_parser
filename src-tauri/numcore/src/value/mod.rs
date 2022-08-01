@@ -3,7 +3,7 @@ pub mod valuetype;
 
 use self::valuetype::ValueType;
 use super::out::*;
-use crate::token::tokentype::TokenType;
+use crate::{settings::Rounding, token::tokentype::TokenType};
 use num::complex::Complex64;
 
 pub type IntValue = i64;
@@ -267,6 +267,30 @@ impl Value {
                 },
                 ValueType::VectorType => Value::Vector(self.as_vector()),
             }
+        }
+    }
+
+    pub fn round(&self, rounding: Rounding) -> Self {
+        match rounding {
+            Rounding::Round(precision) => {
+                let precision = precision.clamp(0, 12);
+                let factor = (10.0f64.powi(precision as i32)) as f64;
+                match self {
+                    Self::Float(v) => Value::Float((*v * factor).round() / factor),
+                    Self::Complex(c) => Value::Complex(Complex64::new(
+                        (c.re * factor).round() / factor,
+                        (c.im * factor).round() / factor,
+                    )),
+                    Self::Vector(vec) => {
+                        for val in vec {
+                            val.round(rounding);
+                        }
+                        self.clone()
+                    }
+                    other => other.clone(),
+                }
+            }
+            _ => self.clone(),
         }
     }
 }

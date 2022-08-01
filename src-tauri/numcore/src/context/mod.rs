@@ -1,5 +1,7 @@
 use std::collections::HashMap;
 
+pub mod settings;
+
 use crate::objects::Expression;
 
 /// Contains user-defined functions and constants.
@@ -8,6 +10,7 @@ use crate::objects::Expression;
 pub struct Context {
     pub functions: HashMap<String, (Vec<String>, Box<Expression>)>,
     pub variables: HashMap<String, Box<Expression>>,
+    pub rounding: settings::Rounding,
 }
 
 impl Context {
@@ -16,6 +19,7 @@ impl Context {
         Self {
             functions: HashMap::new(),
             variables: HashMap::new(),
+            rounding: settings::Rounding::Round(8),
         }
     }
 

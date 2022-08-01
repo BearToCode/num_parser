@@ -1,15 +1,17 @@
 use numcore;
 
 #[tauri::command]
+pub fn create_empty_context() -> numcore::Context {
+    numcore::create_empty_context()
+}
+
+#[tauri::command]
 pub fn evaluate_with_static_context(
     input: String,
     context: numcore::Context,
 ) -> Result<String, String> {
     match numcore::eval_with_static_context(&input, &context) {
-        Ok(value) => Ok(match value {
-            Some(data) => data.to_string(),
-            None => "()".to_owned(),
-        }),
+        Ok(value) => Ok(value.to_string()),
         Err(err) => Err(err.to_string()),
     }
 }

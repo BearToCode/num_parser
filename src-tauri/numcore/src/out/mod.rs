@@ -1,5 +1,7 @@
 mod display;
 
+use crate::objects::Request;
+
 use super::{
     token::tokentype::TokenType,
     value::{valuetype::ValueType, Value},
@@ -64,6 +66,8 @@ pub enum ErrorType {
     ReservedFunctionName { func_name: String },
     /// An empty union ,,
     EmptyUnion,
+    /// Invalid request for a static context
+    InvalidMutableContext { request: Request },
 
     /// An error wrapper to add additional information.
     ErrorDuring {

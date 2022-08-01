@@ -16,6 +16,7 @@ fn main() {
         .invoke_handler(tauri::generate_handler![
             core::evaluate_with_static_context,
             core::evaluate_with_mutable_context,
+            core::create_empty_context
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

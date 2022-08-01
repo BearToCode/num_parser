@@ -74,6 +74,11 @@ impl fmt::Display for ErrorType {
                 func_name
             ),
             EmptyUnion => write!(f, "SYNTAX ERROR: trying to aggregate an empty value."),
+            InvalidMutableContext { request } => write!(
+                f,
+                "INTERNAL ERROR: request `{}` is not valid for a static context",
+                request
+            ),
 
             ErrorDuring {
                 operation_name,

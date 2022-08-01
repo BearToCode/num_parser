@@ -30,7 +30,8 @@
 		terminalController.loadAddon(termFit);
 		terminalController.open(terminalElement);
 		termFit.fit();
-		IO = new termIO(terminalController);
+		IO = new termIO();
+		IO.init(terminalController);
 	}
 	onMount(async () => {
 		initializeXterm();

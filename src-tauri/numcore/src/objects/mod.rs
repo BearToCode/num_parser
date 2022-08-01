@@ -1,3 +1,5 @@
+mod display;
+
 use crate::{
     context::Context,
     function::builtin,
@@ -19,7 +21,7 @@ pub enum Request {
 impl Request {
     pub fn execute(&self, context: &mut Context) -> EvalResult<Option<Value>> {
         match self {
-            Self::Evaluation(expr) => Ok(Some(expr.eval(context, None)?)),
+            Self::Evaluation(expr) => Ok(Some(expr.eval(context, None)?.round(context.rounding))),
             Self::FuncDeclaration(identifier, params, body) => {
                 if builtin::reserved_keywords().contains(&&identifier[..]) {
                     Err(ErrorType::ReservedVarName {

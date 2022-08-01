@@ -2,6 +2,10 @@ import type Context from './context';
 import { invoke } from '@tauri-apps/api';
 import Result from './result';
 
+export async function CreateEmptyContext(): Promise<Context> {
+	return invoke('create_empty_context');
+}
+
 export async function EvaluateWithStaticContext(input: string, context: Context): Promise<Result<string>> {
 	return invoke('evaluate_with_static_context', { input: input, context: context })
 		.then((r) => {
@@ -13,6 +17,7 @@ export async function EvaluateWithStaticContext(input: string, context: Context)
 }
 
 export async function EvaluateWithMutableContext(input: string, context: Context): Promise<[Result<string>, Context]> {
+	console.log(context);
 	return invoke('evaluate_with_mutable_context', { input: input, context: context })
 		.then((r) => {
 			console.log(r);

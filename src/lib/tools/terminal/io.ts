@@ -1,9 +1,9 @@
 import ansi from 'ansi-escape-sequences';
 import type { Terminal } from 'xterm';
-import Context from '@core/context';
+import type Context from '@core/context';
 import { hexToRgb } from '@utils/colors';
 import theme from '@utils/theme';
-import { EvaluateWithMutableContext } from '@core/api';
+import { CreateEmptyContext, EvaluateWithMutableContext } from '@core/api';
 
 export default class termIO {
 	private _terminalController: Terminal;
@@ -11,9 +11,9 @@ export default class termIO {
 
 	private _context: Context;
 
-	constructor(term: Terminal) {
+	async init(term: Terminal) {
 		this._terminalController = term;
-		this._context = new Context();
+		this._context = await CreateEmptyContext();
 		this.write(ansi.cursor.hide);
 	}
 
