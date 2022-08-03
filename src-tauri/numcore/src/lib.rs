@@ -159,7 +159,7 @@
 //! derive  [`Serialize`](https://docs.rs/serde/1.0.71/serde/trait.Serializer.html) and
 //! [`Deserialize`](https://docs.rs/serde/1.0.71/serde/trait.Serializer.html).
 //!
-//! ```ignore
+//! ```text
 //! [dependencies]
 //! num = { version = "<version>", features = [ "serde_support" ] }
 //! ```
@@ -180,10 +180,11 @@ extern crate serde;
 
 extern crate num;
 
+pub mod function;
+
 mod api;
 
 mod context;
-mod function;
 mod interpreter;
 mod objects;
 mod operators;
@@ -195,6 +196,7 @@ mod value;
 pub use crate::{
     api::*,
     context::{settings, Context},
+    objects::Expression,
     out::*,
     value::{valuetype::*, Value},
 };

@@ -197,6 +197,8 @@ fn add_implicit_brackets(stream: &TokenStream) -> EvalResult<TokenStream> {
                 out_stream.push(Token::new(TokenType::OpeningBracket, 1, ""));
                 out_stream.push(next.clone());
                 out_stream.push(Token::new(TokenType::ClosingBracket, 1, ""));
+
+                skip_iteration = true;
             } else {
                 return Err(ErrorType::MissingFunctionParameters {
                     func_name: prev.value.clone(),
@@ -260,17 +262,16 @@ pub fn split_into_identifiers(input: String, context: &Context) -> Vec<(String, 
     let patterns = vec![
         (
             IdentifierType::Function,
-            builtin::BUILT_IN_FUNCTIONS
+            builtin::get_built_in_functions_vec()
                 .iter()
                 .map(|x| x.func_identifier)
                 .collect::<Vec<&str>>(),
         ),
         (
             IdentifierType::Var,
-            builtin::CONSTANTS
+            builtin::get_built_in_consts_map()
                 .iter()
                 .map(|x| x.0)
-                .cloned()
                 .collect::<Vec<&str>>(),
         ),
         (

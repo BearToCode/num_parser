@@ -1,3 +1,7 @@
+//!
+//! Contains functions to easily retrieve and set built-in functions and constants.
+//!
+
 use std::collections::HashMap;
 
 use crate::{
@@ -5,15 +9,19 @@ use crate::{
     function::*,
     function::{Arguments, Function},
     out::ErrorType,
+    read_vec_values,
     value::Value,
     EvalResult, ValueType,
 };
 use lazy_static::*;
 use rand::Rng;
+use std::sync::RwLock;
 use tuple_conv::RepeatedTuple;
 
 lazy_static! {
-    pub static ref CONSTANTS: HashMap<&'static str, Value> = {
+    #[derive(Debug, Clone)]
+    static ref CONSTANTS: RwLock<HashMap<&'static str, Value>> = RwLock::new
+    ({
         let mut m = HashMap::new();
         use std::f64::consts;
         // Math constants
@@ -28,9 +36,9 @@ lazy_static! {
         m.insert("i", Value::Complex(num::Complex::i()));
 
         m
-    };
-    #[derive(Debug)]
-    pub static ref BUILT_IN_FUNCTIONS: Vec<Function> = vec![
+    });
+    #[derive(Debug, Clone)]
+    static ref BUILT_IN_FUNCTIONS: RwLock<Vec<Function>> = RwLock::new(vec![
         create_func!(min, Arguments::Dynamic),
         create_func!(max, Arguments::Dynamic),
         create_func!(floor, Arguments::Const(1)),
@@ -62,48 +70,90 @@ lazy_static! {
         create_func!(arg, Arguments::Const(1)),
         create_func!(norm, Arguments::Const(1)),
 
-    ];
+    ]);
 }
 
 /// Returns `Some(Function)` if the identifier matches some.
-pub fn get_function(identifier: &str) -> Option<Function> {
-    BUILT_IN_FUNCTIONS
+pub fn get_built_in_function(identifier: &str) -> Option<Function> {
+    get_built_in_functions_vec()
         .iter()
         .find(|x| x.func_identifier == identifier)
         .cloned()
 }
 
 /// Returns `Some(Value)` if the identifier matches some.
-pub fn get_const(identifier: &str) -> Option<Value> {
-    CONSTANTS.get(identifier).cloned()
+pub fn get_built_in_const(identifier: &str) -> Option<Value> {
+    get_built_in_consts_map()
+        .iter()
+        .find(|&x| x.0 == identifier)
+        .map(|x| x.1.clone())
 }
 
 /// Returns all reserved keywords.
-pub fn reserved_keywords() -> Vec<&'static str> {
+pub fn reserved_keywords<'a>() -> Vec<&'a str> {
     [
-        CONSTANTS.keys().cloned().collect::<Vec<&'static str>>(),
-        BUILT_IN_FUNCTIONS
+        get_built_in_consts_map()
+            .iter()
+            .map(|x| x.0)
+            .collect::<Vec<&str>>(),
+        get_built_in_functions_vec()
             .iter()
             .map(|x| x.func_identifier)
-            .collect(),
+            .collect::<Vec<&str>>(),
     ]
     .concat()
 }
 
-// UTILS
+/// Get a cloned vector of all built-in functions.
+pub fn get_built_in_functions_vec() -> Vec<Function> {
+    BUILT_IN_FUNCTIONS.read().unwrap().iter().cloned().collect()
+}
 
-macro_rules! read_vec_values {
-    ( $vec:expr, $($x:ident),* ) => {
-        let vec = $vec.as_vector();
-        let mut iter = vec.iter();
+/// Get a cloned vector of all built-in constants.
+pub fn get_built_in_consts_map() -> Vec<(&'static str, Value)> {
+    CONSTANTS
+        .read()
+        .unwrap()
+        .iter()
+        .map(|x| (x.0.clone(), x.1.clone()))
+        .collect()
+}
 
-        $(
-            let $x = match iter.next() {
-                Some(value) => value,
-                None => return Err(ErrorType::InternalError { message: "failed to retrieve function parameters".to_owned() })
-            };
-        )*
-    };
+/// Add a function to the built-in ones.
+pub fn add_built_in_function(func: Function) {
+    BUILT_IN_FUNCTIONS.write().unwrap().push(func)
+}
+
+/// Add a constant to the built-in ones.
+///
+/// If a constant with the same identifier didn't exist, `None` is returned.
+///
+/// If it existed, the value is updated and the old value is returned.
+pub fn add_built_in_const(identifier: &'static str, value: Value) -> Option<Value> {
+    CONSTANTS.write().unwrap().insert(identifier, value)
+}
+
+/// Removes a built-in function with a matching identifier.
+///
+/// If a function is found, it is removed and returned, otherwise `None` is returned.
+pub fn remove_built_in_function(func_identifier: &str) -> Option<Function> {
+    if let Some(index) = BUILT_IN_FUNCTIONS
+        .read()
+        .unwrap()
+        .iter()
+        .position(|x| x.func_identifier == func_identifier)
+    {
+        Some(BUILT_IN_FUNCTIONS.write().unwrap().swap_remove(index))
+    } else {
+        None
+    }
+}
+
+/// Removes a built-in constant with a matching identifier.
+///
+/// If a constant is found, it is removed and returned, otherwise `None` is returned.
+pub fn remove_built_in_const(const_identifier: &str) -> Option<Value> {
+    CONSTANTS.write().unwrap().remove(const_identifier)
 }
 
 // STD

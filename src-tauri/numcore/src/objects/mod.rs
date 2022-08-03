@@ -124,7 +124,7 @@ impl Expression {
             }
             Self::Var(identifier) => {
                 // Check built-in vars
-                if let Some(var) = builtin::get_const(identifier) {
+                if let Some(var) = builtin::get_built_in_const(identifier) {
                     return Ok(var);
                 }
 
@@ -193,7 +193,7 @@ impl Expression {
             }
             Self::Func(identifier, arguments) => {
                 // Check built-in functions
-                if let Some(func) = builtin::get_function(identifier) {
+                if let Some(func) = builtin::get_built_in_function(identifier) {
                     return Ok(func.call(arguments, context, scope)?);
                 }
                 // Check user-defined ones
