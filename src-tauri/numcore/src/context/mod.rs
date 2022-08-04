@@ -12,7 +12,10 @@ use self::settings::Rounding;
 pub struct Context {
     pub functions: HashMap<String, (Vec<String>, Box<Expression>)>,
     pub variables: HashMap<String, Box<Expression>>,
+
+    // Settings
     pub rounding: settings::Rounding,
+    pub angle_unit: settings::AngleUnit,
 }
 
 impl Context {
@@ -21,16 +24,18 @@ impl Context {
         Self {
             functions: HashMap::new(),
             variables: HashMap::new(),
-            rounding: settings::Rounding::Round(8),
+            rounding: settings::Rounding::default(),
+            angle_unit: settings::AngleUnit::default(),
         }
     }
 
     /// Generates an empty context.
-    pub fn new(rounding: Rounding) -> Self {
+    pub fn new(rounding: Rounding, angle_unit: settings::AngleUnit) -> Self {
         Self {
             functions: HashMap::new(),
             variables: HashMap::new(),
             rounding,
+            angle_unit,
         }
     }
 

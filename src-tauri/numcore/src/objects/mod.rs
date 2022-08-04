@@ -143,7 +143,7 @@ impl Expression {
                 // Try to split the identifier, as it might have not been interpreted correctly
                 // in a function declaration, where function parameters were not know at the
                 // time of "tokenization".
-                let mut joined_context = Context::new(context.rounding);
+                let mut joined_context = context.clone();
                 // Create a new context with all the data.
                 joined_context.join_with(context);
                 if let Some(c) = scope {
@@ -199,7 +199,7 @@ impl Expression {
                 // Check user-defined ones
                 if let Some((names, body)) = context.get_function(&identifier) {
                     let mut inner_scope = {
-                        let mut cont = Context::new(context.rounding);
+                        let mut cont = context.clone();
                         // Retrieve the parameters values
                         let params = match value_to_params(
                             names,
@@ -240,7 +240,7 @@ impl Expression {
                 // Try to split the identifier, as it might have not been interpreted correctly
                 // in a function declaration, where function parameters were not know at the
                 // time of "tokenization".
-                let mut joined_context = Context::new(context.rounding);
+                let mut joined_context = context.clone();
                 // Create a new context with all the data.
                 joined_context.join_with(context);
                 if let Some(c) = scope {

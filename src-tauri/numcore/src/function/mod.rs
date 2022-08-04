@@ -13,8 +13,15 @@
 //!
 //! This macro takes three parameters:
 //! - the function name,
+//! - the function type,
 //! - a predicate, which is the actual function that takes a value as input,
 //! - the target type, a `ValueType`.
+//!
+//! Mark your function as `FunctionType::Trig` if it expects an angle.
+//! Mark your function as `FunctionType::InverseTrig` if returns an angle if you
+//! use `type_wrapper` (included in `decl_func!`).
+//!
+//! All angles are automatically converted to radians at function call.
 //!
 //! The predicate expects a `EvalResult<Value>` as output.
 //!
@@ -33,6 +40,8 @@
 //!     decl_func!(
 //!         // Function name
 //!         addone,
+//!         // Function type
+//!         FunctionType::Std,
 //!         // Predicate
 //!         | v: Value | {
 //!             Value::add(v, Value::from(1))
@@ -65,6 +74,8 @@
 //! decl_func!(
 //!     // Function name
 //!     addtriplet,
+//!     // Function type
+//!     FunctionType::Std,
 //!     // Predicate
 //!     | v: Value | {
 //!         read_vec_values!(v, foo, bar, baz);
@@ -102,6 +113,7 @@
 //! #
 //! decl_func!(
 //!     min,
+//!     FunctionType::Std,
 //!     |v: Value| {
 //!         let vec = v.as_vector();
 //!         let mut min = vec[0].as_float()?;
@@ -131,6 +143,7 @@ pub mod builtin;
 use crate::{
     objects::Expression,
     out::{ErrorType, EvalResult},
+    settings::{self, AngleUnit},
     value::{valuetype::ValueType, Value},
     Context,
 };
@@ -155,6 +168,18 @@ pub enum Arguments {
     Const(usize),
     /// Expects any amount greater than one.
     Dynamic,
+}
+
+/// The function type. Handles angle conversions.
+#[derive(Clone, Copy, PartialEq, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum FunctionType {
+    /// A function that does not need conversion.
+    Std,
+    /// A function that expects an angle.
+    Trig,
+    /// A function that returns an angle.
+    InverseTrig,
 }
 
 impl Function {
@@ -191,7 +216,7 @@ impl Function {
             _ => (),
         }
 
-        let mut joined_context = Context::new(context.rounding);
+        let mut joined_context = context.clone();
         joined_context.join_with(context);
         if let Some(c) = scope {
             joined_context.join_with(c);
@@ -211,6 +236,7 @@ impl Function {
 ///    of lower complexity.
 pub fn type_wrapper<P, T>(
     value: Value,
+    func_type: FunctionType,
     target_type: ValueType,
     context: &Context,
     mut predicate: P,
@@ -220,10 +246,26 @@ where
     Value: From<T>,
 {
     let original_type = value.get_type();
+
     let value = value.as_type(&target_type)?;
-    Ok(Value::from(predicate(value)?)
-        .round(context.rounding)
-        .try_as_type(original_type))
+    // Input angle conversion
+    let value = match func_type {
+        FunctionType::Trig => {
+            AngleUnit::convert_value(context.angle_unit, AngleUnit::Radian, value)?
+        }
+        _ => value,
+    };
+
+    let result = Value::from(predicate(value)?);
+    // Output angle conversion
+    let result = match func_type {
+        FunctionType::InverseTrig => {
+            AngleUnit::convert_value(AngleUnit::Radian, context.angle_unit, result)?
+        }
+        _ => result,
+    };
+
+    Ok(result.round(context.rounding).try_as_type(original_type))
 }
 
 /// Returns the output value(s) of the function arguments.
@@ -235,7 +277,7 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
     Expression::Union(arguments.clone()).eval(context, None)
 }
 
-/// Given a function name, a predicate and a target `ValueType` declares a function. It generates
+/// Given a function name, a `FunctionType`, a predicate and a target `ValueType` declares a function. It generates
 /// a wrapper that handles types and unbox parameters.
 ///
 /// The predicate expects a `Value` as parameter and an `EvalResult<Value>` as output.
@@ -248,6 +290,8 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
 /// decl_func!(
 ///     // Function name
 ///     hypotenuse,
+///     // Function type
+///     FunctionType::Std,
 ///     // Predicate
 ///     |v: Value| {
 ///         // Read the contained data using read_vec_values
@@ -269,13 +313,14 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
 ///
 /// ### Generated code
 ///
-/// ```ignore
+/// ```
 /// use numcore::{*, function::*};
 ///
 /// fn hypotenuse(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
 ///     let unboxed = unbox_parameters(arguments, context)?;
 ///     type_wrapper(
 ///         unboxed,
+///         FunctionType::Std,
 ///         ValueType::VectorType,
 ///         context,
 ///         |v: Value| {
@@ -286,7 +331,7 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
 ///     
 ///             Ok(
 ///                 Value::Float(
-///                     a.expi(2) + b.expi(2)
+///                     a_as_number.powi(2) + b_as_number.powi(2)
 ///                 )
 ///             )
 ///         }    
@@ -296,10 +341,10 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
 ///
 #[macro_export]
 macro_rules! decl_func {
-    ( $identifier:ident, $predicate:expr, $target:expr ) => {
+    ( $identifier:ident, $func_type:expr, $predicate:expr, $target:expr ) => {
         fn $identifier(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
             let unboxed = unbox_parameters(arguments, context)?;
-            type_wrapper(unboxed, $target, context, $predicate)
+            type_wrapper(unboxed, $func_type, $target, context, $predicate)
         }
     };
 }
@@ -344,7 +389,7 @@ macro_rules! read_vec_values {
     };
 }
 
-/// Creates a `Function` object from an actual function and a `Arguments` object.
+/// Creates a `Function` object from an actual function and an `Arguments` object.
 ///
 /// See `Function::new` for additional information.
 ///
@@ -360,8 +405,11 @@ macro_rules! read_vec_values {
 /// decl_func!(
 ///     // Function name
 ///     hypotenuse,
+///     // Function type
+///     FunctionType::Std,
 ///     // Predicate
 ///     |v: Value| {
+///         // ...
 /// #        // Read the contained data using read_vec_values
 /// #        read_vec_values!(v, a, b);
 /// #        // Convert the data to the desired type
@@ -389,4 +437,32 @@ macro_rules! create_func {
     ( $func:ident, $args:expr ) => {
         Function::new(stringify!($func), $func, $args)
     };
+}
+
+/// Converts angle units and executes the function. Useful for functions that take angles as inputs.
+pub fn convert_angle_and_execute<P>(
+    value: Value,
+    from: settings::AngleUnit,
+    to: settings::AngleUnit,
+    mut predicate: P,
+) -> EvalResult<Value>
+where
+    P: FnMut(Value) -> EvalResult<Value>,
+{
+    let converted = AngleUnit::convert_value(from, to, value)?;
+    predicate(converted)
+}
+
+/// Executes the function and converts the output. Useful for functions that return angles.
+pub fn execute_and_convert_angle<P>(
+    value: Value,
+    from: settings::AngleUnit,
+    to: settings::AngleUnit,
+    mut predicate: P,
+) -> EvalResult<Value>
+where
+    P: FnMut(Value) -> EvalResult<Value>,
+{
+    let result = predicate(value)?;
+    AngleUnit::convert_value(from, to, result)
 }
