@@ -1,8 +1,9 @@
 [package]
 name = "numcore"
-version = "0.1.0"
+version = "1.0.0"
 description = "A math interpreter and evaluator"
 keywords = ["math", "parser", "evaluator", "complex", "analysis"]
+categories = ["mathematics", "parsing"]
 edition = "2021"
 repository = "https://github.com/BearToCode/Numerus.git"
 homepage = "https://github.com/BearToCode/Numerus/tree/master/src-tauri/numcore"
