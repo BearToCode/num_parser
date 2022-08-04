@@ -1,5 +1,10 @@
 
 # Numcore: a math interpreter and evaluator
+
+[![crate](https://img.shields.io/crates/v/numcore)](https://crates.io/crates/numcore)
+[![license](https://img.shields.io/github/license/BearToCode/Numerus)](https://github.com/BearToCode/Numerus/blob/master/src-tauri/numcore/LICENSE)
+[![docs](https://img.shields.io/docsrs/numcore)](https://docs.rs/numcore/1.0.0/numcore/)
+
 **Numcore** allows you to easily **parse** strings into math expressions
 and **evaluate** them.
 
