@@ -129,6 +129,8 @@ met, the cast would have failed.
 | `exp`    | 1                          | Returns e^(arg).                                              |
 | `rand`   | 2 (min, max)               | Returns a random float between the two number specified.      |
 | `abs`    | 1                          | Returns the absolute value of a number.                       |
+| `sqrt`   | 1                          | Returns the square root of a number.                          |
+
 | `branch` | 3 (condition, true, false) | Returns the second argument if the condition is true, the third if it is false. |
 | `sin`    | 1                          | Returns the sine of the angle.                                |
 | `cos`    | 1                          | Returns the cosine of the angle.                              |

@@ -41,6 +41,7 @@ lazy_static! {
         create_func!(ceil, Arguments::Const(1)),
         create_func!(round, Arguments::Const(1)),
         create_func!(abs, Arguments::Const(1)),
+        create_func!(sqrt, Arguments::Const(1)),
         create_func!(ln, Arguments::Const(1)),
         create_func!(log, Arguments::Const(2)),
         create_func!(exp, Arguments::Const(1)),
@@ -212,6 +213,13 @@ decl_func!(
     abs,
     FunctionType::Std,
     |v: Value| Ok(Value::Float(v.as_complex()?.abs())),
+    ValueType::ComplexType
+);
+
+decl_func!(
+    sqrt,
+    FunctionType::Std,
+    |v: Value| Ok(Value::Complex(v.as_complex()?.sqrt())),
     ValueType::ComplexType
 );
 
