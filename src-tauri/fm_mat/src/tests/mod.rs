@@ -352,3 +352,64 @@ fn recursion() {
         Value::from(6765)
     );
 }
+
+// FUNCTIONS
+
+#[test]
+fn min() {
+    assert_eq!(
+        eval("min(4,-1.5,5.344,2.7,-6,9.2)").unwrap(),
+        Value::from(-6)
+    );
+}
+
+#[test]
+fn max() {
+    assert_eq!(
+        eval("max(4,-1.5,5.344,2.7,-6,9.2)").unwrap(),
+        Value::from(9.2)
+    );
+}
+
+#[test]
+fn floor() {
+    assert_eq!(eval("floor(1.34)").unwrap(), Value::from(1));
+}
+
+#[test]
+fn ceil() {
+    assert_eq!(eval("ceil(1.34)").unwrap(), Value::from(2));
+}
+
+#[test]
+fn round() {
+    assert_eq!(eval("round(1.2)").unwrap(), Value::from(1));
+    assert_eq!(eval("round(1.5001)").unwrap(), Value::from(2));
+    assert_eq!(eval("round(1.5)").unwrap(), Value::from(2));
+}
+
+#[test]
+fn abs() {
+    assert_eq!(eval("abs(1.5)").unwrap(), Value::from(1.5));
+    assert_eq!(eval("abs(-1.5)").unwrap(), Value::from(1.5));
+    assert_eq!(eval("abs(4+3i)").unwrap(), Value::from(5));
+}
+
+#[test]
+fn ln() {
+    assert_eq!(eval("ln(e^3.5)").unwrap(), Value::from(3.5));
+    assert_eq!(eval("ln(e^(-1.5))").unwrap(), Value::from(-1.5));
+    assert_eq!(
+        eval("ln(-1)").unwrap(),
+        Value::from(Complex64::new(0.0, 3.14159265))
+    );
+    assert_eq!(
+        eval("ln(i)").unwrap(),
+        Value::from(Complex64::new(0.0, 1.57079633))
+    );
+}
+
+#[test]
+fn log() {
+    assert_eq!(eval("ln(e^3.5)").unwrap(), Value::from(3.5));
+}

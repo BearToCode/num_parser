@@ -197,7 +197,7 @@ decl_func!(
 decl_func!(
     ceil,
     FunctionType::Std,
-    |v| Ok(v.as_float()?.floor()),
+    |v| Ok(v.as_float()?.ceil()),
     ValueType::FloatType
 );
 
