@@ -5,13 +5,8 @@
 use std::collections::HashMap;
 
 use crate::{
-    create_func, decl_func,
-    function::*,
-    function::{Arguments, Function},
-    out::ErrorType,
-    read_vec_values,
-    value::Value,
-    EvalResult, ValueType,
+    create_func, decl_func, function::Function, function::*, out::ErrorType, read_vec_values,
+    value::Value, EvalResult, ValueType,
 };
 use lazy_static::*;
 use rand::Rng;
@@ -160,6 +155,7 @@ pub fn remove_built_in_const(const_identifier: &str) -> Option<Value> {
 
 decl_func!(
     min,
+    FunctionType::Std,
     |v| {
         let vec = v.as_vector();
         let mut min = vec[0].as_float()?;
@@ -175,6 +171,7 @@ decl_func!(
 
 decl_func!(
     max,
+    FunctionType::Std,
     |v| {
         let vec = v.as_vector();
         let mut max = vec[0].as_float()?;
@@ -188,16 +185,37 @@ decl_func!(
     ValueType::VectorType
 );
 
-decl_func!(floor, |v| Ok(v.as_float()?.floor()), ValueType::FloatType);
+decl_func!(
+    floor,
+    FunctionType::Std,
+    |v| Ok(v.as_float()?.floor()),
+    ValueType::FloatType
+);
 
-decl_func!(ceil, |v| Ok(v.as_float()?.floor()), ValueType::FloatType);
+decl_func!(
+    ceil,
+    FunctionType::Std,
+    |v| Ok(v.as_float()?.floor()),
+    ValueType::FloatType
+);
 
-decl_func!(round, |v| Ok(v.as_float()?.round()), ValueType::FloatType);
+decl_func!(
+    round,
+    FunctionType::Std,
+    |v| Ok(v.as_float()?.round()),
+    ValueType::FloatType
+);
 
-decl_func!(ln, |v| Ok(v.as_complex()?.ln()), ValueType::ComplexType);
+decl_func!(
+    ln,
+    FunctionType::Std,
+    |v| Ok(v.as_complex()?.ln()),
+    ValueType::ComplexType
+);
 
 decl_func!(
     log,
+    FunctionType::Std,
     |v| {
         read_vec_values!(v, base, argument);
         Ok(argument.as_complex()?.log(base.as_float()?))
@@ -205,10 +223,16 @@ decl_func!(
     ValueType::VectorType
 );
 
-decl_func!(exp, |v| Ok(v.as_complex()?.exp()), ValueType::ComplexType);
+decl_func!(
+    exp,
+    FunctionType::Std,
+    |v| Ok(v.as_complex()?.exp()),
+    ValueType::ComplexType
+);
 
 decl_func!(
     rand,
+    FunctionType::Std,
     |v| {
         read_vec_values!(v, min, max);
         Ok(Value::Float(
@@ -231,54 +255,123 @@ fn branch(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Val
 
 // TRIGONOMETRY
 
-decl_func!(sin, |v| Ok(v.as_complex()?.sin()), ValueType::ComplexType);
+decl_func!(
+    sin,
+    FunctionType::Trig,
+    |v| Ok(v.as_complex()?.sin()),
+    ValueType::ComplexType
+);
 
-decl_func!(cos, |v| Ok(v.as_complex()?.cos()), ValueType::ComplexType);
+decl_func!(
+    cos,
+    FunctionType::Trig,
+    |v| Ok(v.as_complex()?.cos()),
+    ValueType::ComplexType
+);
 
-decl_func!(tan, |v| Ok(v.as_complex()?.tan()), ValueType::ComplexType);
+decl_func!(
+    tan,
+    FunctionType::Trig,
+    |v| Ok(v.as_complex()?.tan()),
+    ValueType::ComplexType
+);
 
-decl_func!(asin, |v| Ok(v.as_complex()?.asin()), ValueType::ComplexType);
+decl_func!(
+    asin,
+    FunctionType::InverseTrig,
+    |v| Ok(v.as_complex()?.asin()),
+    ValueType::ComplexType
+);
 
-decl_func!(acos, |v| Ok(v.as_complex()?.acos()), ValueType::ComplexType);
+decl_func!(
+    acos,
+    FunctionType::InverseTrig,
+    |v| Ok(v.as_complex()?.acos()),
+    ValueType::ComplexType
+);
 
-decl_func!(atan, |v| Ok(v.as_complex()?.atan()), ValueType::ComplexType);
+decl_func!(
+    atan,
+    FunctionType::InverseTrig,
+    |v| Ok(v.as_complex()?.atan()),
+    ValueType::ComplexType
+);
 
-decl_func!(sinh, |v| Ok(v.as_complex()?.sinh()), ValueType::ComplexType);
+decl_func!(
+    sinh,
+    FunctionType::Trig,
+    |v| Ok(v.as_complex()?.sinh()),
+    ValueType::ComplexType
+);
 
-decl_func!(cosh, |v| Ok(v.as_complex()?.cosh()), ValueType::ComplexType);
+decl_func!(
+    cosh,
+    FunctionType::Trig,
+    |v| Ok(v.as_complex()?.cosh()),
+    ValueType::ComplexType
+);
 
-decl_func!(tanh, |v| Ok(v.as_complex()?.tanh()), ValueType::ComplexType);
+decl_func!(
+    tanh,
+    FunctionType::Trig,
+    |v| Ok(v.as_complex()?.tanh()),
+    ValueType::ComplexType
+);
 
 decl_func!(
     asinh,
+    FunctionType::InverseTrig,
     |v| Ok(v.as_complex()?.asinh()),
     ValueType::ComplexType
 );
 
 decl_func!(
     acosh,
+    FunctionType::InverseTrig,
     |v| Ok(v.as_complex()?.acosh()),
     ValueType::ComplexType
 );
 
 decl_func!(
     atanh,
+    FunctionType::InverseTrig,
     |v| Ok(v.as_complex()?.atanh()),
     ValueType::ComplexType
 );
 
 // COMPLEX
 
-decl_func!(re, |v| Ok(v.as_complex()?.re), ValueType::ComplexType);
+decl_func!(
+    re,
+    FunctionType::Std,
+    |v| Ok(v.as_complex()?.re),
+    ValueType::ComplexType
+);
 
-decl_func!(im, |v| Ok(v.as_complex()?.im), ValueType::ComplexType);
+decl_func!(
+    im,
+    FunctionType::Std,
+    |v| Ok(v.as_complex()?.im),
+    ValueType::ComplexType
+);
 
 decl_func!(
     polar,
+    FunctionType::Std,
     |v| Ok(v.as_complex()?.to_polar().to_vec()),
     ValueType::ComplexType
 );
 
-decl_func!(arg, |v| Ok(v.as_complex()?.arg()), ValueType::ComplexType);
+decl_func!(
+    arg,
+    FunctionType::Std,
+    |v| Ok(v.as_complex()?.arg()),
+    ValueType::ComplexType
+);
 
-decl_func!(norm, |v| Ok(v.as_complex()?.norm()), ValueType::ComplexType);
+decl_func!(
+    norm,
+    FunctionType::Std,
+    |v| Ok(v.as_complex()?.norm()),
+    ValueType::ComplexType
+);

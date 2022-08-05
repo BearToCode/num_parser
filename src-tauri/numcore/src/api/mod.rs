@@ -40,7 +40,10 @@ pub fn eval(input: &str) -> EvalResult<Value> {
 /// use numcore::*;
 ///
 /// // Create context with custom settings
-/// let context = Context::new(settings::Rounding::Round(2));
+/// let context = Context::new(
+///     settings::Rounding::Round(2),
+///     settings::AngleUnit::Turn
+/// );
 ///
 /// let res = eval_with_static_context("pi + 1", &context).unwrap();
 ///

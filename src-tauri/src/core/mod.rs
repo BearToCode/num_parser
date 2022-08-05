@@ -24,6 +24,7 @@ pub fn evaluate_with_mutable_context(
 
     decl_func!(
         addone,
+        FunctionType::Std,
         |v: Value| Value::add(v, Value::from(1)),
         ValueType::FloatType
     );
