@@ -33,7 +33,7 @@
 //!
 //!
 //! ```
-//! use numcore::{*, function::*};
+//! use fm_mat::{*, function::*};
 //!  
 //! fn main() {
 //!     // Declare the function
@@ -67,7 +67,7 @@
 //! first parameter, and the any other identifier will be assigned a value.
 //!
 //! ```
-//! # use numcore::{*, function:: *};
+//! # use fm_mat::{*, function:: *};
 //! #
 //! # fn main() {
 //! #
@@ -107,7 +107,7 @@
 //!
 //! Example:
 //! ```
-//! # use numcore::{*, function:: *};
+//! # use fm_mat::{*, function:: *};
 //! #
 //! # fn main() {
 //! #
@@ -285,7 +285,7 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
 /// ## Examples
 /// ```
 /// // Remember to import everything under the `function` module.
-/// use numcore::{*, function::*};
+/// use fm_mat::{*, function::*};
 ///
 /// decl_func!(
 ///     // Function name
@@ -314,7 +314,7 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
 /// ### Generated code
 ///
 /// ```
-/// use numcore::{*, function::*};
+/// use fm_mat::{*, function::*};
 ///
 /// fn hypotenuse(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
 ///     let unboxed = unbox_parameters(arguments, context)?;
@@ -356,7 +356,7 @@ macro_rules! decl_func {
 ///
 /// ## Examples
 /// ```
-/// use numcore::{*, function:: *};
+/// use fm_mat::{*, function:: *};
 ///
 /// fn read_values() -> EvalResult<()> {
 ///     
@@ -399,7 +399,7 @@ macro_rules! read_vec_values {
 ///
 /// ## Examples
 /// ```
-/// use numcore::{*, function::*};
+/// use fm_mat::{*, function::*};
 ///
 /// // Declare the function
 /// decl_func!(

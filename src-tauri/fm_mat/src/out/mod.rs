@@ -13,7 +13,7 @@ pub type EvalResult<T> = Result<T, ErrorType>;
 /// Contains all possible error messages. Implements `Display`.
 ///
 /// ```
-/// use numcore::*;
+/// use fm_mat::*;
 ///
 /// let msg = ErrorType::DivideByZero{
 ///     numerator: Value::from(2)

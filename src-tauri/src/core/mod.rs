@@ -1,4 +1,4 @@
-use numcore::*;
+use fm_mat::*;
 
 #[tauri::command]
 pub fn create_empty_context() -> Context {
@@ -18,7 +18,7 @@ pub fn evaluate_with_mutable_context(
     input: String,
     mut context: Context,
 ) -> Result<(String, Context), String> {
-    use numcore::function::*;
+    use fm_mat::function::*;
 
     function::builtin::add_built_in_function(create_func!(addone, Arguments::Const(1)));
 

@@ -1,9 +1,9 @@
 //!
-//! # Numcore: a math interpreter and evaluator
-//! **Numcore** allows you to easily **parse** strings into math expressions
+//! # fm_mat: a math interpreter and evaluator
+//! **fm_mat** allows you to easily **parse** strings into math expressions
 //! and **evaluate** them.
 //!
-//! Numcore is part of [Numerus](https://github.com/BearToCode/Numerus).
+//! fm_mat is part of [Fermi](https://github.com/BearToCode/Fermi).
 //!
 //! ## Features
 //! * Binary and unary operators
@@ -29,7 +29,7 @@
 //!
 //! Evaluating **simple static expressions**:
 //! ```
-//! use numcore::*;
+//! use fm_mat::*;
 //!
 //! assert_eq!(eval("2+2").unwrap(), Value::from(4));
 //! assert_eq!(eval("sin(pi)").unwrap(), Value::from(0));
@@ -39,7 +39,7 @@
 //! Using **contexts**:
 //!
 //! ```
-//! use numcore::*;
+//! use fm_mat::*;
 //!
 //! let mut context = Context::default();
 //! // Declaring a function
@@ -61,7 +61,7 @@
 //! to access the contained data:
 //!
 //! ```rust
-//! use numcore::Value;
+//! use fm_mat::Value;
 //!
 //! let value = Value::Float(1.0);
 //!
@@ -148,7 +148,7 @@
 //! as settings. They can be created as follows:
 //!
 //! ```rust
-//! use numcore::*;
+//! use fm_mat::*;
 //!
 //! // Generate the default context
 //! let mut default = Context::default();
@@ -172,9 +172,9 @@
 //! ```
 //!
 //! ## License and contribution
-//! Differently from Numerus, Numcore is licensed under a **MIT License**.
+//! Differently from Fermi, fm_mat is licensed under a **MIT License**.
 //!
-//! Numcore is currently under heavy development, but feel free to open issues and
+//! fm_mat is currently under heavy development, but feel free to open issues and
 //! pull requests for any problems or ideas you come up with.
 //!
 //! **IMPORTANT**: after staging files use the `npm run commit` command to commit and then

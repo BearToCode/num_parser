@@ -1,5 +1,5 @@
-# Numerus
+# Fermi
 
-Numerus is currently work-in-progress.
+Fermi is currently work-in-progress.
 
-If you looking for `numcore` click [here](https://github.com/BearToCode/Numerus/tree/master/src-tauri/numcore).
+If you looking for `fm_mat` click [here](https://github.com/BearToCode/Fermi/tree/master/src-tauri/fm_mat).

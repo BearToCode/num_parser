@@ -1,14 +1,14 @@
 
-# Numcore: a math interpreter and evaluator
+# fm_mat: a math interpreter and evaluator
 
-[![crate](https://img.shields.io/crates/v/numcore)](https://crates.io/crates/numcore)
-[![license](https://img.shields.io/github/license/BearToCode/Numerus)](https://github.com/BearToCode/Numerus/blob/master/src-tauri/numcore/LICENSE)
-[![docs](https://img.shields.io/docsrs/numcore)](https://docs.rs/numcore/1.0.0/numcore/)
+[![crate](https://img.shields.io/crates/v/fm_mat)](https://crates.io/crates/fm_mat)
+[![license](https://img.shields.io/github/license/BearToCode/Fermi)](https://github.com/BearToCode/Fermi/blob/master/src-tauri/fm_mat/LICENSE)
+[![docs](https://img.shields.io/docsrs/fm_mat)](https://docs.rs/fm_mat/1.0.0/fm_mat/)
 
-**Numcore** allows you to easily **parse** strings into math expressions
+**fm_mat** allows you to easily **parse** strings into math expressions
 and **evaluate** them.
 
-Numcore is part of [Numerus](https://github.com/BearToCode/Numerus).
+fm_mat is part of [Fermi](https://github.com/BearToCode/Fermi).
 
 ## Features
 * Binary and unary operators
@@ -34,7 +34,7 @@ Much more will be implemented in future releases!
 
 Evaluating **simple static expressions**:
 ```rust
-use numcore::*;
+use fm_mat::*;
 
 assert_eq!(eval("2+2").unwrap(), Value::from(4));
 assert_eq!(eval("sin(pi)").unwrap(), Value::from(0));
@@ -44,7 +44,7 @@ assert_eq!(eval("re(10+3i)").unwrap(), Value::from(10));
 Using **contexts**:
 
 ```rust
-use numcore::*;
+use fm_mat::*;
 
 let mut context = Context::default();
 // Declaring a function
@@ -66,7 +66,7 @@ assert_eq!(res, Some(Value::from(55)));
 to access the contained data:
 
 ```rust
-use numcore::Value;
+use fm_mat::Value;
 
 let value = Value::Float(1.0);
 
@@ -153,7 +153,7 @@ met, the cast would have failed.
 as settings. They can be created as follows:
 
 ```rust
-use numcore::*;
+use fm_mat::*;
 
 let mut my_context = Context::new(settings::Rounding::Round(8));
 ```
@@ -170,9 +170,9 @@ num = { version = "<version>", features = [ "serde_support" ] }
 ```
 
 ## License and contribution
-Differently from Numerus, Numcore is licensed under a **MIT License**.
+Differently from Fermi, fm_mat is licensed under a **MIT License**.
 
-Numcore is currently under heavy development, but feel free to open issues and
+fm_mat is currently under heavy development, but feel free to open issues and
 pull requests for any problems or ideas you come up with.
 
 **IMPORTANT**: after staging files use the `npm run commit` command to commit and then

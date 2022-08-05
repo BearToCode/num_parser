@@ -9,7 +9,7 @@ use crate::{context::Context, interpreter, out::*, token, tree, value::Value};
 /// ## Examples
 /// This works:
 /// ```
-/// use numcore::*;
+/// use fm_mat::*;
 ///
 /// let result = eval("2 + 2").unwrap();
 ///
@@ -19,7 +19,7 @@ use crate::{context::Context, interpreter, out::*, token, tree, value::Value};
 ///
 /// This panics:
 /// ```should_panic
-/// use numcore::*;
+/// use fm_mat::*;
 ///
 /// // Unwraps an error.
 /// let result = eval("f(x) = 2x").unwrap();
@@ -37,7 +37,7 @@ pub fn eval(input: &str) -> EvalResult<Value> {
 ///
 /// ## Examples
 /// ```
-/// use numcore::*;
+/// use fm_mat::*;
 ///
 /// // Create context with custom settings
 /// let context = Context::new(
@@ -78,7 +78,7 @@ pub fn eval_with_static_context(input: &str, context: &Context) -> EvalResult<Va
 ///
 /// ## Examples
 /// ```
-/// use numcore::*;
+/// use fm_mat::*;
 ///
 /// let mut context = Context::default();
 ///
@@ -100,5 +100,6 @@ pub fn eval_with_mutable_context(input: &str, context: &mut Context) -> EvalResu
     let tree = tree::build_tree(stream)?;
     let request = interpreter::interpret_tree(&tree)?;
 
+    println!("REQUEST: {:?}", request);
     request.execute(context)
 }
