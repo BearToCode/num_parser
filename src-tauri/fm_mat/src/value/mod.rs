@@ -282,10 +282,11 @@ impl Value {
                         (c.im * factor).round() / factor,
                     )),
                     Self::Vector(vec) => {
+                        let mut out_vec = vec![];
                         for val in vec {
-                            val.round(rounding);
+                            out_vec.push(val.round(rounding).clone());
                         }
-                        self.clone()
+                        Value::Vector(out_vec)
                     }
                     other => other.clone(),
                 }
@@ -322,10 +323,10 @@ impl From<ComplexValue> for Value {
 impl<T> From<Vec<T>> for Value
 where
     Value: From<T>,
-    T: Copy,
+    T: Clone,
 {
     fn from(vec: Vec<T>) -> Self {
-        Value::Vector(vec.iter().map(|v| Value::from(*v)).collect())
+        Value::Vector(vec.iter().map(|v| Value::from(v.clone())).collect())
     }
 }
 
