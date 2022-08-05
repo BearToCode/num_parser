@@ -200,6 +200,9 @@ mod token;
 mod tree;
 mod value;
 
+#[cfg(test)]
+mod tests;
+
 pub use crate::{
     api::*,
     context::{settings, Context},

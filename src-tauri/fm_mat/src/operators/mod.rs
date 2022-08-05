@@ -328,14 +328,7 @@ impl Value {
     }
 
     pub fn not_equal_to(self, rhs: Self) -> EvalResult<Self> {
-        convert_and_apply(
-            &self,
-            &rhs,
-            &mut |lhs, rhs| Ok(Value::Bool(lhs.as_bool()? != rhs.as_bool()?)),
-            "Not equal to",
-            ValueType::ComplexType,
-            false,
-        )
+        self.equal_to(rhs)?.not()
     }
 
     pub fn not(self) -> EvalResult<Self> {
