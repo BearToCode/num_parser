@@ -100,6 +100,5 @@ pub fn eval_with_mutable_context(input: &str, context: &mut Context) -> EvalResu
     let tree = tree::build_tree(stream)?;
     let request = interpreter::interpret_tree(&tree)?;
 
-    println!("REQUEST: {:?}", request);
     request.execute(context)
 }

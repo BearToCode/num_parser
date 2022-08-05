@@ -1,0 +1,19 @@
+name: fm_mat tests
+
+on: [push, pull_request]
+
+jobs:
+  test-fm_mat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Install Rust Stable
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      
+      - name: Execute tests
+        run: cargo test
+        working-directory: ./src-tauri/fm_mat
