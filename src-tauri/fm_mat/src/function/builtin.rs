@@ -9,6 +9,7 @@ use crate::{
     value::Value, EvalResult, ValueType,
 };
 use lazy_static::*;
+use num::complex::ComplexFloat;
 use rand::Rng;
 use std::sync::RwLock;
 use tuple_conv::RepeatedTuple;
@@ -39,6 +40,7 @@ lazy_static! {
         create_func!(floor, Arguments::Const(1)),
         create_func!(ceil, Arguments::Const(1)),
         create_func!(round, Arguments::Const(1)),
+        create_func!(abs, Arguments::Const(1)),
         create_func!(ln, Arguments::Const(1)),
         create_func!(log, Arguments::Const(2)),
         create_func!(exp, Arguments::Const(1)),
@@ -204,6 +206,13 @@ decl_func!(
     FunctionType::Std,
     |v| Ok(v.as_float()?.round()),
     ValueType::FloatType
+);
+
+decl_func!(
+    abs,
+    FunctionType::Std,
+    |v: Value| Ok(Value::Float(v.as_complex()?.abs())),
+    ValueType::ComplexType
 );
 
 decl_func!(

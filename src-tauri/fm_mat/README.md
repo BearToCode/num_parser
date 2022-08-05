@@ -128,6 +128,7 @@ met, the cast would have failed.
 | `log`    | 2 (base, arg)              | Returns the logarithm of the number with the specified base.  |
 | `exp`    | 1                          | Returns e^(arg).                                              |
 | `rand`   | 2 (min, max)               | Returns a random float between the two number specified.      |
+| `abs`    | 1                          | Returns the absolute value of a number.                       |
 | `branch` | 3 (condition, true, false) | Returns the second argument if the condition is true, the third if it is false. |
 | `sin`    | 1                          | Returns the sine of the angle.                                |
 | `cos`    | 1                          | Returns the cosine of the angle.                              |
