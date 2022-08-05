@@ -396,6 +396,12 @@ fn abs() {
 }
 
 #[test]
+fn sqrt() {
+    assert_eq!(eval("sqrt(2)").unwrap(), eval("2^(0.5)").unwrap());
+    assert_eq!(eval("sqrt(4+3i)").unwrap(), eval("(4+3i)^(0.5)").unwrap());
+}
+
+#[test]
 fn ln() {
     assert_eq!(eval("ln(e^3.5)").unwrap(), Value::from(3.5));
     assert_eq!(eval("ln(e^(-1.5))").unwrap(), Value::from(-1.5));
@@ -411,5 +417,135 @@ fn ln() {
 
 #[test]
 fn log() {
-    assert_eq!(eval("ln(e^3.5)").unwrap(), Value::from(3.5));
+    assert_eq!(eval("log(3, 9^2)").unwrap(), Value::from(4));
+}
+
+#[test]
+fn exp() {
+    assert_eq!(eval("exp(ln(4))").unwrap(), Value::from(4));
+}
+
+#[test]
+fn branch() {
+    assert_eq!(eval("branch(true, 1, 2)").unwrap(), Value::from(1));
+    assert_eq!(eval("branch(false, 1, 2)").unwrap(), Value::from(2));
+}
+
+#[test]
+fn sin() {
+    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    assert_eq!(
+        eval_with_static_context("sin(30)", &context).unwrap(),
+        Value::from(0.5)
+    );
+    assert_eq!(
+        eval_with_static_context("sin(30)", &context).unwrap(),
+        Value::from(0.5)
+    );
+}
+
+#[test]
+fn cos() {
+    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    assert_eq!(
+        eval_with_static_context("cos(60)", &context).unwrap(),
+        Value::from(0.5)
+    );
+}
+
+#[test]
+fn tan() {
+    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    assert_eq!(
+        eval_with_static_context("tan(45)", &context).unwrap(),
+        Value::from(1)
+    );
+}
+
+#[test]
+fn asin() {
+    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    assert_eq!(
+        eval_with_static_context("asin(0.5)", &context).unwrap(),
+        Value::from(30)
+    );
+}
+
+#[test]
+fn acos() {
+    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    assert_eq!(
+        eval_with_static_context("acos(0.5)", &context).unwrap(),
+        Value::from(60)
+    );
+}
+
+#[test]
+fn atan() {
+    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    assert_eq!(
+        eval_with_static_context("atan(1)", &context).unwrap(),
+        Value::from(45)
+    );
+}
+
+#[test]
+fn sinh_asinh() {
+    assert_eq!(eval("asinh(sinh(1))").unwrap(), Value::from(1));
+    assert_eq!(eval("asinh(sinh(pi))").unwrap(), Value::from(3.14159265));
+}
+#[test]
+fn cosh_acosh() {
+    assert_eq!(eval("acosh(cosh(1))").unwrap(), Value::from(1));
+    assert_eq!(eval("acosh(cosh(pi))").unwrap(), Value::from(3.14159265));
+}
+#[test]
+fn tanh_atanh() {
+    // Requires less precision, otherwise the test would fail
+    let context = Context::new(settings::Rounding::Round(4), settings::AngleUnit::default());
+    assert_eq!(
+        eval_with_static_context("atanh(tanh(1))", &context).unwrap(),
+        Value::from(1)
+    );
+    assert_eq!(
+        eval_with_static_context("atanh(tanh(pi))", &context).unwrap(),
+        Value::from(3.1416)
+    );
+}
+
+#[test]
+fn re() {
+    assert_eq!(eval("re(1)").unwrap(), Value::from(1));
+    assert_eq!(eval("re(3+2i)").unwrap(), Value::from(3));
+}
+
+#[test]
+fn im() {
+    assert_eq!(eval("im(1)").unwrap(), Value::from(0));
+    assert_eq!(eval("im(3+2i)").unwrap(), Value::from(2));
+}
+
+#[test]
+fn polar() {
+    assert_eq!(
+        eval("polar(1+sqrt(3)i)").unwrap(),
+        Value::from(vec![
+            2.0,
+            1.04719755 // 30 deg
+        ])
+    );
+}
+
+#[test]
+fn arg() {
+    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    assert_eq!(
+        eval_with_static_context("arg(1+i)", &context).unwrap(),
+        Value::from(0.78539816)
+    );
+}
+
+#[test]
+fn norm() {
+    assert_eq!(eval("norm(3+4i)").unwrap(), Value::from(5));
 }
