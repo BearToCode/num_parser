@@ -7,7 +7,7 @@
     "distDir": "../dist"
   },
   "package": {
-    "productName": "numerus-app",
+    "productName": "fermi-app",
     "version": "0.1.0"
   },
   "tauri": {
@@ -29,7 +29,7 @@
         "icons/icon.icns",
         "icons/icon.ico"
       ],
-      "identifier": "com.numerus.dev",
+      "identifier": "com.fermi.dev",
       "longDescription": "",
       "macOS": {
         "entitlements": null,
@@ -58,8 +58,8 @@
         "fullscreen": false,
         "height": 600,
         "resizable": true,
-        "title": "Numerus",
-        "label": "Numerus",
+        "title": "Fermi",
+        "label": "Fermi",
         "width": 800,
         "decorations": false,
         "minWidth": 400,

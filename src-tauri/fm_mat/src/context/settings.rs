@@ -10,7 +10,7 @@ use crate::{EvalResult, Value};
 ///
 /// ## Examples
 /// ```
-/// use numcore::*;
+/// use fm_mat::*;
 ///
 /// let my_context = Context::new(
 ///     settings::Rounding::Round(4),
@@ -38,7 +38,7 @@ impl Rounding {
 ///
 /// ## Examples
 /// ```
-/// use numcore::*;
+/// use fm_mat::*;
 ///
 /// let my_context = Context::new(
 ///     settings::Rounding::default(),
