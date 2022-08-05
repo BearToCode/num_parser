@@ -228,11 +228,10 @@ impl Function {
 
 /// A function wrapper around a predicate to handle types.
 ///
-/// This function does essentially four things:
+/// This function does essentially three things:
 /// 1. Converts the input value to the target type.
 /// 2. Executes the predicate and insert the output into a value.
-/// 3. Rounds the value.
-/// 4. Tries to convert it back to the original value type, if it is
+/// 3. Tries to convert it back to the original value type, if it is
 ///    of lower complexity.
 pub fn type_wrapper<P, T>(
     value: Value,
@@ -265,7 +264,7 @@ where
         _ => result,
     };
 
-    Ok(result.round(context.rounding).try_as_type(original_type))
+    Ok(result.try_as_type(original_type))
 }
 
 /// Returns the output value(s) of the function arguments.
