@@ -347,10 +347,7 @@ fn recursion() {
         eval_with_static_context("f(10)", &context).unwrap(),
         Value::from(55)
     );
-    assert_eq!(
-        eval_with_static_context("f(20)", &context).unwrap(),
-        Value::from(6765)
-    );
+    eval_with_static_context("f(20)", &context).unwrap_err();
 }
 
 // FUNCTIONS
