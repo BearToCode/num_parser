@@ -433,7 +433,11 @@ fn branch() {
 
 #[test]
 fn sin() {
-    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    let context = Context::new(
+        settings::Rounding::default(),
+        settings::AngleUnit::Degree,
+        settings::DepthLimit::default(),
+    );
     assert_eq!(
         eval_with_static_context("sin(30)", &context).unwrap(),
         Value::from(0.5)
@@ -446,7 +450,11 @@ fn sin() {
 
 #[test]
 fn cos() {
-    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    let context = Context::new(
+        settings::Rounding::default(),
+        settings::AngleUnit::Degree,
+        settings::DepthLimit::default(),
+    );
     assert_eq!(
         eval_with_static_context("cos(60)", &context).unwrap(),
         Value::from(0.5)
@@ -455,7 +463,11 @@ fn cos() {
 
 #[test]
 fn tan() {
-    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    let context = Context::new(
+        settings::Rounding::default(),
+        settings::AngleUnit::Degree,
+        settings::DepthLimit::default(),
+    );
     assert_eq!(
         eval_with_static_context("tan(45)", &context).unwrap(),
         Value::from(1)
@@ -464,7 +476,11 @@ fn tan() {
 
 #[test]
 fn asin() {
-    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    let context = Context::new(
+        settings::Rounding::default(),
+        settings::AngleUnit::Degree,
+        settings::DepthLimit::default(),
+    );
     assert_eq!(
         eval_with_static_context("asin(0.5)", &context).unwrap(),
         Value::from(30)
@@ -473,7 +489,11 @@ fn asin() {
 
 #[test]
 fn acos() {
-    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    let context = Context::new(
+        settings::Rounding::default(),
+        settings::AngleUnit::Degree,
+        settings::DepthLimit::default(),
+    );
     assert_eq!(
         eval_with_static_context("acos(0.5)", &context).unwrap(),
         Value::from(60)
@@ -482,7 +502,11 @@ fn acos() {
 
 #[test]
 fn atan() {
-    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    let context = Context::new(
+        settings::Rounding::default(),
+        settings::AngleUnit::Degree,
+        settings::DepthLimit::default(),
+    );
     assert_eq!(
         eval_with_static_context("atan(1)", &context).unwrap(),
         Value::from(45)
@@ -502,7 +526,11 @@ fn cosh_acosh() {
 #[test]
 fn tanh_atanh() {
     // Requires less precision, otherwise the test would fail
-    let context = Context::new(settings::Rounding::Round(4), settings::AngleUnit::default());
+    let context = Context::new(
+        settings::Rounding::Round(4),
+        settings::AngleUnit::default(),
+        settings::DepthLimit::default(),
+    );
     assert_eq!(
         eval_with_static_context("atanh(tanh(1))", &context).unwrap(),
         Value::from(1)
@@ -538,7 +566,11 @@ fn polar() {
 
 #[test]
 fn arg() {
-    let context = Context::new(settings::Rounding::default(), settings::AngleUnit::Degree);
+    let context = Context::new(
+        settings::Rounding::default(),
+        settings::AngleUnit::Degree,
+        settings::DepthLimit::default(),
+    );
     assert_eq!(
         eval_with_static_context("arg(1+i)", &context).unwrap(),
         Value::from(0.78539816)

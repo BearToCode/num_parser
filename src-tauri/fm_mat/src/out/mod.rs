@@ -80,6 +80,8 @@ pub enum ErrorType {
     EmptyUnion,
     /// Invalid request for a static context
     InvalidMutableContext { request: Request },
+    /// Reached maximum recursion depth.
+    RecursionDepthLimitReached { limit: u32 },
 
     /// An error wrapper to add additional information.
     ErrorDuring {

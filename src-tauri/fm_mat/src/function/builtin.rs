@@ -261,12 +261,12 @@ decl_func!(
 
 // LOGIC
 
-fn branch(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
-    let condition = arguments[0].eval(context, None)?.as_bool()?;
+fn branch(arguments: &Vec<Box<Expression>>, context: &Context, depth: u32) -> EvalResult<Value> {
+    let condition = arguments[0].eval(context, None, depth)?.as_bool()?;
     if condition {
-        Ok(arguments[1].eval(context, None)?)
+        Ok(arguments[1].eval(context, None, depth)?)
     } else {
-        Ok(arguments[2].eval(context, None)?)
+        Ok(arguments[2].eval(context, None, depth)?)
     }
 }
 

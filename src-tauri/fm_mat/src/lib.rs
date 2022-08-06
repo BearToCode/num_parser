@@ -158,7 +158,8 @@
 //! // Generate a custom context
 //! let mut custom = Context::new(
 //!     settings::Rounding::NoRounding,
-//!     settings::AngleUnit::Degree
+//!     settings::AngleUnit::Degree,
+//!     settings::DepthLimit::NoLimit
 //! );
 //! ```
 //!

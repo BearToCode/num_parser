@@ -4,6 +4,7 @@ use crate::{
     context::Context,
     function::builtin,
     out::{ErrorType, EvalResult},
+    settings,
     token::{
         self,
         tokentype::{IdentifierType, TokenType},
@@ -21,7 +22,9 @@ pub enum Request {
 impl Request {
     pub fn execute(&self, context: &mut Context) -> EvalResult<Option<Value>> {
         match self {
-            Self::Evaluation(expr) => Ok(Some(expr.eval(context, None)?.round(context.rounding))),
+            Self::Evaluation(expr) => {
+                Ok(Some(expr.eval(context, None, 0)?.round(context.rounding)))
+            }
             Self::FuncDeclaration(identifier, params, body) => {
                 if builtin::reserved_keywords().contains(&&identifier[..]) {
                     Err(ErrorType::ReservedVarName {
@@ -65,11 +68,28 @@ pub enum Expression {
 }
 
 impl Expression {
-    pub fn eval(&self, context: &Context, scope: Option<&Context>) -> EvalResult<Value> {
+    pub fn eval(
+        &self,
+        context: &Context,
+        scope: Option<&Context>,
+        depth: u32,
+    ) -> EvalResult<Value> {
+        let depth = depth + 1;
+
+        // Check depth limit
+        match context.depth_limit {
+            settings::DepthLimit::Limit(max) => {
+                if depth >= max {
+                    return Err(ErrorType::RecursionDepthLimitReached { limit: max });
+                }
+            }
+            settings::DepthLimit::NoLimit => (),
+        }
+
         match self {
             Self::Binary(left_expr, token_type, right_expr) => {
-                let left_value = (**left_expr).eval(context, scope)?;
-                let right_value = (**right_expr).eval(context, scope)?;
+                let left_value = (**left_expr).eval(context, scope, depth)?;
+                let right_value = (**right_expr).eval(context, scope, depth)?;
                 Ok(match token_type {
                     // Sum
                     TokenType::Plus => Value::add(left_value, right_value)?,
@@ -107,15 +127,15 @@ impl Expression {
             }
             Self::Unary(token_type, expr) => Ok(match token_type {
                 // Negate
-                TokenType::Minus => Value::negate(expr.eval(context, scope)?)?,
+                TokenType::Minus => Value::negate(expr.eval(context, scope, depth)?)?,
                 // Not
-                TokenType::Exclamation => Value::not(expr.eval(context, scope)?)?,
+                TokenType::Exclamation => Value::not(expr.eval(context, scope, depth)?)?,
                 _ => return Err(ErrorType::InvalidTokenPosition { token: *token_type }),
             }),
             Self::Union(expressions) => {
                 let mut vec = vec![];
                 for expr in expressions {
-                    vec.push(expr.eval(context, scope)?);
+                    vec.push(expr.eval(context, scope, depth)?);
                 }
                 if vec.len() == 1 {
                     Ok(vec[0].clone())
@@ -132,13 +152,13 @@ impl Expression {
                 // Check scope vars
                 if let Some(c) = scope {
                     if let Some(expr) = c.get_var(identifier) {
-                        return Ok(expr.eval(context, scope)?);
+                        return Ok(expr.eval(context, scope, depth)?);
                     }
                 }
 
                 // Check context
                 if let Some(expr) = context.get_var(identifier) {
-                    return Ok(expr.eval(context, scope)?);
+                    return Ok(expr.eval(context, scope, depth)?);
                 }
 
                 // Try to split the identifier, as it might have not been interpreted correctly
@@ -174,11 +194,12 @@ impl Expression {
                                 product = Value::mul(
                                     product,
                                     Self::Func(func_ident, vec![Box::new(Self::Var(i))])
-                                        .eval(context, scope)?,
+                                        .eval(context, scope, depth)?,
                                 )?;
                                 argument = Option::None;
                             } else {
-                                product = Value::mul(product, Self::Var(i).eval(context, scope)?)?;
+                                product =
+                                    Value::mul(product, Self::Var(i).eval(context, scope, depth)?)?;
                             }
                         }
                     }
@@ -195,7 +216,7 @@ impl Expression {
             Self::Func(identifier, arguments) => {
                 // Check built-in functions
                 if let Some(func) = builtin::get_built_in_function(identifier) {
-                    return Ok(func.call(arguments, context, scope)?);
+                    return Ok(func.call(arguments, context, scope, depth)?);
                 }
                 // Check user-defined ones
                 if let Some((names, body)) = context.get_function(&identifier) {
@@ -204,7 +225,7 @@ impl Expression {
                         // Retrieve the parameters values
                         let params = match value_to_params(
                             names,
-                            &Expression::Union(arguments.clone()).eval(context, scope)?,
+                            &Expression::Union(arguments.clone()).eval(context, scope, depth)?,
                         ) {
                             Ok(value) => value,
                             Err(err) => {
@@ -235,7 +256,7 @@ impl Expression {
                         None => (),
                     };
 
-                    return Ok(body.eval(context, Some(&inner_scope))?);
+                    return Ok(body.eval(context, Some(&inner_scope), depth)?);
                 }
 
                 // Try to split the identifier, as it might have not been interpreted correctly
@@ -274,13 +295,13 @@ impl Expression {
                                 product = Value::mul(
                                     product,
                                     Self::Func(func_ident, vec![Box::new(Self::Var(i.clone()))])
-                                        .eval(context, scope)?,
+                                        .eval(context, scope, depth)?,
                                 )?;
                                 argument = Option::None;
                             } else {
                                 product = Value::mul(
                                     product,
-                                    Self::Var(i.clone()).eval(context, scope)?,
+                                    Self::Var(i.clone()).eval(context, scope, depth)?,
                                 )?;
                             }
                         }
@@ -294,7 +315,7 @@ impl Expression {
                 if valid && last_i_type == IdentifierType::Function {
                     Value::mul(
                         product,
-                        Self::Func(last_i, arguments.clone()).eval(context, scope)?,
+                        Self::Func(last_i, arguments.clone()).eval(context, scope, depth)?,
                     )
                 } else {
                     Err(ErrorType::UnknownFunction {

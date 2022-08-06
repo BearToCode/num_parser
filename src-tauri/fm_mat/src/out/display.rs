@@ -79,6 +79,9 @@ impl fmt::Display for ErrorType {
                 "INTERNAL ERROR: request `{}` is not valid for a static context",
                 request
             ),
+            RecursionDepthLimitReached { limit } => {
+                write!(f, "INTERNAL ERROR: maximum depth reached: {}.", limit)
+            }
 
             ErrorDuring {
                 operation_name,

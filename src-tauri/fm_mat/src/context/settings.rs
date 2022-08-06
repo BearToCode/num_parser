@@ -14,7 +14,8 @@ use crate::{EvalResult, Value};
 ///
 /// let my_context = Context::new(
 ///     settings::Rounding::Round(4),
-///     settings::AngleUnit::default()
+///     settings::AngleUnit::default(),
+///     settings::DepthLimit::default()
 /// );
 ///
 /// ```
@@ -42,7 +43,8 @@ impl Rounding {
 ///
 /// let my_context = Context::new(
 ///     settings::Rounding::default(),
-///     settings::AngleUnit::Degree // Or Radian or Turn
+///     settings::AngleUnit::Degree, // Or Radian or Turn
+///     settings::DepthLimit::default()
 /// );
 ///
 /// ```
@@ -58,7 +60,7 @@ pub enum AngleUnit {
 }
 
 impl AngleUnit {
-    /// Returns the angle unit default value
+    /// Returns the angle unit default value.
     pub fn default() -> Self {
         AngleUnit::Radian
     }
@@ -80,5 +82,37 @@ impl AngleUnit {
                 .div(Value::from(consts::PI))?
                 .mul(Value::from(0.5))?,
         })
+    }
+}
+
+/// The depth limit.
+///
+/// ## Examples
+/// ```
+/// use fm_mat::*;
+///
+/// let my_context = Context::new(
+///     settings::Rounding::default(),
+///     settings::AngleUnit::default(),
+///     settings::DepthLimit::Limit(10)
+/// );
+///
+/// ```
+#[derive(Clone, Copy, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub enum DepthLimit {
+    /// An iteration limit.
+    Limit(u32),
+    /// No limit.
+    ///
+    /// **WARNING**: disabling limit prevents recursion control and may cause
+    /// the stack to overflow causing the program to panic.
+    NoLimit,
+}
+
+impl DepthLimit {
+    /// Return the depth limit default value.
+    pub fn default() -> Self {
+        DepthLimit::Limit(49)
     }
 }

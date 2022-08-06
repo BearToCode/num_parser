@@ -10,12 +10,18 @@ use self::settings::Rounding;
 #[derive(Debug, Clone)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Context {
+    /// Function declared by the user at runtime.
     pub functions: HashMap<String, (Vec<String>, Box<Expression>)>,
+    /// Variables declared by the user at runtime.
     pub variables: HashMap<String, Box<Expression>>,
 
     // Settings
+    /// The decimal digits to display.
     pub rounding: settings::Rounding,
+    /// The angle unit to use.
     pub angle_unit: settings::AngleUnit,
+    /// Depth limit for recursion control. .
+    pub depth_limit: settings::DepthLimit,
 }
 
 impl Context {
@@ -26,16 +32,22 @@ impl Context {
             variables: HashMap::new(),
             rounding: settings::Rounding::default(),
             angle_unit: settings::AngleUnit::default(),
+            depth_limit: settings::DepthLimit::default(),
         }
     }
 
     /// Generates an empty context.
-    pub fn new(rounding: Rounding, angle_unit: settings::AngleUnit) -> Self {
+    pub fn new(
+        rounding: Rounding,
+        angle_unit: settings::AngleUnit,
+        depth_limit: settings::DepthLimit,
+    ) -> Self {
         Self {
             functions: HashMap::new(),
             variables: HashMap::new(),
             rounding,
             angle_unit,
+            depth_limit,
         }
     }
 

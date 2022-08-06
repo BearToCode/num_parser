@@ -155,7 +155,7 @@ pub struct Function {
     /// The identifier needed to call this function.
     pub func_identifier: &'static str,
     /// The actual function.
-    pub func: fn(&Vec<Box<Expression>>, &Context) -> EvalResult<Value>,
+    pub func: fn(&Vec<Box<Expression>>, &Context, u32) -> EvalResult<Value>,
     /// The function arguments type.
     pub args: Arguments,
 }
@@ -186,7 +186,7 @@ impl Function {
     /// Creates a new function with the specified data.
     pub fn new(
         func_identifier: &'static str,
-        func: fn(&Vec<Box<Expression>>, &Context) -> EvalResult<Value>,
+        func: fn(&Vec<Box<Expression>>, &Context, u32) -> EvalResult<Value>,
         args: Arguments,
     ) -> Self {
         Self {
@@ -202,6 +202,7 @@ impl Function {
         arguments: &Vec<Box<Expression>>,
         context: &Context,
         scope: Option<&Context>,
+        depth: u32,
     ) -> EvalResult<Value> {
         match self.args {
             Arguments::Const(count) => {
@@ -222,7 +223,7 @@ impl Function {
             joined_context.join_with(c);
         }
 
-        (self.func)(arguments, &joined_context)
+        (self.func)(arguments, &joined_context, depth)
     }
 }
 
@@ -272,8 +273,12 @@ where
 /// Arguments are actually expressions. This function calculates all of them and returns a `Value`,
 /// which can be either a `VectorType` with all the values inside, or any other type if the argument
 /// was just one.
-pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
-    Expression::Union(arguments.clone()).eval(context, None)
+pub fn unbox_parameters(
+    arguments: &Vec<Box<Expression>>,
+    context: &Context,
+    depth: u32,
+) -> EvalResult<Value> {
+    Expression::Union(arguments.clone()).eval(context, None, depth)
 }
 
 /// Given a function name, a `FunctionType`, a predicate and a target `ValueType` declares a function. It generates
@@ -315,8 +320,8 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
 /// ```
 /// use fm_mat::{*, function::*};
 ///
-/// fn hypotenuse(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
-///     let unboxed = unbox_parameters(arguments, context)?;
+/// fn hypotenuse(arguments: &Vec<Box<Expression>>, context: &Context, depth: u32) -> EvalResult<Value> {
+///     let unboxed = unbox_parameters(arguments, context, depth)?;
 ///     type_wrapper(
 ///         unboxed,
 ///         FunctionType::Std,
@@ -341,8 +346,12 @@ pub fn unbox_parameters(arguments: &Vec<Box<Expression>>, context: &Context) -> 
 #[macro_export]
 macro_rules! decl_func {
     ( $identifier:ident, $func_type:expr, $predicate:expr, $target:expr ) => {
-        fn $identifier(arguments: &Vec<Box<Expression>>, context: &Context) -> EvalResult<Value> {
-            let unboxed = unbox_parameters(arguments, context)?;
+        fn $identifier(
+            arguments: &Vec<Box<Expression>>,
+            context: &Context,
+            depth: u32,
+        ) -> EvalResult<Value> {
+            let unboxed = unbox_parameters(arguments, context, depth)?;
             type_wrapper(unboxed, $func_type, $target, context, $predicate)
         }
     };
@@ -392,9 +401,9 @@ macro_rules! read_vec_values {
 ///
 /// See `Function::new` for additional information.
 ///
-/// The created `Function` has the same name as the provided function. The provided function
-/// needs `&Vec<Box<Expression>>` and a `&Context` as parameters and returns an `EvalResult<Values>`.
-/// You can easily declare one using the `decl_func!` macro.
+/// The generated `Function` has the same name as the provided function. The provided function
+/// needs `&Vec<Box<Expression>>`, a `&Context` and a u32 (for depth controls) as parameters and
+/// returns an `EvalResult<Values>`. You can easily declare one using the `decl_func!` macro.
 ///
 /// ## Examples
 /// ```

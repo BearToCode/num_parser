@@ -42,7 +42,8 @@ pub fn eval(input: &str) -> EvalResult<Value> {
 /// // Create context with custom settings
 /// let context = Context::new(
 ///     settings::Rounding::Round(2),
-///     settings::AngleUnit::Turn
+///     settings::AngleUnit::Turn,
+///     settings::DepthLimit::Limit(500)
 /// );
 ///
 /// let res = eval_with_static_context("pi + 1", &context).unwrap();
