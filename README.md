@@ -156,7 +156,15 @@ as settings. They can be created as follows:
 ```rust
 use num_parser::*;
 
-let mut my_context = Context::new(settings::Rounding::Round(8));
+// Generate the default context
+let mut default = Context::default();
+
+// Generate a custom context
+let mut custom = Context::new(
+    settings::Rounding::NoRounding,
+    settings::AngleUnit::Degree,
+    settings::DepthLimit::NoLimit
+);
 ```
 
 ### Serde
