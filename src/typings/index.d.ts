@@ -3,6 +3,8 @@ declare module 'svelte-icons-pack';
 declare module 'svelte-icons-pack/Icon.svelte';
 declare module 'svelte-icons-pack/ai/AiOutlineFunction';
 declare module 'svelte-icons-pack/ai/AiOutlineAppstore';
+declare module 'svelte-icons-pack/hi/HiOutlineFolderOpen';
+declare module 'svelte-icons-pack/hi/HiOutlineCubeTransparent';
 declare module 'svelte-icons-pack/bs/BsBraces';
 declare module 'svelte-icons-pack/io/IoDocumentText';
 declare module 'svelte-icons-pack/bi/BiCube';

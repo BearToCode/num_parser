@@ -9,12 +9,12 @@
 	import NavbarItem from './lib/nav/navbar-item.svelte';
 
 	// icons
-	import Icon from 'svelte-icons-pack';
-	import AiOutlineFunction from 'svelte-icons-pack/ai/AiOutlineFunction';
+	import Icon from '@components/common/icon.svelte';
+	import HiOutlineFolderOpen from 'svelte-icons-pack/hi/HiOutlineFolderOpen';
 	import AiOutlineAppstore from 'svelte-icons-pack/ai/AiOutlineAppstore';
 	import BsBraces from 'svelte-icons-pack/bs/BsBraces';
 	import IoDocumentText from 'svelte-icons-pack/io/IoDocumentText';
-	import BiCube from 'svelte-icons-pack/bi/BiCube';
+	import HiOutlineCubeTransparent from 'svelte-icons-pack/hi/HiOutlineCubeTransparent';
 
 	export let url = '';
 </script>
@@ -23,19 +23,19 @@
 	<Layout>
 		<div slot="links" class="flex flex-col">
 			<NavbarItem to="/2d">
-				<Icon color="currentcolor" src={AiOutlineFunction} />
+				<Icon src={HiOutlineFolderOpen} />
 			</NavbarItem>
 			<NavbarItem to="/3d">
-				<Icon color="currentcolor" src={BiCube} />
+				<Icon src={HiOutlineCubeTransparent} />
 			</NavbarItem>
 			<NavbarItem to="/code">
-				<Icon color="currentcolor" src={BsBraces} />
+				<Icon src={BsBraces} />
 			</NavbarItem>
 			<NavbarItem to="/document">
-				<Icon color="currentcolor" src={IoDocumentText} />
+				<Icon src={IoDocumentText} />
 			</NavbarItem>
 			<NavbarItem to="/addons">
-				<Icon color="currentcolor" src={AiOutlineAppstore} />
+				<Icon src={AiOutlineAppstore} />
 			</NavbarItem>
 		</div>
 
