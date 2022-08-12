@@ -1,6 +1,6 @@
 [package]
 name = "num_parser"
-version = "0.0.1"
+version = "1.0.0"
 description = "A math interpreter and evaluator"
 keywords = ["math", "parser", "evaluator", "complex", "analysis"]
 categories = ["mathematics", "parsing"]
