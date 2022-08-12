@@ -3,7 +3,7 @@
 //! 
 //! [![crate](https://img.shields.io/crates/v/num_parser)](https://crates.io/crates/num_parser)
 //! [![license](https://img.shields.io/github/license/BearToCode/num_parser)](https://github.com/BearToCode/num_parser/blob/master/LICENSE)
-//! [![docs](https://img.shields.io/docsrs/num_parser)](https://docs.rs/num_parser/1.0.1/num_parser/)
+//! [![docs](https://img.shields.io/docsrs/num_parser)](https://docs.rs/num_parser/1.0.2/num_parser/)
 //! 
 //! **num_parser** allows you to easily **parse** strings into math expressions
 //! and **evaluate** them.
