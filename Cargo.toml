@@ -1,0 +1,28 @@
+[package]
+name = "num_parser"
+version = "0.0.1"
+description = "A math interpreter and evaluator"
+keywords = ["math", "parser", "evaluator", "complex", "analysis"]
+categories = ["mathematics", "parsing"]
+edition = "2021"
+repository = "https://github.com/BearToCode/num_parser.git"
+homepage = "https://github.com/BearToCode/num_parser"
+documentation = "https://docs.rs/num_parser"
+readme = "README.md"
+license = "MIT"
+authors = ["BearToCode"]
+
+[lib]
+name = "num_parser"
+"path" = "src/lib.rs"
+
+[features]
+serde_support = ["serde"]
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"], optional = true }
+num = { version = "0.4.0", features = ["serde"] }
+lazy_static = "1.4.0"
+itertools = "0.10.3"
+tuple-conv = "1.0.1"
+rand = "0.8.5"
